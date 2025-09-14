@@ -1,31 +1,7 @@
-import { Globe, Calendar, Smartphone, Layers } from 'lucide-react';
+import { Globe, Calendar, Smartphone, Layers } from "lucide-react";
 
-const LimitedTimeOffers = () => {
+const GlobaleSIMs = () => {
   const offers = [
-    {
-      company: "Airalo",
-      coverage: "137 Countries",
-      duration: "365 Days",
-      data: "50 GB",
-      originalPrice: 53,
-      discountedPrice: 50.7,
-    },
-    {
-      company: "Globetrotter",
-      coverage: "120 Countries",
-      duration: "180 Days",
-      data: "30 GB",
-      originalPrice: 45,
-      discountedPrice: 42.5,
-    },
-    {
-      company: "ConnectSphere",
-      coverage: "150 Countries",
-      duration: "90 Days",
-      data: "20 GB",
-      originalPrice: 35,
-      discountedPrice: 33.0,
-    },
     {
       company: "RoamFree",
       coverage: "100 Countries",
@@ -51,16 +27,19 @@ const LimitedTimeOffers = () => {
       discountedPrice: 75.0,
     },
   ];
-
   return (
-    <div className="mt-10">
-      <h1 className="text-3xl font-medium mb-4">Limited Time Offers</h1>
+    <div className="md:mt-16 mt-7">
+      <h1 className="text-3xl font-medium">Global eSIMs</h1>
+      <p className="text-gray-600 mb-4">
+        Discover our range of global eSIMs for seamless connectivity while
+        traveling.
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
         {offers.map((offer, index) => (
           <div
             key={index}
-            className="rounded-2xl border border-gray-200 p-6 shadow-sm"
+            className="rounded-3xl border border-gray-200 p-6 bg-[#FFF6ED]"
           >
             {/* Header with logo and sale badge */}
             <div className="flex items-center justify-between mb-8">
@@ -95,7 +74,10 @@ const LimitedTimeOffers = () => {
               {/* Duration */}
               <div className="flex items-center justify-between border-b pb-2 border-gray-300">
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+                  <Calendar
+                    className="w-5 h-5 text-gray-400"
+                    strokeWidth={1.5}
+                  />
                   <span className="text-gray-600 text-lg">Duration</span>
                 </div>
                 <span className="text-gray-900 text-lg font-semibold">
@@ -106,7 +88,10 @@ const LimitedTimeOffers = () => {
               {/* Data */}
               <div className="flex items-center justify-between border-b pb-2 border-gray-300">
                 <div className="flex items-center gap-3">
-                  <Smartphone className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+                  <Smartphone
+                    className="w-5 h-5 text-gray-400"
+                    strokeWidth={1.5}
+                  />
                   <span className="text-gray-600 text-lg">Data</span>
                 </div>
                 <span className="text-gray-900 text-lg font-semibold">
@@ -143,4 +128,4 @@ const LimitedTimeOffers = () => {
   );
 };
 
-export default LimitedTimeOffers;
+export default GlobaleSIMs;

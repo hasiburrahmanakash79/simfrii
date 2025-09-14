@@ -10,7 +10,7 @@ import banner from "../../assets/images/footer.svg";
 
 const Footer = () => {
   return (
-    <footer className="bg-white md:pt-16 pt-7">
+    <footer className="bg-white pt-7">
       <div className="px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 container mx-auto">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-6 lg:space-y-0">

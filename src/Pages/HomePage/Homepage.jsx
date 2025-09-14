@@ -1,3 +1,4 @@
+import GlobaleSIMs from "./GlobaleSIMs/GlobaleSIMs";
 import Hero from "./Hero/Hero";
 import LimitedTimeOffers from "./LimitedTimeOffers/LimitedTimeOffers";
 import PopularCountries from "./PopularCountries/PopularCountries";
@@ -13,6 +14,7 @@ const Homepage = () => {
         <PopularCountries />
         <Regions />
         <LimitedTimeOffers />
+        <GlobaleSIMs />
       </div>
     </div>
   );
