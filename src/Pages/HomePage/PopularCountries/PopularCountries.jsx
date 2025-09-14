@@ -779,15 +779,15 @@ const PopularCountries = () => {
   ];
 
   const sliceCountries = countries.slice(0, 16); 
-  
+
   return (
     <div className="my-10">
       <h2 className="text-3xl font-medium mb-4">Popular Countries</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-6 ">
         {sliceCountries.map((country, index) => (
           <div
             key={index}
-            className="flex items-center gap-5 border border-gray-300 p-4 rounded-xl mb-4 shadow-lg"
+            className="flex items-center gap-5 border border-gray-300 p-4 rounded-xl mb-4 shadow-lg hover:scale-105 transition-transform cursor-pointer"
           >
             <img
               src={country.flag}
@@ -799,7 +799,7 @@ const PopularCountries = () => {
         ))}
       </div>
       <div className="flex justify-center mt-6">
-        <button className="border border-gray-300 px-10 py-4 rounded-lg shadow-lg">
+        <button className="border border-gray-300 px-10 py-4 rounded-lg shadow-lg hover:scale-105 transition-transform cursor-pointer">
           See all 200+ countries
         </button>
       </div>

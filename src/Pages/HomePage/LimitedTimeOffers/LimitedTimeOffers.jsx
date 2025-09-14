@@ -1,4 +1,5 @@
 import { Globe, Calendar, Smartphone, Layers } from 'lucide-react';
+import eSime from '../../../assets/icons/eSim.svg';
 
 const LimitedTimeOffers = () => {
   const offers = [
@@ -65,10 +66,8 @@ const LimitedTimeOffers = () => {
             {/* Header with logo and sale badge */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-400 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">
-                    {offer.company[0].toLowerCase()}
-                  </span>
+                <div>
+                    <img src={eSime} alt="" className="w-10 h-10" />
                 </div>
                 <h2 className="text-2xl font-semibold text-gray-900">
                   {offer.company}
