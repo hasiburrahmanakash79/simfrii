@@ -820,7 +820,6 @@ const AllCountries = () => {
             <p className="">{country.name}</p>
           </Link>
         ))}
-        :
         {filteredCountries.length === 0 && (
           <p className="text-center col-span-full text-gray-500">
             No countries found.

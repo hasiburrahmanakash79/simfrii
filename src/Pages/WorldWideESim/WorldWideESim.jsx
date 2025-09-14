@@ -1,15 +1,17 @@
 import { useState } from "react";
 import banner from "../../assets/images/travelBG.jpg";
 import AllCountries from "./AllCountries";
+import Regions from "../HomePage/Regions/Regions";
+import GlobaleSIMs from "../HomePage/GlobaleSIMs/GlobaleSIMs";
 
 const WorldWideESim = () => {
   const tabs = [
     { label: "All Countries", value: "countries", content: <AllCountries/> },
-    { label: "Regions", value: "regions", content: <> History</> },
+    { label: "Regions", value: "regions", content: <Regions/> },
     {
       label: "Global eSIMs",
       value: "global",
-      content: <>global</>,
+      content: <GlobaleSIMs/>,
     },
   ];
 

@@ -53,7 +53,7 @@ const LimitedTimeOffers = () => {
   ];
 
   return (
-    <div className="mt-10">
+    <div className="my-10">
       <h1 className="text-3xl font-medium mb-4">Limited Time Offers</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">

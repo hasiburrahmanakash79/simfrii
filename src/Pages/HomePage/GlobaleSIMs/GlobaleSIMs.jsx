@@ -29,7 +29,7 @@ const GlobaleSIMs = () => {
   ];
 
   return (
-    <div className="md:mt-16 mt-7">
+    <div className="my-10">
       <h1 className="text-3xl font-medium">Global eSIMs</h1>
       <p className="text-gray-600 mb-4">
         Discover our range of global eSIMs for seamless connectivity while
