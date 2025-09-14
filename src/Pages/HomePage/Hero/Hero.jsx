@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import banner from "../../../assets/images/bannerImage.svg";
 
 const Hero = () => {
@@ -20,7 +21,7 @@ const Hero = () => {
             Keep control of your expenses with affordable eSIM packs and no roaming fees
           </p>
           <button className="mt-10 inline-block hover:scale-105 transition-transform">
-            <span className="bg-[#8C4B09]  text-white py-3 px-10 rounded-full  text-base sm:text-lg md:text-xl font-medium">View All</span>
+            <Link to='/worldwide' className="bg-[#8C4B09]  text-white py-3 px-10 rounded-full  text-base sm:text-lg md:text-xl font-medium">View All</Link>
           </button>
         </div>
       </div>
