@@ -1,4 +1,5 @@
 import Hero from "./Hero/Hero";
+import LimitedTimeOffers from "./LimitedTimeOffers/LimitedTimeOffers";
 import PopularCountries from "./PopularCountries/PopularCountries";
 import Regions from "./Regions/Regions";
 import RewardOffer from "./RewardOffer/RewardOffer";
@@ -11,6 +12,7 @@ const Homepage = () => {
         <RewardOffer />
         <PopularCountries />
         <Regions />
+        <LimitedTimeOffers />
       </div>
     </div>
   );
