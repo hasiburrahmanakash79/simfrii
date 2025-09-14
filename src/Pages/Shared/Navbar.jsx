@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isLoggedIn = true;
-  const userImage = "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
+  const userImage =
+    "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -16,21 +18,35 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg fixed w-full top-0 z-50">
+    <nav className="bg-white border border-gray-100 fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between md:grid grid-cols-3 items-center">
-        <div className="text-2xl font-bold text-orange-600 tracking-tight">SimFrii.com</div>
-        
+        <div className="text-2xl font-bold text-orange-600 tracking-tight">
+          SimFrii.com
+        </div>
+
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center justify-center space-x-8">
-          <a href="#" className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium">Home</a>
-          <a href="#" className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium">My eSIMs</a>
-          <a href="#" className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium">Support</a>
-          <select className="text-gray-700 bg-transparent border-none focus:outline-none font-medium">
-            <option>EN | USD</option>
-            <option>ES | EUR</option>
-            <option>FR | EUR</option>
-          </select>
-          
+          <Link
+            to="/"
+            className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium"
+          >
+            Home
+          </Link>
+          <Link
+            to="/"
+            className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium"
+          >
+            My eSIMs
+          </Link>
+          <Link
+            to="/"
+            className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium"
+          >
+            Support
+          </Link>
+          <Link className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium">
+            EN | USD
+          </Link>
         </div>
 
         {/* Desktop Sign In / User Image */}
@@ -41,8 +57,19 @@ const Navbar = () => {
               placeholder="Search"
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300"
             />
-            <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <svg
+              className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
             </svg>
           </div>
           {isLoggedIn ? (
@@ -65,8 +92,19 @@ const Navbar = () => {
             className="text-gray-700 focus:outline-none"
             aria-label="Toggle menu"
           >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}></path>
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+              ></path>
             </svg>
           </button>
         </div>
@@ -85,8 +123,19 @@ const Navbar = () => {
             className="self-end text-gray-700 focus:outline-none"
             aria-label="Close menu"
           >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
             </svg>
           </button>
           <a
@@ -121,8 +170,19 @@ const Navbar = () => {
               placeholder="Search"
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full outline-none transition-all duration-300"
             />
-            <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <svg
+              className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
             </svg>
           </div>
           {isLoggedIn ? (

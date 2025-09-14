@@ -4,6 +4,7 @@ import SignIn from "../Pages/Authentication/SignIn";
 import Main from "../Layouts/Main";
 import Homepage from "../Pages/HomePage/Homepage";
 import OtpVerification from "../Pages/Authentication/OtpVerification";
+import WorldWideESim from "../Pages/WorldWideESim/WorldWideESim";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,54 +14,13 @@ const router = createBrowserRouter([
         path: "/",
         element: <Homepage />,
       },
+      {
+        path: "/worldwide",
+        element: <WorldWideESim />,
+      },
     ],
   },
-  // {
-  //   path: "/admin",
-  //   element: <Dashboard />,
-  //   children: [
-  //     {
-  //       path: "dashboard",
-  //       element: <AdminOverview/>
-  //     },
-  //     {
-  //       path: "user",
-  //       element: <AllUser/>
-  //     },
-  //     {
-  //       path: "userDetail/:id",
-  //       element: <UserDetail/>
-  //     },
-  //     {
-  //       path: "order",
-  //       element: <OrderList/>
-  //     },
-  //     {
-  //       path: "order-details/:id",
-  //       element: <OrderDetailPage/>
-  //     },
-  //     {
-  //       path: "service",
-  //       element: <AllService/>
-  //     },
-  //     {
-  //       path: "request",
-  //       element: <SellerRequest/>
-  //     },
-  //     {
-  //       path: "request-details/:id",
-  //       element: <RequestDetails/>
-  //     },
-  //     {
-  //       path: "content",
-  //       element: <ContentPage/>
-  //     },
-  //     {
-  //       path: "add-privacy",
-  //       element: <PrivacyPolicyUpload/>
-  //     },
-  //   ],
-  // },
+
   {
     path: "/signin",
     element: <SignIn />,
