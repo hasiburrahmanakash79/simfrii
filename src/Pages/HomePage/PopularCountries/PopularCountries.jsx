@@ -787,7 +787,7 @@ const PopularCountries = () => {
         {sliceCountries.map((country, index) => (
           <div
             key={index}
-            className="flex items-center gap-5 border border-gray-300 p-4 rounded-xl mb-4 shadow-lg hover:scale-105 transition-transform cursor-pointer"
+            className="flex items-center gap-5 border border-gray-300 p-4 rounded-xl mb-4 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
           >
             <img
               src={country.flag}
@@ -799,7 +799,7 @@ const PopularCountries = () => {
         ))}
       </div>
       <div className="flex justify-center mt-6">
-        <button className="border border-gray-300 px-10 py-4 rounded-lg shadow-lg hover:scale-105 transition-transform cursor-pointer">
+        <button className="border border-gray-300 px-10 py-4 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">
           See all 200+ countries
         </button>
       </div>

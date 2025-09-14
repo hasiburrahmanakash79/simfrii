@@ -27,6 +27,7 @@ const GlobaleSIMs = () => {
       discountedPrice: 75.0,
     },
   ];
+
   return (
     <div className="md:mt-16 mt-7">
       <h1 className="text-3xl font-medium">Global eSIMs</h1>
@@ -45,6 +46,11 @@ const GlobaleSIMs = () => {
             data={offer.data}
             originalPrice={offer.originalPrice}
             discountedPrice={offer.discountedPrice}
+            bgColor="bg-[#FFF6ED]"
+            buttonGradientFrom="orange-400"
+            buttonGradientTo="orange-500"
+            saleBadgeGradientFrom="orange-400"
+            saleBadgeGradientTo="orange-500"
           />
         ))}
       </div>

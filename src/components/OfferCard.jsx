@@ -1,7 +1,6 @@
 import { Globe, Calendar, Smartphone, Layers } from "lucide-react";
-import eSime from '../assets/icons/eSim.svg';
+import eSime from "../assets/icons/eSim.svg";
 
-// OfferCard component to render a single offer card
 const OfferCard = ({
   company,
   coverage,
@@ -9,9 +8,16 @@ const OfferCard = ({
   data,
   originalPrice,
   discountedPrice,
+  bgColor,
+  buttonGradientFrom,
+  buttonGradientTo,
+  saleBadgeGradientFrom,
+  saleBadgeGradientTo,
 }) => {
   return (
-    <div className="rounded-2xl border border-gray-200 p-6 shadow-sm">
+    <div
+      className={`rounded-2xl border border-gray-200 p-6 shadow-sm ${bgColor}`}
+    >
       {/* Header with logo and sale badge */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -20,7 +26,9 @@ const OfferCard = ({
           </div>
           <h2 className="text-2xl font-semibold text-gray-900">{company}</h2>
         </div>
-        <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-medium">
+        <div
+          className={`bg-gradient-to-r from-${saleBadgeGradientFrom} to-${saleBadgeGradientTo} text-white px-4 py-1.5 rounded-full text-sm font-medium`}
+        >
           ON SALE
         </div>
       </div>
@@ -77,7 +85,9 @@ const OfferCard = ({
       </div>
 
       {/* Buy now button */}
-      <button className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-all duration-200 shadow-lg">
+      <button
+        className={`w-full bg-gradient-to-r from-${buttonGradientFrom} to-${buttonGradientTo} hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer`}
+      >
         Buy now
       </button>
     </div>
