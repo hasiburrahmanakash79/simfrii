@@ -5,6 +5,7 @@ import Main from "../Layouts/Main";
 import Homepage from "../Pages/HomePage/Homepage";
 import OtpVerification from "../Pages/Authentication/OtpVerification";
 import WorldWideESim from "../Pages/WorldWideESim/WorldWideESim";
+import CountryEsim from "../Pages/WorldWideESim/CountryEsim";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
         path: "/worldwide",
         element: <WorldWideESim />,
       },
+      {
+        path: "/worldwide-esim/:countryName",
+        element: <CountryEsim />,
+      }
     ],
   },
 

@@ -1,4 +1,4 @@
-
+import { useNavigate } from 'react-router-dom';
 import africa from '../../../assets/map/african.svg';
 import asia from '../../../assets/map/asia.svg';
 import europe from '../../../assets/map/europe.svg';
@@ -8,6 +8,8 @@ import southAmerica from '../../../assets/map/southAmerica.svg';
 import RegionCard from '../../../components/RegionCard';
 
 const Regions = () => {
+  const navigate = useNavigate();
+
   const regions = [
     { name: 'Africa', image: africa, bgColor: 'bg-[#F8FFCD]' },
     { name: 'Asia', image: asia, bgColor: 'bg-[#FFEAFD]' },
@@ -16,6 +18,12 @@ const Regions = () => {
     { name: 'North America', image: northAmerica, bgColor: 'bg-[#FFE2E2]' },
     { name: 'South America', image: southAmerica, bgColor: 'bg-[#C4FDFF]' },
   ];
+
+  const handleRegionClick = (regionName, bgColor) => {
+    if (regionName.toLowerCase() === regionName) {
+      navigate(`/regions/${regionName.toLowerCase()}`, { state: { bgColor } });
+    }
+  };
 
   return (
     <div className="my-10">
@@ -27,6 +35,7 @@ const Regions = () => {
             name={region.name}
             image={region.image}
             bgColor={region.bgColor}
+            onClick={() => handleRegionClick(region.name, region.bgColor)}
           />
         ))}
       </div>

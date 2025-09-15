@@ -787,7 +787,10 @@ const PopularCountries = () => {
       <h2 className="text-3xl font-medium mb-4">Popular Countries</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-6 ">
         {sliceCountries.map((country, index) => (
-          <div
+          <Link
+            to={`/worldwide-esim/${country.name
+              .replace(/\s+/g, "-")
+              .toLowerCase()}`}
             key={index}
             className="flex items-center gap-5 border border-gray-300 p-4 rounded-xl mb-4 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
           >
@@ -797,7 +800,7 @@ const PopularCountries = () => {
               className="h-10 w-10 rounded-full object-cover"
             />
             <p className="">{country.name}</p>
-          </div>
+          </Link>
         ))}
       </div>
       <div className="flex justify-center mt-6">

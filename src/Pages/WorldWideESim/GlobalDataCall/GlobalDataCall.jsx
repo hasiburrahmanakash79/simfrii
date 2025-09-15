@@ -1,16 +1,17 @@
-import { Filter, X } from 'lucide-react';
-import CallTextCard from './CallTextCard';
-import DataCard from './DataCard';
-import { useState } from 'react';
-import useModal from '../../../components/modal/useModal';
+import { X } from "lucide-react";
+import CallTextCard from "./CallTextCard";
+import DataCard from "./DataCard";
+import { useState } from "react";
+import useModal from "../../../components/modal/useModal";
+import filter from "../../../assets/icons/filter.svg";
 
 const GlobalDataCall = () => {
   const tabs = [
-    { label: 'Data', value: 'data', content: <DataCard /> },
-    { label: 'Data/Text/Call', value: 'callText', content: <CallTextCard /> },
+    { label: "Data", value: "data", content: <DataCard /> },
+    { label: "Data/Text/Call", value: "callText", content: <CallTextCard /> },
   ];
 
-  const [activeTab, setActiveTab] = useState('data');
+  const [activeTab, setActiveTab] = useState("data");
   const [priceRange, setPriceRange] = useState({ min: 10, max: 150 });
   const [sortOrder, setSortOrder] = useState(null);
   const { isOpen, openModal, closeModal } = useModal();
@@ -30,11 +31,12 @@ const GlobalDataCall = () => {
     // Pass filter parameters to child components
     // This assumes DataCard and CallTextCard accept these props
     tabs.forEach((tab) => {
-      tab.content = tab.value === 'data' ? (
-        <DataCard priceRange={priceRange} sortOrder={sortOrder} />
-      ) : (
-        <CallTextCard priceRange={priceRange} sortOrder={sortOrder} />
-      );
+      tab.content =
+        tab.value === "data" ? (
+          <DataCard priceRange={priceRange} sortOrder={sortOrder} />
+        ) : (
+          <CallTextCard priceRange={priceRange} sortOrder={sortOrder} />
+        );
     });
     closeModal();
   };
@@ -64,16 +66,19 @@ const GlobalDataCall = () => {
                 onClick={() => setActiveTab(tab.value)}
                 className={`px-10 py-3 mx-1 rounded-md text-xm transition-all duration-500 cursor-pointer ${
                   activeTab === tab.value
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-black hover:bg-white/60'
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black hover:bg-white/60"
                 }`}
               >
                 {tab.label}
               </button>
             ))}
           </div>
-          <div className="bg-[#FDF8DB] p-3 rounded-lg cursor-pointer" onClick={openModal}>
-            <Filter className="w-10 h-10 text-gray-600" strokeWidth={1} />
+          <div
+            className="bg-[#FDF8DB] p-5 rounded-lg cursor-pointer"
+            onClick={openModal}
+          >
+            <img src={filter} alt="" />
           </div>
         </div>
       </div>
@@ -94,17 +99,21 @@ const GlobalDataCall = () => {
             <div className="space-y-4">
               <button
                 className={`w-full text-left text-gray-800 p-2 rounded border border-gray-200 ${
-                  sortOrder === 'lowToHigh' ? 'bg-gray-100' : 'hover:bg-gray-100'
+                  sortOrder === "lowToHigh"
+                    ? "bg-gray-100"
+                    : "hover:bg-gray-100"
                 }`}
-                onClick={() => handleSort('lowToHigh')}
+                onClick={() => handleSort("lowToHigh")}
               >
                 Price Low to High
               </button>
               <button
                 className={`w-full text-left text-gray-800 p-2 rounded border border-gray-200 ${
-                  sortOrder === 'highToLow' ? 'bg-gray-100' : 'hover:bg-gray-100'
+                  sortOrder === "highToLow"
+                    ? "bg-gray-100"
+                    : "hover:bg-gray-100"
                 }`}
-                onClick={() => handleSort('highToLow')}
+                onClick={() => handleSort("highToLow")}
               >
                 Price High to Low
               </button>
