@@ -135,7 +135,6 @@ const RegionOffers = () => {
       discountedPrice: 90.0,
     },
   ];
-
   // Scroll to top whenever page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -167,10 +166,57 @@ const RegionOffers = () => {
   const totalPages = Math.ceil(filteredAndSortedOffers.length / offersPerPage);
 
   // Format country name
-  const formattedName = regionName
+  const region = regionName
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
+  // Define color schemes for each region
+  const regionColorSchemes = {
+    africa: {
+      bgColor: "bg-[#F8FFCD]",
+      button:
+        "w-full bg-[#8E9D30] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    asia: {
+      bgColor: "bg-[#FFEAFD]",
+      button:
+        "w-full bg-[#792873] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#792873] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    oceania: {
+      bgColor: "bg-[#E9F4FF]",
+      button:
+        "w-full bg-[#077DB5] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#077DB5] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    europe: {
+      bgColor: "bg-[#E9FFE7]",
+      button:
+        "w-full bg-[#319628] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#319628] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    "north-america": {
+      bgColor: "bg-[#FFE7E7]",
+      button:
+        "w-full bg-[#D72B2B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#D72B2B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    "south-america": {
+      bgColor: "bg-[#DBFEFF]",
+      button:
+        "w-full bg-[#08868B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge: "bg-[#08868B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+  };
+
+  // Get the color scheme for the current region (default to white if region not found)
+  const currentColorScheme = regionColorSchemes[regionName.toLowerCase()] || {
+    bgColor: "bg-white",
+    button: "w-full bg-[#08868B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+    badge: "bg-[#08868B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+  };
 
   // Helper function for pagination range
   const getPaginationRange = () => {
@@ -212,7 +258,7 @@ const RegionOffers = () => {
   return (
     <div className="my-10 container mx-auto px-4 py-16">
       <div className="flex items-center justify-between mb-10">
-        <h1 className="text-3xl font-medium">{formattedName} eSIM Plans</h1>
+        <h1 className="text-3xl font-medium">{region} eSIM Plans</h1>
         <div
           className="border border-gray-300 hover:bg-[#FFF6ED] rounded-full flex px-4 py-2 cursor-pointer"
           onClick={openModal}
@@ -229,14 +275,14 @@ const RegionOffers = () => {
             <OfferCard
               key={index}
               company={offer.company}
-              coverage={formattedName}
+              coverage={region}
               duration={offer.duration}
               data={offer.data}
               originalPrice={offer.originalPrice}
               discountedPrice={offer.discountedPrice}
-              bgColor="bg-[#FFFFFF]"
-              button="btn-primary"
-              saleBadge="saleBadge"
+              bgColor={currentColorScheme.bgColor}
+              button={currentColorScheme.button}
+              saleBadge={currentColorScheme.badge}
             />
           ))
         ) : (
