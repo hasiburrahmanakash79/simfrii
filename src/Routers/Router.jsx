@@ -6,6 +6,7 @@ import Homepage from "../Pages/HomePage/Homepage";
 import OtpVerification from "../Pages/Authentication/OtpVerification";
 import WorldWideESim from "../Pages/WorldWideESim/WorldWideESim";
 import CountryEsim from "../Pages/WorldWideESim/CountryEsim";
+import RegionOffers from "../Pages/HomePage/Regions/RegionOffers";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "/worldwide-esim/:countryName",
         element: <CountryEsim />,
+      },
+      {
+        path: "/region/:regionName",
+        element: <RegionOffers />,
       }
     ],
   },

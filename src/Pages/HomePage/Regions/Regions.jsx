@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+
+import { Link } from 'react-router-dom';
 import africa from '../../../assets/map/african.svg';
 import asia from '../../../assets/map/asia.svg';
 import europe from '../../../assets/map/europe.svg';
@@ -8,8 +9,6 @@ import southAmerica from '../../../assets/map/southAmerica.svg';
 import RegionCard from '../../../components/RegionCard';
 
 const Regions = () => {
-  const navigate = useNavigate();
-
   const regions = [
     { name: 'Africa', image: africa, bgColor: 'bg-[#F8FFCD]' },
     { name: 'Asia', image: asia, bgColor: 'bg-[#FFEAFD]' },
@@ -19,24 +18,18 @@ const Regions = () => {
     { name: 'South America', image: southAmerica, bgColor: 'bg-[#C4FDFF]' },
   ];
 
-  const handleRegionClick = (regionName, bgColor) => {
-    if (regionName.toLowerCase() === regionName) {
-      navigate(`/regions/${regionName.toLowerCase()}`, { state: { bgColor } });
-    }
-  };
-
   return (
-    <div className="my-10">
+    <div className="my-16">
       <h2 className="text-3xl font-medium mb-4">Regions</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-7 mb-10">
         {regions.map((region, index) => (
-          <RegionCard
-            key={index}
-            name={region.name}
-            image={region.image}
-            bgColor={region.bgColor}
-            onClick={() => handleRegionClick(region.name, region.bgColor)}
-          />
+          <Link key={index} to={`/region/${region.name.toLowerCase().replace(' ', '-')}`}>
+            <RegionCard
+              name={region.name}
+              image={region.image}
+              bgColor={region.bgColor}
+            />
+          </Link>
         ))}
       </div>
     </div>
