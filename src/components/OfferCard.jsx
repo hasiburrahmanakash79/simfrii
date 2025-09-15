@@ -9,10 +9,8 @@ const OfferCard = ({
   originalPrice,
   discountedPrice,
   bgColor,
-  buttonGradientFrom,
-  buttonGradientTo,
-  saleBadgeGradientFrom,
-  saleBadgeGradientTo,
+  button,
+  saleBadge,
 }) => {
   return (
     <div
@@ -26,11 +24,7 @@ const OfferCard = ({
           </div>
           <h2 className="text-2xl font-semibold text-gray-900">{company}</h2>
         </div>
-        <div
-          className={`bg-gradient-to-r from-${saleBadgeGradientFrom} to-${saleBadgeGradientTo} text-white px-4 py-1.5 rounded-full text-sm font-medium`}
-        >
-          ON SALE
-        </div>
+        <div className={`${saleBadge}`}>ON SALE</div>
       </div>
 
       {/* Plan details */}
@@ -85,11 +79,7 @@ const OfferCard = ({
       </div>
 
       {/* Buy now button */}
-      <button
-        className={`w-full bg-gradient-to-r from-${buttonGradientFrom} to-${buttonGradientTo} hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer`}
-      >
-        Buy now
-      </button>
+      <button className={`${button}`}>Buy now</button>
     </div>
   );
 };

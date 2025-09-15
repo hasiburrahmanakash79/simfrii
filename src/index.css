@@ -8,3 +8,10 @@
 @plugin "daisyui" {
   themes: light --default, dark --light;
 }
+
+.btn-primary {
+  @apply w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer;
+}
+.saleBadge {
+  @apply bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-medium;
+}

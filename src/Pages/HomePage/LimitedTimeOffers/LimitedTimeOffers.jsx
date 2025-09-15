@@ -67,10 +67,8 @@ const LimitedTimeOffers = () => {
             originalPrice={offer.originalPrice}
             discountedPrice={offer.discountedPrice}
             bgColor="bg-[#ffffff]"
-            buttonGradientFrom="orange-400"
-            buttonGradientTo="orange-500"
-            saleBadgeGradientFrom="orange-400"
-            saleBadgeGradientTo="orange-500"
+            button="btn-primary"
+            saleBadge="saleBadge"
           />
         ))}
       </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import banner from "../../assets/images/travelBG.jpg";
 import AllCountries from "./AllCountries";
 import Regions from "../HomePage/Regions/Regions";
-import GlobaleSIMs from "../HomePage/GlobaleSIMs/GlobaleSIMs";
+import GlobalDataCall from "./GlobalDataCall/GlobalDataCall";
 
 const WorldWideESim = () => {
   const tabs = [
@@ -11,7 +11,7 @@ const WorldWideESim = () => {
     {
       label: "Global eSIMs",
       value: "global",
-      content: <GlobaleSIMs/>,
+      content: <GlobalDataCall/>,
     },
   ];
 
@@ -31,10 +31,10 @@ const WorldWideESim = () => {
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`px-4 py-3 mx-1 rounded-md text-xm w-full  transition-all duration-500 ${
+            className={`px-4 py-3 mx-1 rounded-md text-xm w-full cursor-pointer transition-all duration-500 ${
               activeTab === tab.value
                 ? "bg-white text-black shadow-sm"
-                : "text-black hover:bg-white"
+                : "text-black hover:bg-white/60"
             }`}
           >
             {tab.label}

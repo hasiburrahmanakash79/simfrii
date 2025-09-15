@@ -1,6 +1,6 @@
 import OfferCard from "../../../components/OfferCard";
 
-const GlobaleSIMs = () => {
+const DataCard = () => {
   const offers = [
     {
       company: "RoamFree",
@@ -30,12 +30,6 @@ const GlobaleSIMs = () => {
 
   return (
     <div className="my-10">
-      <h1 className="text-3xl font-medium">Global eSIMs</h1>
-      <p className="text-gray-600 mb-4">
-        Discover our range of global eSIMs for seamless connectivity while
-        traveling.
-      </p>
-
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
         {offers.map((offer, index) => (
           <OfferCard
@@ -56,4 +50,4 @@ const GlobaleSIMs = () => {
   );
 };
 
-export default GlobaleSIMs;
+export default DataCard;
