@@ -64,11 +64,11 @@ export default function ESIMDetails() {
     loadData();
   }, []);
 
-  // Calculate percentage for circular progress
+  // Calculate percentage for semicircular progress
   const usagePercentage = (data.usedData / data.totalData) * 100;
-  const circumference = 2 * Math.PI * 40; // radius is 40
-  const strokeDashoffset =
-    circumference - (usagePercentage / 100) * circumference;
+  const radius = 40;
+  const circumference = Math.PI * radius; // Half circle circumference (180 degrees)
+  const strokeDashoffset = circumference - (usagePercentage / 100) * circumference;
 
   // Format data display
   const formatData = (value) => {
@@ -98,7 +98,7 @@ export default function ESIMDetails() {
   };
 
   return (
-    <div className="min-h-screen container mx-auto p-4 py-10">
+    <div className="min-h-screen container mx-auto p-4 mt-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
@@ -118,30 +118,26 @@ export default function ESIMDetails() {
               {data.daysRemaining} days
             </div>
 
-            {/* Circular Progress */}
-            <div className="relative w-48 h-48 mx-auto mb-4">
+            {/* Semicircular Progress */}
+            <div className="relative w-96 h-48 mx-auto mb-4">
               <svg
-                className="w-48 h-48 transform -rotate-90"
-                viewBox="0 0 100 100"
+                className="w-96 h-48"
+                viewBox="0 0 100 50" // Adjusted viewBox for half circle
               >
-                {/* Background circle */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
+                {/* Background semicircle */}
+                <path
+                  d="M 10 50 A 40 40 0 0 1 90 50"
                   stroke="#f3f4f6"
-                  strokeWidth="8"
+                  strokeWidth="5"
                   fill="none"
                 />
-                {/* Progress circle - animated based on usage */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
+                {/* Progress semicircle - animated based on usage */}
+                <path
+                  d="M 10 50 A 40 40 0 0 1 90 50"
                   stroke="#fb923c"
-                  strokeWidth="8"
+                  strokeWidth="5"
                   fill="none"
-                  strokeLinecap="round"
+                  strokeLinecap="round" // Ensures rounded endpoints
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDashoffset}
                   className="transition-all duration-1000 ease-out"
@@ -149,7 +145,7 @@ export default function ESIMDetails() {
               </svg>
 
               {/* Center text */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-end pb-2">
                 <div className="text-sm text-gray-500 mb-1">Data</div>
                 <div className="text-4xl font-bold text-orange-500">
                   {data.totalData}GB
