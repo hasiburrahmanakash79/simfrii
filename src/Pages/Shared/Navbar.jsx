@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import SupportModal from "../Support/supportModal";
+import ChatModal from "../Support/ChatModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isLoggedIn = true;
+  const [chatOpen, setChatOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const userImage =
     "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
 
@@ -11,10 +15,26 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
+  const openSupport = () => setSupportOpen(true);
+  const closeSupport = () => setSupportOpen(false);
+  const openChat = () => {
+    closeSupport();
+    setChatOpen(true);
+  };
+  const closeChat = () => setChatOpen(false);
+
   const handleMenuItemClick = () => {
     setTimeout(() => {
       setIsOpen(false);
     }, 200); // Delay for smooth closing
+  };
+
+  const handleSupportClick = (e) => {
+    e.preventDefault(); // Prevent default link navigation
+      setSupportOpen(true);
+    if (isOpen) {
+      setIsOpen(false); // Close mobile menu if open
+    }
   };
 
   return (
@@ -38,12 +58,13 @@ const Navbar = () => {
           >
             My eSIMs
           </Link>
-          <Link
-            to="/"
+          <a
+            href="#"
+            onClick={openSupport}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium"
           >
             Support
-          </Link>
+          </a>
           <Link className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium">
             EN | USD
           </Link>
@@ -154,7 +175,10 @@ const Navbar = () => {
           </a>
           <a
             href="#"
-            onClick={handleMenuItemClick}
+            onClick={(e) => {
+              handleSupportClick(e);
+              handleMenuItemClick();
+            }}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
           >
             Support
@@ -201,6 +225,9 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      {/* Shared Modal */}
+      <SupportModal isOpen={supportOpen} onClose={closeSupport} openChat={openChat} />
+      <ChatModal isOpen={chatOpen} onClose={closeChat} />
     </nav>
   );
 };

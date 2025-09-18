@@ -138,11 +138,11 @@ const Footer = () => {
                   44 Danwers, NY City, USA, 70-102
                 </a>
               </li>
-              <li className="flex items-center space-x-3">
-                <img src={email} alt="Email" />
+              <li className="flex items-center gap-2">
+                <img src={email} alt="Email" className="shrink-0" />
                 <a
-                  href="https://hr-akash23.web.app"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  href="mailto:simfrii@gmail.com"
+                  className="text-gray-600 hover:text-[#8272ED] transition-colors break-all"
                 >
                   simfrii.contact@gmail.com
                 </a>
