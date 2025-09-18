@@ -1,4 +1,19 @@
-export default function Notifications({ notifications, handleToggle }) {
+import { useState } from "react";
+
+export default function Notifications() {
+  const [notifications, setNotifications] = useState({
+    popup: true,
+    chat: true,
+    updates: false,
+  });
+
+  const handleToggle = (key) => {
+    setNotifications((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   return (
     <div className="space-y-6 bg-gray-50 p-4 rounded-2xl">
       <div className="flex justify-between items-center">

@@ -1,24 +1,66 @@
+import { useState } from "react";
 import { Edit2, Trash2 } from "lucide-react";
 
-export default function AccountInformation({
-  editingName,
-  setEditingName,
-  fullName,
-  setFullName,
-  editingPhone,
-  setEditingPhone,
-  phone,
-  setPhone,
-  editingPassword,
-  setEditingPassword,
-  passwords,
-  handlePasswordChange,
-  passwordError,
-  handlePasswordSave,
-}) {
+export default function AccountInformation() {
+  const [editingName, setEditingName] = useState(false);
+  const [fullName, setFullName] = useState("Daniel Smith");
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phone, setPhone] = useState("+1 25556 5585 99");
+  const [editingPassword, setEditingPassword] = useState(false);
+  const [passwords, setPasswords] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleSaveName = () => {
+    console.log("Name updated:", fullName);
+    setEditingName(false);
+  };
+
+  const handleSavePhone = () => {
+    console.log("Phone updated:", phone);
+    setEditingPhone(false);
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswords((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (name === "new" || name === "confirm") {
+      setPasswordError("");
+    }
+  };
+
+  const handlePasswordSave = () => {
+    if (passwords.new !== passwords.confirm) {
+      setPasswordError("New password and confirm password must match");
+      return;
+    }
+    if (!passwords.current || !passwords.new || !passwords.confirm) {
+      setPasswordError("All password fields are required");
+      return;
+    }
+    console.log("Password updated:", {
+      current: passwords.current,
+      new: passwords.new,
+    });
+    setEditingPassword(false);
+    setPasswords({ current: "", new: "", confirm: "" });
+    setPasswordError("");
+  };
+
+  const handleDeleteAccount = () => {
+    console.log("Delete account clicked");
+    // Add actual delete account logic here (e.g., API call)
+  };
+
   return (
     <div className="space-y-8">
-      {/* Your name section */}
+      {/* Name Section */}
       {editingName ? (
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-2">Your name</h3>
@@ -50,10 +92,7 @@ export default function AccountInformation({
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  console.log("Name updated:", fullName);
-                  setEditingName(false);
-                }}
+                onClick={handleSaveName}
                 className="px-6 py-2 rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] cursor-pointer"
               >
                 Save
@@ -77,7 +116,7 @@ export default function AccountInformation({
         </div>
       )}
 
-      {/* Phone number section */}
+      {/* Phone Section */}
       {editingPhone ? (
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-2">Phone number</h3>
@@ -103,10 +142,7 @@ export default function AccountInformation({
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  console.log("Phone updated:", phone);
-                  setEditingPhone(false);
-                }}
+                onClick={handleSavePhone}
                 className="px-6 py-2 rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] cursor-pointer"
               >
                 Save
@@ -130,7 +166,7 @@ export default function AccountInformation({
         </div>
       )}
 
-      {/* Email section (view-only) */}
+      {/* Email Section */}
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-medium text-gray-800">Email</h3>
@@ -138,7 +174,7 @@ export default function AccountInformation({
         </div>
       </div>
 
-      {/* Password section */}
+      {/* Password Section */}
       {editingPassword ? (
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-2">Change password</h3>
@@ -224,11 +260,13 @@ export default function AccountInformation({
         </div>
       )}
 
+      {/* Delete Account Section */}
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-medium text-gray-800">Delete account</h3>
         </div>
         <button
+          onClick={handleDeleteAccount}
           className="flex items-center space-x-1 text-red-600 transition-colors duration-300"
         >
           <Trash2 className="w-4 h-4" />
