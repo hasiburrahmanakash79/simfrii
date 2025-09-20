@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
+import LogoutModal from "../../components/LogoutModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,7 @@ const Navbar = () => {
     "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -28,7 +30,7 @@ const Navbar = () => {
   const handleMenuItemClick = () => {
     setTimeout(() => {
       setIsOpen(false);
-    }, 200); // Delay for smooth closing
+    }, 200);
   };
 
   const handleSupportClick = (e) => {
@@ -43,8 +45,11 @@ const Navbar = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const handleDropdownOptionClick = () => {
+  const handleDropdownOptionClick = (option) => {
     setDropdownOpen(false);
+    if (option === "Logout") {
+      setShowLogoutModal(true);
+    }
   };
 
   const toggleLanguageModal = () => {
@@ -120,15 +125,23 @@ const Navbar = () => {
               />
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
-                  <Link to='/settings'
-                    onClick={handleDropdownOptionClick}
+                  <Link
+                    to="/dashboard"
+                    onClick={() => handleDropdownOptionClick("Settings")}
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => handleDropdownOptionClick("Settings")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     Settings
                   </Link>
                   <a
                     href="#"
-                    onClick={handleDropdownOptionClick}
+                    onClick={() => handleDropdownOptionClick("Logout")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     Logout
@@ -175,7 +188,6 @@ const Navbar = () => {
         } transition-all duration-500 ease-in-out z-40`}
       >
         <div className="pt-6 pb-8 px-6 flex flex-col space-y-6">
-          {/* Close Icon */}
           <button
             onClick={toggleMenu}
             className="self-end text-gray-700 focus:outline-none"
@@ -261,15 +273,16 @@ const Navbar = () => {
               />
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
-                  <Link to="/settings"
-                    onClick={handleDropdownOptionClick}
+                  <Link
+                    to="/settings"
+                    onClick={() => handleDropdownOptionClick("Settings")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     Settings
                   </Link>
                   <a
                     href="#"
-                    onClick={handleDropdownOptionClick}
+                    onClick={() => handleDropdownOptionClick("Logout")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     Logout
@@ -314,6 +327,7 @@ const Navbar = () => {
       {/* Shared Modal */}
       <SupportModal isOpen={supportOpen} onClose={closeSupport} openChat={openChat} />
       <ChatModal isOpen={chatOpen} onClose={closeChat} />
+      <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
     </nav>
   );
 };

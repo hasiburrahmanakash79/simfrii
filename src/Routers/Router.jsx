@@ -10,6 +10,9 @@ import RegionOffers from "../Pages/HomePage/Regions/RegionOffers";
 import MyEsim from "../Pages/MyEsim/MyEsim";
 import ESIMDetails from "../Pages/MyEsim/ESIMDetails";
 import AccountSettings from "../Pages/AccountSettings/AccountSettings";
+import Dashboard from "../Layouts/Dashboard";
+import AdminOverview from "../Pages/AdminPages/AdminOverview";
+import OrderPreview from "../Pages/OrderPreview/OrderPreview";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +45,20 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <AccountSettings />,
+      },
+      {
+        path: "/order-preview/:id",
+        element: <OrderPreview />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+    children: [
+      {
+        path: "",
+        element: <AdminOverview />,
       },
     ],
   },
