@@ -1,6 +1,6 @@
-import { Mail, MessageCircleMoreIcon } from "lucide-react";
 
-const SupportModal = ({ isOpen, onClose, openChat }) => {
+
+const TroubleshootingModal = ({ isOpen, onClose}) => {
   if (!isOpen) return null;
 
   return (
@@ -10,13 +10,8 @@ const SupportModal = ({ isOpen, onClose, openChat }) => {
           Choose your preferred channel to get help from our support team{" "}
         </p>
 
-        <div className="flex gap-2 items-center cursor-pointer" onClick={() => window.location.href = "mailto:support@nfrii.com"}>
-          <Mail className="text-orange-400" />
+        <div className="flex gap-2 items-center cursor-pointer">
           <p>Support with Mail</p>
-        </div>
-        <div className="flex gap-2 items-center cursor-pointer" onClick={openChat}>
-          <MessageCircleMoreIcon className="text-orange-400" />
-          <p>Support with Chat</p>
         </div>
         <button
           onClick={onClose}
@@ -30,5 +25,4 @@ const SupportModal = ({ isOpen, onClose, openChat }) => {
 };
 
 
-
-export { SupportModal as default};
+export default TroubleshootingModal;
