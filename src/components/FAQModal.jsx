@@ -33,8 +33,8 @@ const FAQModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 min-w-6xl max-w-6xl space-y-4">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center md:p-0 p-4">
+      <div className="bg-white rounded-lg p-6 md:min-w-6xl space-y-4">
         <div className="flex gap-4 items-center font-medium mb-7">
           <button onClick={onClose} className="">
             <ChevronLeft />

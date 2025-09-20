@@ -4,7 +4,7 @@ const SupportModal = ({ isOpen, onClose, openChat }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center md:p-0 p-4">
       <div className="bg-white text-[#5A5A5A] rounded-lg p-6 md:max-w-sm space-y-3">
         <p className="text-center text-sm mb-5">
           Choose your preferred channel to get help from our support team{" "}
