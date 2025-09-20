@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import SupportModal from "../Support/supportModal";
+import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 
 const Navbar = () => {
