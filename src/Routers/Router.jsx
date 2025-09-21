@@ -16,6 +16,7 @@ import OrderPreview from "../Pages/OrderPreview/OrderPreview";
 import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
 import TopUp from "../Pages/TopUp/TopUp";
 import Instructions from "../Pages/Instructions/Instructions";
+import Email from "../Pages/Authentication/Email";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -85,6 +86,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />,
+  },
+  {
+    path: "/email",
+    element: <Email />,
   },
   {
     path: "/otp",
