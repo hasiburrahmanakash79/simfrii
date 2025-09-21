@@ -9,9 +9,10 @@ import {
   Ticket,
   ChevronRight,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const OrderPreview = () => {
+    const navigate = useNavigate()
   const countries = [
     {
       name: "Afghanistan",
@@ -98,6 +99,8 @@ const OrderPreview = () => {
 
   const closeCardSelectionModal = () => {
     setShowCardSelectionModal(false);
+    navigate('/payment-successful')
+
   };
 
   // Sample card data (you can replace with dynamic data from your state or API)

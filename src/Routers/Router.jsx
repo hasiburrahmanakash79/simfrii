@@ -13,6 +13,7 @@ import AccountSettings from "../Pages/AccountSettings/AccountSettings";
 import Dashboard from "../Layouts/Dashboard";
 import AdminOverview from "../Pages/AdminPages/AdminOverview";
 import OrderPreview from "../Pages/OrderPreview/OrderPreview";
+import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
       {
         path: "/order-preview/:id",
         element: <OrderPreview />,
+      },
+      {
+        path: "/payment-successful",
+        element: <SuccessPayment />,
       },
     ],
   },
