@@ -17,6 +17,7 @@ import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
 import TopUp from "../Pages/TopUp/TopUp";
 import Instructions from "../Pages/Instructions/Instructions";
 import Email from "../Pages/Authentication/Email";
+import ResetPassword from "../Pages/Authentication/ResetPassword";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
   {
     path: "/otp",
     element: <OtpVerification />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
 ]);
 
