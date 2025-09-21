@@ -14,6 +14,7 @@ import Dashboard from "../Layouts/Dashboard";
 import AdminOverview from "../Pages/AdminPages/AdminOverview";
 import OrderPreview from "../Pages/OrderPreview/OrderPreview";
 import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
+import TopUp from "../Pages/TopUp/TopUp";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/package-details",
         element: <ESIMDetails />,
+      },
+      {
+        path: "/top-up/:id",
+        element: <TopUp />,
       },
       {
         path: "/settings",
