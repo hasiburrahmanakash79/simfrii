@@ -1,14 +1,18 @@
 
 import { useState } from "react";
+import Direct from "./Direct";
+import QRCodeInstall from "./QRCodeInstall";
+import ManualInstall from "./ManualInstall";
 
 
 const Instructions = () => {
   const tabs = [
-    { label: "Data", value: "data", content:  <>Akash</> },
-    { label: "Data/Text/Call", value: "callText", content: <>akash2</> },
+    { label: "Direct", value: "direct", content:  <Direct/> },
+    { label: "QR Code", value: "code", content: <QRCodeInstall/> },
+    { label: "Manual", value: "manual", content: <ManualInstall/> },
   ];
 
-  const [activeTab, setActiveTab] = useState("data");
+  const [activeTab, setActiveTab] = useState("direct");
 
   return (
     <div className="container mx-auto my-16 p-4">
