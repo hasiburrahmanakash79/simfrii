@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import OfferCard from "../../../components/OfferCard";
 
 const GlobaleSIMs = () => {
+  const navigate = useNavigate();
   const offers = [
     {
       company: "RoamFree",
@@ -27,6 +29,9 @@ const GlobaleSIMs = () => {
       discountedPrice: 75.0,
     },
   ];
+  const handleBuy = (id) => {
+    navigate(`/order-preview/${id}`);
+  };
 
   return (
     <div className="my-10">
@@ -49,6 +54,7 @@ const GlobaleSIMs = () => {
             bgColor="bg-[#FFF6ED]"
             button="btn-primary"
             saleBadge="saleBadge"
+            onBuy={() => handleBuy(index)}
           />
         ))}
       </div>
