@@ -1,7 +1,14 @@
 import { useState } from "react";
 import RewardOffer from "../HomePage/RewardOffer/RewardOffer";
 import eSime from "../../assets/icons/eSim.svg";
-import { Calendar, Globe, Layers, Smartphone, Ticket, ChevronRight } from "lucide-react";
+import {
+  Calendar,
+  Globe,
+  Layers,
+  Smartphone,
+  Ticket,
+  ChevronRight,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const OrderPreview = () => {
@@ -73,6 +80,7 @@ const OrderPreview = () => {
   ];
 
   const [showCountryModal, setShowCountryModal] = useState(false);
+  const [showCardSelectionModal, setShowCardSelectionModal] = useState(false);
 
   const first7Countries = countries.slice(0, 8);
 
@@ -84,8 +92,41 @@ const OrderPreview = () => {
     setShowCountryModal(false);
   };
 
+  const openCardSelectionModal = () => {
+    setShowCardSelectionModal(true);
+  };
+
+  const closeCardSelectionModal = () => {
+    setShowCardSelectionModal(false);
+  };
+
+  // Sample card data (you can replace with dynamic data from your state or API)
+  const cards = [
+    {
+      id: 1,
+      type: "Visa",
+      holder: "John Doe",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png",
+    },
+    { id: 2, type: "MasterCard", holder: "Jane Smith", logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/1200px-Mastercard_2019_logo.svg.png' },
+    {
+      id: 3,
+      type: "Apple Pay",
+      holder: "Alex Brown",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png",
+    },
+    {
+      id: 4,
+      type: "Google Pay",
+      holder: "Sarah Lee",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png",
+    },
+  ];
+
+  const [selectedCard, setSelectedCard] = useState(null);
+
   return (
-    <div className="min-h-screen mt-24 container mx-auto p-4 sm:p-4">
+    <div className="min-h-screen my-4 sm:my-6 md:my-24 container mx-auto p-2 sm:p-4">
       <RewardOffer />
 
       <div className="mt-4 sm:mt-6 md:mt-10">
@@ -95,7 +136,9 @@ const OrderPreview = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-6">
           <div className="border border-gray-200 rounded-xl p-3 sm:p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-center ">
-              <h1 className="text-lg sm:text-xl font-semibold">Supported Countries</h1>
+              <h1 className="text-lg sm:text-xl font-semibold">
+                Supported Countries
+              </h1>
               <button
                 onClick={openCountryModal}
                 className="text-orange-600 hover:text-orange-500 font-medium flex items-center gap-1 mt-2 sm:mt-0"
@@ -111,13 +154,17 @@ const OrderPreview = () => {
                     alt={country.name}
                     className="h-8 sm:h-10 w-8 sm:w-10 rounded-full object-cover mr-2 sm:mr-3"
                   />
-                  <p className="text-sm sm:text-base text-gray-700">{country.name}</p>
+                  <p className="text-sm sm:text-base text-gray-700">
+                    {country.name}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
           <div className="">
-            <div className={`rounded-2xl border border-gray-200 p-3 sm:p-6 shadow-sm`}>
+            <div
+              className={`rounded-2xl border border-gray-200 p-3 sm:p-6 shadow-sm`}
+            >
               <div className="flex justify-center items-center">
                 <img src={eSime} alt="" className="w-12 sm:w-16 h-12 sm:h-16" />
               </div>
@@ -134,7 +181,9 @@ const OrderPreview = () => {
                       className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400"
                       strokeWidth={1.5}
                     />
-                    <span className="text-gray-600 text-base sm:text-lg">Coverage</span>
+                    <span className="text-gray-600 text-base sm:text-lg">
+                      Coverage
+                    </span>
                   </div>
                   <span className="text-gray-900 text-base sm:text-lg font-semibold">
                     33 Country
@@ -148,7 +197,9 @@ const OrderPreview = () => {
                       className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400"
                       strokeWidth={1.5}
                     />
-                    <span className="text-gray-600 text-base sm:text-lg">Duration</span>
+                    <span className="text-gray-600 text-base sm:text-lg">
+                      Duration
+                    </span>
                   </div>
                   <span className="text-gray-900 text-base sm:text-lg font-semibold">
                     365 day
@@ -162,7 +213,9 @@ const OrderPreview = () => {
                       className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400"
                       strokeWidth={1.5}
                     />
-                    <span className="text-gray-600 text-base sm:text-lg">Data</span>
+                    <span className="text-gray-600 text-base sm:text-lg">
+                      Data
+                    </span>
                   </div>
                   <span className="text-gray-900 text-base sm:text-lg font-semibold">
                     500GB
@@ -176,10 +229,14 @@ const OrderPreview = () => {
                       className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400"
                       strokeWidth={1.5}
                     />
-                    <span className="text-gray-600 text-base sm:text-lg">Price</span>
+                    <span className="text-gray-600 text-base sm:text-lg">
+                      Price
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-gray-500 text-base sm:text-lg">USD </span>
+                    <span className="text-gray-500 text-base sm:text-lg">
+                      USD{" "}
+                    </span>
                     <span className="text-gray-400 line-through text-base sm:text-lg">
                       20
                     </span>
@@ -211,12 +268,11 @@ const OrderPreview = () => {
                 />
               </div>
               <div className="flex space-x-2 sm:space-x-4">
-                <button
-                  className="flex-1 px-2 sm:px-4 py-1 sm:py-2 border border-gray-800 rounded-full text-gray-800 text-sm sm:text-base hover:bg-gray-50 transition-colors duration-300"
-                >
+                <button className="flex-1 px-2 sm:px-4 py-1 sm:py-2 border border-gray-800 rounded-full text-gray-800 text-sm sm:text-base hover:bg-gray-50 transition-colors duration-300">
                   Cancel
                 </button>
                 <button
+                  onClick={openCardSelectionModal}
                   className="flex-1 px-2 sm:px-4 py-1 sm:py-2 bg-black text-white rounded-full text-sm sm:text-base"
                 >
                   Payment
@@ -232,13 +288,25 @@ const OrderPreview = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-lg mx-2 sm:mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center p-3 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold">All Supported Countries</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">
+                All Supported Countries
+              </h2>
               <button
                 onClick={closeCountryModal}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 sm:w-6 h-5 sm:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -250,9 +318,78 @@ const OrderPreview = () => {
                     alt={country.name}
                     className="h-6 sm:h-8 w-6 sm:w-8 rounded-full object-cover mr-2 sm:mr-3"
                   />
-                  <p className="text-sm sm:text-base text-gray-700">{country.name}</p>
+                  <p className="text-sm sm:text-base text-gray-700">
+                    {country.name}
+                  </p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Card Selection Modal */}
+      {showCardSelectionModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-lg mx-2 sm:mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-3 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold">
+                Select Payment Method
+              </h2>
+              <button
+                onClick={closeCardSelectionModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-5 sm:w-6 h-5 sm:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="px-3 sm:px-6 pb-3 sm:pb-5 space-y-4">
+              {cards.map((card) => (
+                <label
+                  key={card.id}
+                  className="flex items-center justify-between p-2 sm:p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <img src={card.logo} alt="" className="w-12 border p-1 border-gray-200 rounded" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm sm:text-base font-medium">
+                        {card.type}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        {card.holder}
+                      </p>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="card"
+                    value={card.id}
+                    checked={selectedCard === card.id}
+                    onChange={() => setSelectedCard(card.id)}
+                    className="w-4 h-4 text-orange-500 focus:ring-0"
+                  />
+                </label>
+              ))}
+              <button
+                onClick={closeCardSelectionModal} // Replace with payment confirmation logic
+                className="w-full py-2 sm:py-3 bg-black text-white rounded-lg text-sm sm:text-base hover:bg-gray-800 transition-colors duration-200"
+              >
+                Continue
+              </button>
             </div>
           </div>
         </div>
