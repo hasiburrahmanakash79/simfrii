@@ -15,6 +15,7 @@ import AdminOverview from "../Pages/AdminPages/AdminOverview";
 import OrderPreview from "../Pages/OrderPreview/OrderPreview";
 import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
 import TopUp from "../Pages/TopUp/TopUp";
+import Instructions from "../Pages/Instructions/Instructions";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/package-details",
         element: <ESIMDetails />,
+      },
+      {
+        path: "/instruction",
+        element: <Instructions />,
       },
       {
         path: "/top-up/:id",

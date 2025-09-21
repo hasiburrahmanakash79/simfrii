@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
+import { Link } from "react-router-dom";
 
 export default function ESIMDetails() {
   const [loading, setLoading] = useState(true);
@@ -238,7 +239,7 @@ export default function ESIMDetails() {
               eSIMs Installation
             </h3>
 
-            <div className="bg-orange-50 rounded-xl p-4 flex items-center justify-between hover:bg-orange-100 transition-colors cursor-pointer">
+            <Link to='/instruction' className="bg-orange-50 rounded-xl p-4 flex items-center justify-between hover:bg-orange-100 transition-colors cursor-pointer">
               <div className="flex items-center">
                 <div className="bg-white rounded-lg p-2 mr-3">
                   <FileText className="w-5 h-5 text-gray-600" />
@@ -248,7 +249,7 @@ export default function ESIMDetails() {
                 </span>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-400" />
-            </div>
+            </Link>
           </div>
         </div>
       </div>

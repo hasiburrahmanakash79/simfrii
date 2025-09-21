@@ -1,21 +1,18 @@
+
 import { useState } from "react";
 
-import TopUpDataCard from "./TopUpDataCard";
-import TopUpCallCard from "./TopUpCallCard";
 
-const TopUp = () => {
+const Instructions = () => {
   const tabs = [
-    { label: "Data", value: "data", content: <TopUpDataCard /> },
-    { label: "Data/Text/Call", value: "callText", content: <TopUpCallCard /> },
+    { label: "Data", value: "data", content:  <>Akash</> },
+    { label: "Data/Text/Call", value: "callText", content: <>akash2</> },
   ];
 
   const [activeTab, setActiveTab] = useState("data");
 
-
   return (
     <div className="container mx-auto my-16 p-4">
       <div className="">
-        
         <div className="flex items-center gap-5 w-full my-5">
           <div className="bg-[#FDF8DB] p-2 rounded-lg flex justify-between text-center items-center w-full">
             {tabs.map((tab) => (
@@ -32,15 +29,12 @@ const TopUp = () => {
               </button>
             ))}
           </div>
-          
         </div>
       </div>
       {/* Tab Content */}
       <div>{tabs.find((tab) => tab.value === activeTab)?.content}</div>
-
-      
     </div>
   );
 };
 
-export default TopUp;
+export default Instructions;
