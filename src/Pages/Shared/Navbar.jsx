@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";
+import Language from "../AccountSettings/Language";
+import SwitchLanguage from "../CurrencyAndLanguage/SwitchLanguage";
+import Currency from "../CurrencyAndLanguage/Currency";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,14 +13,14 @@ const Navbar = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const userImage =
-    "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
+    "https://www.logoai.com/uploads/resources/2023/06/19/fa7fe9edacbfae0e5ad69f061d0153b8.jpeg";
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const tabs = [
-    { label: "Language", value: "language", content: <>Tab1</> },
-    { label: "Currency", value: "currency", content: <>TAB2</> },
+    { label: "Language", value: "language", content: <SwitchLanguage/> },
+    { label: "Currency", value: "currency", content: <Currency/> },
   ];
 
   const [activeTab, setActiveTab] = useState("language");
@@ -127,7 +130,7 @@ const Navbar = () => {
               <img
                 src={userImage || "https://via.placeholder.com/40"}
                 alt="User"
-                className="w-10 h-10 rounded-full border-2 border-gray-400 cursor-pointer"
+                className="w-10 h-10 rounded-full border-2 border-orange-400 cursor-pointer"
                 onClick={toggleDropdown}
               />
               {dropdownOpen && (
@@ -319,7 +322,7 @@ const Navbar = () => {
       {languageModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
           <div className=" bg-white rounded-2xl p-5">
-            <div className="flex justify-between text-center items-center gap-3 md:min-w-xl ">
+            <div className="flex justify-between text-center items-center gap-3  md:min-w-xl ">
               {tabs.map((tab) => (
                 <button
                   key={tab.value}
@@ -334,12 +337,12 @@ const Navbar = () => {
                 </button>
               ))}
             </div>
-            <div className="py-5">{tabs.find((tab) => tab.value === activeTab)?.content}</div>
+            <div className="py-5 h-[500px] overflow-auto">{tabs.find((tab) => tab.value === activeTab)?.content}</div>
             <button
               onClick={toggleLanguageModal}
               className="btn-primary"
             >
-              Close
+              Confirm
             </button>
           </div>
         </div>
