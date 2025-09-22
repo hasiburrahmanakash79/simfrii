@@ -3,11 +3,13 @@ import user from "../assets/icons/user.png";
 import Logout from "../assets/icons/logout.png";
 import HomeIconSvg from "../assets/icons/Home.svg";
 import UserIconSvg from "../assets/icons/Users.svg";
-import ShoppingIconSvg from "../assets/icons/shopping.svg";
-import LaborIconSvg from "../assets/icons/labor.svg";
-import ContentIconSvg from "../assets/icons/content.svg";
-import PrivacyIconSvg from "../assets/icons/privacy.svg";
-import ServicesIconSvg from "../assets/icons/power-service.svg";
+import OrderIconSvg from "../assets/icons/order.svg";
+import PaymentIconSvg from "../assets/icons/payment.svg";
+import CloudIconSvg from "../assets/icons/cloud.svg";
+import AnalyticsIconSvg from "../assets/icons/analytics.svg";
+import SupportIconSvg from "../assets/icons/support.svg";
+import SettingIconSvg from "../assets/icons/setting.svg";
+import SimIconSvg from "../assets/icons/simcard.svg";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -36,11 +38,13 @@ const Dashboard = () => {
   const menus = [
     { title: "Dashboard", path: "dashboard", icon: HomeIconSvg },
     { title: "User", path: "/admin/user", icon: UserIconSvg },
-    { title: "Order", path: "/admin/order", icon: ShoppingIconSvg },
-    { title: "Services", path: "/admin/service", icon: ServicesIconSvg },
-    { title: "Seller request", path: "/admin/request", icon: LaborIconSvg },
-    { title: "Content", path: "/admin/content", icon: ContentIconSvg },
-    { title: "Privacy", path: "/admin/add-privacy", icon: PrivacyIconSvg },
+    { title: "Orders", path: "/admin/order", icon: OrderIconSvg },
+    { title: "eSIM plan management", path: "/admin/service", icon: SimIconSvg },
+    { title: "Payment", path: "/admin/request", icon: PaymentIconSvg },
+    { title: "Upload", path: "/admin/content", icon: CloudIconSvg },
+    { title: "Analytics", path: "/admin/add-privacy", icon: AnalyticsIconSvg },
+    { title: "Support", path: "/admin/add-privacy", icon: SupportIconSvg },
+    { title: "Settings", path: "/admin/add-privacy", icon: SettingIconSvg },
   ];
 
   return (
@@ -49,7 +53,7 @@ const Dashboard = () => {
       <aside className="w-64 shadow-lg border-r border-gray-200 fixed left-0 top-0 bottom-0 z-50 pt-8 bg-white transition-all duration-500">
         {/* Logo Section */}
         <div className="p-2 flex flex-col items-center justify-center">
-          <img src={logo} alt="Logo" className="cursor-pointer w-3/4 mb-1" />
+          <img src={logo} alt="Logo" className="cursor-pointer w-16 mb-1" />
         </div>
 
         {/* Navigation Menu */}
@@ -60,8 +64,8 @@ const Dashboard = () => {
               to={menu.path}
               className={`flex items-center py-2 px-5 text-sm rounded-lg cursor-pointer transition-colors ${
                 location.pathname === menu.path
-                  ? "bg-[#EFEEF9] text-[#4776EB]"
-                  : "text-gray-600 hover:bg-[#EFEEF9]"
+                  ? "bg-[#EAF3FF] text-[#4776EB]"
+                  : "text-gray-600 hover:bg-[#EAF3FF]"
               }`}
             >
               <img src={menu.icon} className={`w-6 h-6`} />

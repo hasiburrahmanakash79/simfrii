@@ -22,6 +22,9 @@ import AllUser from "../Pages/AdminPages/AllUser/AllUsers";
 import OrderList from "../Pages/AdminPages/OrderPage/OrderList";
 import UserDetailPage from "../Pages/AdminPages/AllUser/UserDetail";
 import OrderDetailPage from "../Pages/AdminPages/OrderPage/OrderDetailPage";
+import AllService from "../Pages/AdminPages/Services/AllService";
+import ContentPage from "../Pages/AdminPages/ContentPage/ContentPage";
+import Payment from "../Pages/AdminPages/Payment/Payment";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -92,6 +95,22 @@ const router = createBrowserRouter([
       {
         path: "order",
         element: <OrderList />,
+      },
+      {
+        path: "order-details/:id",
+        element: <OrderDetailPage />,
+      },
+      {
+        path: "service",
+        element: <AllService />,
+      },
+      {
+        path: "request",
+        element: <Payment />,
+      },
+      {
+        path: "content",
+        element: <ContentPage />,
       },
       {
         path: "order-details/:id",

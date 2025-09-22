@@ -299,7 +299,7 @@ const OrderList = () => {
             <thead className="bg-gray-50">
               <tr className="text-left text-gray-600 uppercase text-sm font-bold">
                 <th className="py-3 px-4">ID</th>
-                <th className="py-3 px-4">Seller</th>
+                <th className="py-3 px-4">Customer</th>
                 <th className="py-3 px-4">Plan</th>
                 <th className="py-3 px-4">Date</th>
                 <th className="py-3 px-4">Price</th>
