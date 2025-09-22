@@ -15,6 +15,13 @@ const Navbar = () => {
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const tabs = [
+    { label: "Language", value: "language", content: <>Tab1</> },
+    { label: "Currency", value: "currency", content: <>TAB2</> },
+  ];
+
+  const [activeTab, setActiveTab] = useState("language");
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -310,20 +317,27 @@ const Navbar = () => {
 
       {/* Language Modal */}
       {languageModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-80">
-            <h2 className="text-lg font-semibold mb-4">Select Language & Currency</h2>
-            <select
-              className="w-full p-2 border border-gray-300 rounded mb-4"
-              onChange={(e) => console.log(e.target.value)}
-            >
-              <option>EN | USD</option>
-              <option>ES | EUR</option>
-              <option>FR | EUR</option>
-            </select>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
+          <div className=" bg-white rounded-2xl p-5">
+            <div className="flex justify-between text-center items-center gap-3 md:min-w-xl ">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={`px-10 py-3 rounded-md text-xm transition-all duration-500 cursor-pointer w-full text-center ${
+                    activeTab === tab.value
+                      ? "bg-[#FFF3E7] text-black"
+                      : "text-black hover:bg-white/60"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="py-5">{tabs.find((tab) => tab.value === activeTab)?.content}</div>
             <button
               onClick={toggleLanguageModal}
-              className="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700"
+              className="btn-primary"
             >
               Close
             </button>
@@ -332,9 +346,16 @@ const Navbar = () => {
       )}
 
       {/* Shared Modal */}
-      <SupportModal isOpen={supportOpen} onClose={closeSupport} openChat={openChat} />
+      <SupportModal
+        isOpen={supportOpen}
+        onClose={closeSupport}
+        openChat={openChat}
+      />
       <ChatModal isOpen={chatOpen} onClose={closeChat} />
-      <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </nav>
   );
 };
