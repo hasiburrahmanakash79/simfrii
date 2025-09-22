@@ -1,4 +1,4 @@
-import { Mail, MapPin, Calendar, TrendingUp, TrendingDown } from "lucide-react";
+import { Mail, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../components/SectionTitle";
 
@@ -13,75 +13,7 @@ export default function UserDetailPage() {
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
   };
 
-  const stats = [
-    {
-      title: "Total earning",
-      value: "2,420",
-      change: "40%",
-      changeType: "increase",
-      comparison: "vs last month",
-    },
-    {
-      title: "Total orders",
-      value: "316",
-      change: "40%",
-      changeType: "decrease",
-      comparison: "vs last month",
-    },
-    {
-      title: "Total reviews",
-      value: "420",
-      comparison: "From last month",
-    },
-  ];
 
-  const services = [
-    {
-      id: 1,
-      title: "Floral Arrangements",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=80&h=80&fit=crop",
-    },
-    {
-      id: 2,
-      title: "Floral Arrangements",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=80&h=80&fit=crop",
-    },
-  ];
-
-  const activeOrders = [
-    {
-      id: 1,
-      title: "Floral Arrangements",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=80&h=80&fit=crop",
-    },
-    {
-      id: 2,
-      title: "Floral Arrangements",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1487070183336-b863922373d4?w=80&h=80&fit=crop",
-    },
-    {
-      id: 3,
-      title: "Outdoor party catering",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=80&h=80&fit=crop",
-    },
-    {
-      id: 4,
-      title: "Outdoor party catering",
-      category: "Floral Arrangements",
-      image:
-        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=80&h=80&fit=crop",
-    },
-  ];
 
   return (
     <div className="">

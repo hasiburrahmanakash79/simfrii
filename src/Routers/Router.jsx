@@ -21,6 +21,7 @@ import ResetPassword from "../Pages/Authentication/ResetPassword";
 import AllUser from "../Pages/AdminPages/AllUser/AllUsers";
 import OrderList from "../Pages/AdminPages/OrderPage/OrderList";
 import UserDetailPage from "../Pages/AdminPages/AllUser/UserDetail";
+import OrderDetailPage from "../Pages/AdminPages/OrderPage/OrderDetailPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -91,6 +92,10 @@ const router = createBrowserRouter([
       {
         path: "order",
         element: <OrderList />,
+      },
+      {
+        path: "order-details/:id",
+        element: <OrderDetailPage />,
       },
     ],
   },
