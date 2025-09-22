@@ -9,24 +9,24 @@ export default function AllUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
   const [users, setUsers] = useState([
-    { id: 1, name: "Olivia Rhye", email: "phoenix@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Buyer" },
-    { id: 2, name: "Phoenix Baker", email: "phoenix@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Seller" },
-    { id: 3, name: "Candice Wu", email: "candice@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Buyer" },
-    { id: 4, name: "Drew Cano", email: "drew@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Seller" },
-    { id: 5, name: "Orlando Diggs", email: "orlando@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Buyer" },
-    { id: 6, name: "Andi Lane", email: "andi@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Seller" },
-    { id: 7, name: "Kate Morrison", email: "kate@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", userType: "Buyer" },
-    { id: 8, name: "John Smith", email: "john@untitledui.com", joiningDate: "Jan 5, 2025", location: "Austin, TX", userType: "Seller" },
-    { id: 9, name: "Sarah Johnson", email: "sarah@untitledui.com", joiningDate: "Jan 4, 2025", location: "Denver, CO", userType: "Buyer" },
-    { id: 10, name: "Mike Wilson", email: "mike@untitledui.com", joiningDate: "Jan 3, 2025", location: "Seattle, WA", userType: "Seller" },
-    { id: 11, name: "Emily Davis", email: "emily@untitledui.com", joiningDate: "Jan 2, 2025", location: "Miami, FL", userType: "Buyer" },
-    { id: 12, name: "David Brown", email: "david@untitledui.com", joiningDate: "Jan 1, 2025", location: "Boston, MA", userType: "Seller" },
-    { id: 13, name: "Lisa Garcia", email: "lisa@untitledui.com", joiningDate: "Dec 31, 2024", location: "Phoenix, AZ", userType: "Buyer" },
-    { id: 14, name: "Tom Anderson", email: "tom@untitledui.com", joiningDate: "Dec 30, 2024", location: "Portland, OR", userType: "Seller" },
-    { id: 15, name: "Anna Martinez", email: "anna@untitledui.com", joiningDate: "Dec 29, 2024", location: "Nashville, TN", userType: "Buyer" },
-    { id: 16, name: "Chris Lee", email: "chris@untitledui.com", joiningDate: "Dec 28, 2024", location: "San Diego, CA", userType: "Seller" },
-    { id: 17, name: "Jessica White", email: "jessica@untitledui.com", joiningDate: "Dec 27, 2024", location: "Atlanta, GA", userType: "Buyer" },
-    { id: 18, name: "Ryan Taylor", email: "ryan@untitledui.com", joiningDate: "Dec 26, 2024", location: "Chicago, IL", userType: "Seller" },
+    { id: 1, name: "Olivia Rhye", email: "phoenix@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Active" },
+    { id: 2, name: "Phoenix Baker", email: "phoenix@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Suspend" },
+    { id: 3, name: "Candice Wu", email: "candice@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Inactive" },
+    { id: 4, name: "Drew Cano", email: "drew@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Active" },
+    { id: 5, name: "Orlando Diggs", email: "orlando@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Suspend" },
+    { id: 6, name: "Andi Lane", email: "andi@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Inactive" },
+    { id: 7, name: "Kate Morrison", email: "kate@untitledui.com", joiningDate: "Jan 6, 2025", location: "Overland Park, KS", status: "Active" },
+    { id: 8, name: "John Smith", email: "john@untitledui.com", joiningDate: "Jan 5, 2025", location: "Austin, TX", status: "Suspend" },
+    { id: 9, name: "Sarah Johnson", email: "sarah@untitledui.com", joiningDate: "Jan 4, 2025", location: "Denver, CO", status: "Inactive" },
+    { id: 10, name: "Mike Wilson", email: "mike@untitledui.com", joiningDate: "Jan 3, 2025", location: "Seattle, WA", status: "Active" },
+    { id: 11, name: "Emily Davis", email: "emily@untitledui.com", joiningDate: "Jan 2, 2025", location: "Miami, FL", status: "Suspend" },
+    { id: 12, name: "David Brown", email: "david@untitledui.com", joiningDate: "Jan 1, 2025", location: "Boston, MA", status: "Inactive" },
+    { id: 13, name: "Lisa Garcia", email: "lisa@untitledui.com", joiningDate: "Dec 31, 2024", location: "Phoenix, AZ", status: "Active" },
+    { id: 14, name: "Tom Anderson", email: "tom@untitledui.com", joiningDate: "Dec 30, 2024", location: "Portland, OR", status: "Suspend" },
+    { id: 15, name: "Anna Martinez", email: "anna@untitledui.com", joiningDate: "Dec 29, 2024", location: "Nashville, TN", status: "Inactive" },
+    { id: 16, name: "Chris Lee", email: "chris@untitledui.com", joiningDate: "Dec 28, 2024", location: "San Diego, CA", status: "Active" },
+    { id: 17, name: "Jessica White", email: "jessica@untitledui.com", joiningDate: "Dec 27, 2024", location: "Atlanta, GA", status: "Suspend" },
+    { id: 18, name: "Ryan Taylor", email: "ryan@untitledui.com", joiningDate: "Dec 26, 2024", location: "Chicago, IL", status: "Inactive" },
   ]);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
@@ -115,10 +115,11 @@ export default function AllUser() {
 
   return (
     <div className="">
-      <SectionTitle title={"Buyer & User management"} description={"Track, manage and forecast your customers and orders."} />
+      <SectionTitle title={"User management"} description={"Track, manage and forecast your customers and orders."} />
       <div className="border border-gray-200 p-5 rounded-2xl">
         <div className="">
-          <div className="flex items-center justify-end mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl font-medium">All User</h1>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
@@ -144,7 +145,7 @@ export default function AllUser() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email address</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joining Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
               </tr>
             </thead>
@@ -165,10 +166,17 @@ export default function AllUser() {
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{user.joiningDate}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{user.location}</div></td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${user.userType === "Seller" ? "bg-green-100 text-green-800" : "bg-purple-100 text-purple-800"}`}>
-                      {user.userType}
-                    </span>
-                  </td>
+  <span
+    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full
+      ${user.status === "Active" ? "bg-green-100 text-green-800" : ""}
+      ${user.status === "Suspend" ? "bg-yellow-100 text-yellow-800" : ""}
+      ${user.status === "Inactive" ? "bg-red-100 text-red-800" : ""}
+    `}
+  >
+    {user.status}
+  </span>
+</td>
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button onClick={() => setSelectedUserId(user.id)} className="text-gray-400 hover:text-red-600 transition-colors">
                       <Trash2 className="h-4 w-4" />
@@ -210,7 +218,7 @@ export default function AllUser() {
                        Are you sure you want to delete the user ? 
                       </p>
                       <div className="flex gap-5">
-                <button onClick={() => setSelectedUserId(null)} className="px-4 py-2 bg-gray-100 w-full rounded-full text-sm sm:text-base cursor-pointer hover:bg-gray-200">Cancel</button>
+                <button onClick={() => setSelectedUserId(null)} className="px-4 py-2 bg-gray-100 w-full rounded-full text-sm sm:text-base cursor-pointer hover:bg-gray-200">Inactive</button>
                 <button onClick={() => handleDeleteUser(selectedUserId)} className="px-4 py-2 rounded-full w-full text-white font-medium bg-red-600 text-sm sm:text-base hover:bg-red-700 cursor-pointer">Delete</button>
               </div>
                     </div>

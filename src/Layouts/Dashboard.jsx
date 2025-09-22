@@ -58,9 +58,9 @@ const Dashboard = () => {
             <Link
               key={index}
               to={menu.path}
-              className={`flex items-center py-2 px-7 text-sm rounded-lg cursor-pointer transition-colors ${
+              className={`flex items-center py-2 px-5 text-sm rounded-lg cursor-pointer transition-colors ${
                 location.pathname === menu.path
-                  ? "bg-[#EFEEF9] text-[#9C6ED9]"
+                  ? "bg-[#EFEEF9] text-[#4776EB]"
                   : "text-gray-600 hover:bg-[#EFEEF9]"
               }`}
             >
