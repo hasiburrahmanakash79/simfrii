@@ -34,7 +34,7 @@ const Dashboard = () => {
 
   // Menu configuration
   const menus = [
-    { title: "Dashboard", path: "/admin/dashboard", icon: HomeIconSvg },
+    { title: "Dashboard", path: "dashboard", icon: HomeIconSvg },
     { title: "User", path: "/admin/user", icon: UserIconSvg },
     { title: "Order", path: "/admin/order", icon: ShoppingIconSvg },
     { title: "Services", path: "/admin/service", icon: ServicesIconSvg },

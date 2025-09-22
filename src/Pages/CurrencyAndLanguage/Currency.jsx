@@ -165,7 +165,7 @@ const Currency = () => {
     { code: "ZWL", name: "Zimbabwean Dollar" },
   ];
 
-  const [selectedCurrency, setSelectedCurrency] = useState(null);
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const handleCurrencySelect = (code) => {
     setSelectedCurrency(code);

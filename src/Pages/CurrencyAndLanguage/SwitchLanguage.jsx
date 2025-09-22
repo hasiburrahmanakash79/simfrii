@@ -85,7 +85,7 @@ const SwitchLanguage = () => {
     { code: "zu", name: "Zulu" },
   ];
 
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguage(code);

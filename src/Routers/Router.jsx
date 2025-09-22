@@ -18,6 +18,9 @@ import TopUp from "../Pages/TopUp/TopUp";
 import Instructions from "../Pages/Instructions/Instructions";
 import Email from "../Pages/Authentication/Email";
 import ResetPassword from "../Pages/Authentication/ResetPassword";
+import AllUser from "../Pages/AdminPages/AllUser/AllUsers";
+import OrderList from "../Pages/AdminPages/OrderPage/OrderList";
+import UserDetailPage from "../Pages/AdminPages/AllUser/UserDetail";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -70,12 +73,24 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/dashboard",
+    path: "/admin",
     element: <Dashboard />,
     children: [
       {
-        path: "",
+        path: "dashboard",
         element: <AdminOverview />,
+      },
+      {
+        path: "user",
+        element: <AllUser />,
+      },
+      {
+        path: "userDetail/:id",
+        element: <UserDetailPage />,
+      },
+      {
+        path: "order",
+        element: <OrderList />,
       },
     ],
   },
