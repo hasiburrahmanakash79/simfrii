@@ -26,6 +26,8 @@ import ContentPage from "../Pages/AdminPages/ContentPage/ContentPage";
 import Payment from "../Pages/AdminPages/Payment/Payment";
 import PlanManagement from "../Pages/AdminPages/PlanManagement/PlanManagement";
 import CustomerSupport from "../Pages/AdminPages/CustomerSupport/CustomerSupport";
+import Settings from "../Pages/AdminPages/Settings/Settings";
+import Analytics from "../Pages/AdminPages/Analytics/Analytics";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -118,8 +120,16 @@ const router = createBrowserRouter([
         element: <OrderDetailPage />,
       },
       {
+        path: "analytics",
+        element: <Analytics />,
+      },
+      {
         path: "support",
         element: <CustomerSupport />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },

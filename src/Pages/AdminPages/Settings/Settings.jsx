@@ -5,53 +5,40 @@ import question from "../../../assets/icons/question.svg";
 const Settings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [replyMessage, setReplyMessage] = useState("");
+  const [permissions, setPermissions] = useState({
+    dashboardAccess: false,
+    viewUsers: false,
+    editUsers: false,
+    suspendUsers: false,
+    viewPlans: false,
+    editPlans: false,
+  });
 
   const tickets = [
     {
       id: "TKT-001",
-      title: "Having problem in installing eSIM",
+      title: "Super Admin",
       customer: "john@gmail.com",
       customerName: "John Smith",
-      created: "2 hours ago",
-      status: "Open",
-      messages: [
-        {
-          id: 1,
-          sender: "John Smith",
-          isCustomer: true,
-          message: "Hi, I'm having trouble connecting to the network in Berlin. My eSIM shows as active but I can't get any data connection. Can you help?",
-          timestamp: "2 hours ago"
-        },
-        {
-          id: 2,
-          sender: "John Smith",
-          isCustomer: false,
-          message: "Hello John, I can see your eSIM is active. There might be a temporary network issue in your area. Please try restarting your device and selecting the network manually. I'll also check with our carrier partner.",
-          timestamp: "1 hour ago"
-        }
-      ]
     },
     {
       id: "TKT-002",
-      title: "Connection issue in Germany",
-      customer: "johnsmith@gmail.com",
-      customerName: "John Smith",
-      created: "3 hours ago",
-      status: "Open",
-      messages: [
-        {
-          id: 1,
-          sender: "John Smith",
-          isCustomer: true,
-          message: "I'm experiencing connection issues in Germany. The eSIM is installed but no data is working.",
-          timestamp: "3 hours ago"
-        }
-      ]
-    }
+      title: "Support Staff",
+      customer: "support@gmail.com",
+      customerName: "Support User",
+    },
   ];
 
   const openModal = (ticket) => {
+    // Reset or set initial permissions based on the role (e.g., default for Support Staff)
+    setPermissions({
+      dashboardAccess: ticket.title === "Super Admin",
+      viewUsers: ticket.title === "Super Admin",
+      editUsers: false,
+      suspendUsers: false,
+      viewPlans: ticket.title === "Super Admin",
+      editPlans: false,
+    });
     setSelectedTicket(ticket);
     setIsModalOpen(true);
   };
@@ -59,36 +46,31 @@ const Settings = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedTicket(null);
-    setReplyMessage("");
   };
 
-  const handleSendReply = () => {
-    if (replyMessage.trim()) {
-      console.log("Sending reply:", replyMessage);
-      setReplyMessage("");
-    }
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setPermissions((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
+  const handleUpdate = () => {
+    console.log("Updated permissions for", selectedTicket.title, permissions);
+    closeModal(); // Close modal after update
+    // Add API call or other logic here to save permissions
+  };
 
   return (
     <div className="">
-      <SectionTitle
-        title={"Customer Support"}
-        description={"Handle customer support requests"}
-      />
+      <SectionTitle title="Settings" description="System configuration and roles" />
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
-                Support Ticket
-              </h1>
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Role Management</h1>
             </div>
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-64 sm:w-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
           </div>
         </div>
 
@@ -102,7 +84,7 @@ const Settings = () => {
                   <p className="text-[#919191]">{ticket.customer}</p>
                 </span>
               </div>
-              <button 
+              <button
                 onClick={() => openModal(ticket)}
                 className="px-3 py-1 rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300 transition-colors"
               >
@@ -113,68 +95,108 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="">
-                <div>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">Support</h2>
-                  <div className="text-red-600 space-y-1 bg-red-50 w-full p-4 rounded-lg">
-                    <p className="font-medium">Ticket {selectedTicket.id}: {selectedTicket.title}</p>
-                    <p>Customer: {selectedTicket.customer}</p>
-                    <p>Created: {selectedTicket.created}</p>
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start pb-3 mb-4">
+                <h2 className="text-2xl font-semibold text-gray-900">Edit Role</h2>
+                
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h3 className="text-blue-600 font-medium mb-1">{selectedTicket.title}</h3>
+                <p className="text-gray-600 text-sm">Configure permissions for this role</p>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-3">Dashboard Access</h4>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="dashboardAccess"
+                    checked={permissions.dashboardAccess}
+                    onChange={handleCheckboxChange}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-gray-600">View dashboard and analytics</span>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-3">User Management</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="viewUsers"
+                      checked={permissions.viewUsers}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">View user accounts</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="editUsers"
+                      checked={permissions.editUsers}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">Edit user accounts</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="suspendUsers"
+                      checked={permissions.suspendUsers}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">Suspend/ban user</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Messages */}
-            <div className="p-6 max-h-96 overflow-y-auto space-y-4">
-              {selectedTicket.messages.map((message) => (
-                <div key={message.id} className="flex items-start gap-3">
-                  {/* Avatar */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                    message.isCustomer ? 'bg-blue-500' : 'bg-purple-500'
-                  }`}>
-                    {message.sender.split(' ').map(n => n[0]).join('')}
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-3">Plan Management</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="viewPlans"
+                      checked={permissions.viewPlans}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">View eSIM plans</span>
                   </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-900">{message.sender}</span>
-                      <span className="text-xs text-gray-500">{message.timestamp}</span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed">{message.message}</p>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="editPlans"
+                      checked={permissions.editPlans}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-600">Create/edit plans</span>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Reply Section */}
-            <div className="border-t border-gray-200 p-6">
-              <h3 className="font-medium text-gray-900 mb-3">Reply to customer</h3>
-              <textarea
-                value={replyMessage}
-                onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder="Type here your response"
-                className="w-full h-24 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-end gap-3 mt-8">
                 <button
                   onClick={closeModal}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 bg-gray-200 rounded-lg transition-colors"
+                  className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                 >
-                  Close
+                  Cancel
                 </button>
                 <button
-                  onClick={handleSendReply}
-                  className="px-6 py-2 bg-[#4776EB] text-white rounded-lg  transition-colors"
+                  onClick={handleUpdate}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                 >
-                  Send reply
+                  Update
                 </button>
               </div>
             </div>

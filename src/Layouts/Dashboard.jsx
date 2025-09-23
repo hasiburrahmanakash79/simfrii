@@ -41,9 +41,9 @@ const Dashboard = () => {
     { title: "eSIM plan management", path: "/admin/management", icon: SimIconSvg },
     { title: "Payment", path: "/admin/payment", icon: PaymentIconSvg },
     { title: "Upload", path: "/admin/content", icon: CloudIconSvg },
-    { title: "Analytics", path: "/admin/add-privacy", icon: AnalyticsIconSvg },
+    { title: "Analytics", path: "/admin/analytics", icon: AnalyticsIconSvg },
     { title: "Support", path: "/admin/support", icon: SupportIconSvg },
-    { title: "Settings", path: "/admin/add-privacy", icon: SettingIconSvg },
+    { title: "Settings", path: "/admin/settings", icon: SettingIconSvg },
   ];
 
   return (
