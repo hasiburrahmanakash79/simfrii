@@ -2,7 +2,7 @@ import { useState } from "react";
 import SectionTitle from "../../../components/SectionTitle";
 import question from "../../../assets/icons/question.svg";
 
-const CustomerSupport = () => {
+const Settings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
@@ -185,4 +185,4 @@ const CustomerSupport = () => {
   );
 };
 
-export default CustomerSupport;
+export default Settings;
