@@ -209,7 +209,7 @@ const Dashboard = () => {
   // Menu configuration
   const menus = [
     { title: "Dashboard", path: "adminOverview", icon: HomeIconSvg, role: "admin" },
-    { title: "User", path: "/dashboard/user", icon: UserIconSvg, role: "admin" },
+    { title: "User", path: "/dashboard/userList", icon: UserIconSvg, role: "admin" },
     { title: "Orders", path: "/dashboard/order", icon: OrderIconSvg, role: "admin" },
     {
       title: "eSIM plan management",
