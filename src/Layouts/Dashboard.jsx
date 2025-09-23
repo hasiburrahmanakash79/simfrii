@@ -1,6 +1,5 @@
 import logo from "../assets/logo/logo.png";
-import user from "../assets/icons/user.png";
-import Logout from "../assets/icons/logout.png";
+import Logout from "../assets/icons/signout.svg";
 import HomeIconSvg from "../assets/icons/Home.svg";
 import UserIconSvg from "../assets/icons/Users.svg";
 import OrderIconSvg from "../assets/icons/order.svg";
@@ -39,11 +38,11 @@ const Dashboard = () => {
     { title: "Dashboard", path: "dashboard", icon: HomeIconSvg },
     { title: "User", path: "/admin/user", icon: UserIconSvg },
     { title: "Orders", path: "/admin/order", icon: OrderIconSvg },
-    { title: "eSIM plan management", path: "/admin/service", icon: SimIconSvg },
-    { title: "Payment", path: "/admin/request", icon: PaymentIconSvg },
+    { title: "eSIM plan management", path: "/admin/management", icon: SimIconSvg },
+    { title: "Payment", path: "/admin/payment", icon: PaymentIconSvg },
     { title: "Upload", path: "/admin/content", icon: CloudIconSvg },
     { title: "Analytics", path: "/admin/add-privacy", icon: AnalyticsIconSvg },
-    { title: "Support", path: "/admin/add-privacy", icon: SupportIconSvg },
+    { title: "Support", path: "/admin/support", icon: SupportIconSvg },
     { title: "Settings", path: "/admin/add-privacy", icon: SettingIconSvg },
   ];
 
@@ -78,8 +77,8 @@ const Dashboard = () => {
         <footer className="mt-28 p-2 absolute bottom-2 w-full">
           <div className="flex items-center justify-center gap-x-3">
             <Link className="flex items-center gap-x-3 p-2 text-sm">
-              <div className="rounded-full p-3 bg-purple-50">
-                <img src={user} alt="Profile" className="w-5" />
+              <div className="">
+                <img src='https://www.logoai.com/uploads/resources/2023/06/19/fa7fe9edacbfae0e5ad69f061d0153b8.jpeg' alt="Profile" className="w-10 rounded-full" />
               </div>
               <span>
                 <p className="font-bold">John Cena</p>
