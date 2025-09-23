@@ -28,6 +28,9 @@ import PlanManagement from "../Pages/AdminPages/PlanManagement/PlanManagement";
 import CustomerSupport from "../Pages/AdminPages/CustomerSupport/CustomerSupport";
 import Settings from "../Pages/AdminPages/Settings/Settings";
 import Analytics from "../Pages/AdminPages/Analytics/Analytics";
+import IssueAnalytics from "../Pages/StaffPages/IssueAnalytics/IssueAnalytics";
+import SimPlan from "../Pages/StaffPages/SimPlan/SimPlan";
+import StaffOverview from "../Pages/StaffPages/StaffOverview/StaffOverview";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -80,15 +83,16 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/admin",
+    path: "/dashboard",
     element: <Dashboard />,
     children: [
       {
-        path: "dashboard",
+        path: "adminOverview",
         element: <AdminOverview />,
       },
+
       {
-        path: "user",
+        path: "userList",
         element: <AllUser />,
       },
       {
@@ -130,6 +134,20 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <Settings />,
+      },
+
+      // Stuff dashboard
+      {
+        path: "stuffOverview",
+        element: <StaffOverview />,
+      },
+      {
+        path: "sim-plan",
+        element: <SimPlan />,
+      },
+      {
+        path: "issue-analytics",
+        element: <IssueAnalytics />,
       },
     ],
   },

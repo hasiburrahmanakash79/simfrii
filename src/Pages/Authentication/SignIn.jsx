@@ -13,13 +13,40 @@ const SignIn = () => {
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
 
+  // Dummy credentials
+  const dummyCredentials = {
+    user: { email: "user@example.com", password: "user123", role: "user" },
+    stuff: { email: "stuff@example.com", password: "stuff123", role: "stuff" },
+    admin: { email: "admin@example.com", password: "admin123", role: "admin" },
+  };
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    navigate("/");
+    // Find matching credential
+    const credential = Object.values(dummyCredentials).find(
+      (cred) =>
+        cred.email === data.email && cred.password === data.password
+    );
+
+    if (credential) {
+      // Store user data in localStorage
+      localStorage.setItem("userRole", credential.role);
+      localStorage.setItem("userEmail", credential.email);
+
+      // Navigate based on role
+      if (credential.role === "user") {
+        navigate("/");
+      } else if (credential.role === "stuff") {
+        navigate("/dashboard/stuffOverview");
+      } else if (credential.role === "admin") {
+        navigate("/dashboard/adminOverview");
+      }
+    } else {
+      alert("Invalid email or password!");
+    }
   };
 
   return (
@@ -46,9 +73,9 @@ const SignIn = () => {
                 />
                 <FaUser className="absolute inset-y-3 right-3 flex items-center text-gray-500" />
               </div>
-              {errors.username && (
+              {errors.email && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.username.message}
+                  {errors.email.message}
                 </p>
               )}
             </div>
@@ -84,11 +111,13 @@ const SignIn = () => {
                 <p>Remember me</p>
               </div>
               <div>
-                <Link to='/email' className="text-xs text-[#fda852]">Forget Password</Link>
+                <Link to="/email" className="text-xs text-[#fda852]">
+                  Forget Password
+                </Link>
               </div>
             </div>
 
-            <button type="submit" className="btn-primary ">
+            <button type="submit" className="btn-primary w-full mt-4">
               Log In
             </button>
           </form>

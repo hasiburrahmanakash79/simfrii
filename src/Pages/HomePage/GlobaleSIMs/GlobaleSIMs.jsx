@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OfferCard from "../../../components/OfferCard";
 
 const GlobaleSIMs = () => {
@@ -35,11 +35,16 @@ const GlobaleSIMs = () => {
 
   return (
     <div className="my-10">
-      <h1 className="text-3xl font-medium">Global eSIMs</h1>
-      <p className="text-gray-600 mb-4">
-        Discover our range of global eSIMs for seamless connectivity while
-        traveling.
-      </p>
+      <div className="flex justify-between">
+        <div>
+        <h1 className="text-3xl font-medium">Global eSIMs</h1>
+        <p className="text-gray-600 mb-4">
+          Discover our range of global eSIMs for seamless connectivity while
+          traveling.
+        </p>
+      </div>
+      <Link to='/worldwide' className="text-[#FF8911] hover:underline">See All</Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
         {offers.map((offer, index) => (

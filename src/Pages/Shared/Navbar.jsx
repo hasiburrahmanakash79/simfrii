@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";
-import Language from "../AccountSettings/Language";
 import SwitchLanguage from "../CurrencyAndLanguage/SwitchLanguage";
 import Currency from "../CurrencyAndLanguage/Currency";
 
@@ -136,7 +135,7 @@ const Navbar = () => {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                   <Link
-                    to="/admin/dashboard"
+                    to="/dashboard"
                     onClick={() => handleDropdownOptionClick("Settings")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
