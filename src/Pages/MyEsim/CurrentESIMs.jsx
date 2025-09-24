@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import eSime from "../../assets/icons/eSim.svg";
 import {
   Calendar,

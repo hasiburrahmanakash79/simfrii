@@ -80,12 +80,12 @@ const TopUpDataCard = () => {
   return (
     <div className="">
       <div className="flex justify-between items-center ">
-        <h1 className="text-2xl font-bold">Top Up</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Top Up</h1>
         <div
-          className="bg-[#FDF8DB] p-5 rounded-lg cursor-pointer"
+          className="bg-[#FDF8DB] p-3 sm:p-4 rounded-lg cursor-pointer mt-3 sm:mt-0"
           onClick={openModal}
         >
-          <img src={filter} alt="" />
+          <img src={filter} alt="" className="w-5 h-5 sm:w-6 sm:h-6"/>
         </div>
       </div>
       <div className="my-7 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
