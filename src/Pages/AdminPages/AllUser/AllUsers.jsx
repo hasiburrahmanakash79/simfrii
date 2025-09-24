@@ -153,7 +153,7 @@ export default function AllUser() {
               {currentUsers.length > 0 ? currentUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link to={`/admin/userDetail/${user.id}`} className="flex items-center">
+                    <Link to={`/dashboard/userDetail/${user.id}`} className="flex items-center">
                       <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${avatarColors[user.id % avatarColors.length]}`}>
                         {user.name.split(" ").map((n) => n[0]).join("")}
                       </div>
