@@ -224,13 +224,13 @@ const Navbar = () => {
           >
             Home
           </a>
-          <a
-            href="#"
+          <Link
+            to="/my-esim"
             onClick={handleMenuItemClick}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
           >
             My eSIMs
-          </a>
+          </Link>
           <a
             href="#"
             onClick={(e) => {

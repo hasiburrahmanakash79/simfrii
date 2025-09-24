@@ -15,7 +15,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 container mx-auto p-4">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-6 lg:space-y-0">
             <div className="space-y-3">
-              <div className="text-2xl font-bold text-orange-600 tracking-tight">
+              <div className="text-2xl font-bold text-[#FF962C] tracking-tight">
                 SimFrii.com
               </div>
               <p className="text-gray-600 max-w-xs">
@@ -48,7 +48,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   United States
                 </a>
@@ -56,7 +56,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   London
                 </a>
@@ -64,7 +64,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Canada
                 </a>
@@ -72,7 +72,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Australia
                 </a>
@@ -80,7 +80,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Germany
                 </a>
@@ -94,7 +94,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-purple-700 transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Contact Us
                 </a>
@@ -102,7 +102,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Blog
                 </a>
@@ -110,7 +110,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   FAQ
                 </a>
@@ -118,7 +118,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   Help
                 </a>
@@ -133,7 +133,7 @@ const Footer = () => {
                 <img src={location} alt="Location" />
                 <a
                   href="#"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   44 Danwers, NY City, USA, 70-102
                 </a>
@@ -142,7 +142,7 @@ const Footer = () => {
                 <img src={email} alt="Email" className="shrink-0" />
                 <a
                   href="mailto:simfrii@gmail.com"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors break-all"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors break-all"
                 >
                   simfrii.contact@gmail.com
                 </a>
@@ -151,7 +151,7 @@ const Footer = () => {
                 <img src={call} alt="Call" />
                 <a
                   href="https://hr-akash23.web.app"
-                  className="text-gray-600 hover:text-[#8272ED] transition-colors"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
                 >
                   91+585-656-658
                 </a>
