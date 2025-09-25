@@ -68,9 +68,9 @@ const Navbar = () => {
   return (
     <nav className="bg-white border border-gray-100 fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between md:grid grid-cols-3 items-center">
-        <div className="text-2xl font-bold text-orange-600 tracking-tight">
+        <Link to='/' className="text-2xl font-bold text-orange-600 tracking-tight">
           SimFrii.com
-        </div>
+        </Link>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center justify-center space-x-8">
@@ -217,13 +217,12 @@ const Navbar = () => {
               ></path>
             </svg>
           </button>
-          <a
-            href="#"
+          <Link to='/'
             onClick={handleMenuItemClick}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
           >
             Home
-          </a>
+          </Link>
           <Link
             to="/my-esim"
             onClick={handleMenuItemClick}
@@ -283,7 +282,7 @@ const Navbar = () => {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                   <Link
-                    to="/admin/dashboard"
+                    to="/dashboard"
                     onClick={() => handleDropdownOptionClick("Settings")}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
@@ -319,9 +318,9 @@ const Navbar = () => {
 
       {/* Language Modal */}
       {languageModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className=" bg-white rounded-2xl p-5">
-            <div className="flex justify-between text-center items-center gap-3  md:min-w-xl ">
+            <div className="flex justify-between text-center items-center gap-3 md:min-w-xl ">
               {tabs.map((tab) => (
                 <button
                   key={tab.value}
