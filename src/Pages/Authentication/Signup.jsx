@@ -138,6 +138,14 @@ const Signup = () => {
                 />
                 Google
               </button>
+              <button className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
+              <img
+                src="https://assets.likefamily.com.au/public/images/socials/apple-icon.png?auto=compress&q=50&ixlib=react-9.3.0"
+                alt="Facebook"
+                className="w-7 h-7 mr-2"
+              />
+              Apple
+            </button>
             </div>
 
             <button
