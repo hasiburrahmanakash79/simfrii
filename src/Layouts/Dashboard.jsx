@@ -139,7 +139,7 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Swal from "sweetalert2";
-import logo from "../assets/logo/logo.png";
+import logo from "../assets/logo/simFriiIcon.svg";
 import Logout from "../assets/icons/signout.svg";
 import HomeIconSvg from "../assets/icons/Home.svg";
 import UserIconSvg from "../assets/icons/Users.svg";
@@ -212,8 +212,8 @@ const Dashboard = () => {
         {/* Sidebar Content */}
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Logo Section */}
-          <div className="p-2 flex flex-col items-center justify-center">
-            <img src={logo} alt="Logo" className="w-12 md:w-16" />
+          <div className="p-2 flex flex-col items-center justify-center mt-7">
+            <img src={logo} alt="Logo" className="w-12 md:w-24" />
           </div>
 
           {/* Navigation Menu */}
@@ -224,8 +224,8 @@ const Dashboard = () => {
                 to={menu.path}
                 className={`flex items-center p-2 text-sm rounded-lg transition-colors ${
                   location.pathname === menu.path || (location.pathname === "/dashboard" && menu.path.includes("Overview"))
-                    ? "bg-[#EAF3FF] text-[#4776EB]"
-                    : "text-gray-600 hover:bg-[#EAF3FF]"
+                    ? "bg-[#fffaea] text-[#ff9900]"
+                    : "text-gray-600 hover:bg-[#fffaea]"
                 }`}
                 aria-label={menu.title}
                 onClick={() => setIsSidebarOpen(false)} // Close sidebar on mobile after click

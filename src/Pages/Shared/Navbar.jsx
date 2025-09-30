@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import simFrii from "../../assets/logo/simFriiLogo.svg";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";
@@ -68,8 +69,8 @@ const Navbar = () => {
   return (
     <nav className="bg-white border border-gray-100 fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between md:grid grid-cols-3 items-center">
-        <Link to='/' className="text-2xl font-bold text-orange-600 tracking-tight">
-          SimFrii.com
+        <Link to='/' className="text-2xl w-36 font-bold text-orange-600 tracking-tight">
+          <img src={simFrii} alt="" />
         </Link>
 
         {/* Desktop Menu */}
@@ -159,7 +160,7 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <button className="bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-colors duration-300 font-medium">
+            <button className="rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] hover:scale-105 md:py-2 py-1 px-6 md:text-lg transition-transform duration-300 shadow-lg cursor-pointer">
               Sign In
             </button>
           )}
