@@ -1,10 +1,15 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
+import apiClient from "../../lib/api-client";
 const OtpVerification = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location);
+  const userId = location.state?.userId; // Assuming passed from Signup via navigate state
+  const email = location.state?.email; // Optional: if you want to display the email, assume passed
+
   const {
     register,
     handleSubmit,
@@ -13,6 +18,8 @@ const OtpVerification = () => {
   } = useForm({ defaultValues: { otp0: "", otp1: "", otp2: "", otp3: "" } });
   const [timer, setTimer] = useState(60);
   const [resendEnabled, setResendEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     let countdown;
@@ -24,18 +31,43 @@ const OtpVerification = () => {
     return () => clearInterval(countdown);
   }, [timer]);
 
-  const handleResendOtp = () => {
-    if (resendEnabled) {
-      setTimer(60);
-      setResendEnabled(false);
-      // Placeholder for resend OTP API call
+  const handleResendOtp = async () => {
+    if (resendEnabled && userId) {
+      setIsLoading(true);
+      setErrorMessage("");
+      try {
+        await apiClient.post("/auth/resend-verification-code", { user_id: userId });
+        setTimer(60);
+        setResendEnabled(false);
+      } catch (error) {
+        console.error("Resend OTP Error:", error);
+        setErrorMessage(error.response?.data?.message || "Failed to resend OTP. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const otp = Object.values(data).join("");
-    console.log("OTP Entered:", otp);
-    navigate('/reset-password')
+    if (!userId) {
+      setErrorMessage("User ID is missing. Please try signing up again.");
+      return;
+    }
+    setIsLoading(true);
+    setErrorMessage("");
+    try {
+      await apiClient.post("/auth/verify-email", {
+        user_id: userId,
+        verification_code: otp,
+      });
+      navigate("/signin"); // Or change to '/signin' if it's for signup verification
+    } catch (error) {
+      console.error("OTP Verification Error:", error);
+      setErrorMessage(error.response?.data?.message || "OTP verification failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e, index) => {
@@ -59,14 +91,21 @@ const OtpVerification = () => {
           Check your email
         </h2>
         <p className="text-center text-sm sm:text-base mb-6 text-[#747086]">
-          Please enter the four verification code we sent to{" "}
+          Please enter the four verification code we sent to {email || "your email"}
         </p>
+
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center mb-4">
+            {errorMessage}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex justify-center gap-3 sm:gap-4">
             {["otp0", "otp1", "otp2", "otp3"].map((name, index) => (
               <input
                 key={name}
+                name={name}
                 {...register(name, {
                   required: "This field is required",
                   pattern: {
@@ -96,6 +135,7 @@ const OtpVerification = () => {
                 type="button"
                 onClick={handleResendOtp}
                 className="text-[#fda852] hover:underline"
+                disabled={isLoading}
               >
                 Resend OTP
               </button>
@@ -107,8 +147,9 @@ const OtpVerification = () => {
           <button
             type="submit"
             className="w-full bg-[#fda852] text-white py-2 rounded-full hover:bg-[#f8b862] transition-colors"
+            disabled={isLoading}
           >
-            Verify OTP
+            {isLoading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>
 
