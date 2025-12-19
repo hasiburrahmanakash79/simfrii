@@ -4,139 +4,22 @@ import { X } from "lucide-react";
 import OfferCard from "../../../components/OfferCard";
 import filter from "../../../assets/icons/filter.svg";
 import useModal from "../../../components/modal/useModal";
+import { useFetchRegionPackages } from "../../../components/hook/useFetchRegionPackages";
 
 const RegionOffers = () => {
   const [selectedDuration, setSelectedDuration] = useState(null);
   const navigate = useNavigate();
   const { regionName } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
   const [sortOrder, setSortOrder] = useState(null);
   const { isOpen, openModal, closeModal } = useModal();
+
+  const { packages, loading, error } = useFetchRegionPackages(regionName)
+  console.log(packages);  
   const offersPerPage = 6;
 
-  const offers = [
-    {
-      company: "RoamFree",
-      coverage: "100 Countries",
-      duration: "30 Days",
-      data: "10 GB",
-      originalPrice: 25,
-      discountedPrice: 23.5,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "WorldLink",
-      coverage: "200 Countries",
-      duration: "365 Days",
-      data: "100 GB",
-      originalPrice: 80,
-      discountedPrice: 75.0,
-    },
-    {
-      company: "GlobeConnect",
-      coverage: "120 Countries",
-      duration: "7 Days",
-      data: "5 GB",
-      originalPrice: 12,
-      discountedPrice: 10.5,
-    },
-    {
-      company: "SimWorld",
-      coverage: "50 Countries",
-      duration: "14 Days",
-      data: "3 GB",
-      originalPrice: 9,
-      discountedPrice: 8.0,
-    },
-    {
-      company: "AirRoam",
-      coverage: "70 Countries",
-      duration: "21 Days",
-      data: "8 GB",
-      originalPrice: 18,
-      discountedPrice: 16.5,
-    },
-    {
-      company: "eConnect",
-      coverage: "150 Countries",
-      duration: "30 Days",
-      data: "20 GB",
-      originalPrice: 40,
-      discountedPrice: 37.0,
-    },
-    {
-      company: "NomadNet",
-      coverage: "60 Countries",
-      duration: "10 Days",
-      data: "4 GB",
-      originalPrice: 11,
-      discountedPrice: 9.5,
-    },
-    {
-      company: "GlobalEase",
-      coverage: "90 Countries",
-      duration: "45 Days",
-      data: "12 GB",
-      originalPrice: 27,
-      discountedPrice: 25.0,
-    },
-    {
-      company: "FlyNet",
-      coverage: "200 Countries",
-      duration: "90 Days",
-      data: "50 GB",
-      originalPrice: 60,
-      discountedPrice: 55.0,
-    },
-    {
-      company: "TripLink",
-      coverage: "40 Countries",
-      duration: "5 Days",
-      data: "2 GB",
-      originalPrice: 6,
-      discountedPrice: 5.0,
-    },
-    {
-      company: "SkySurf",
-      coverage: "110 Countries",
-      duration: "20 Days",
-      data: "7 GB",
-      originalPrice: 15,
-      discountedPrice: 13.5,
-    },
-    {
-      company: "ConnectGo",
-      coverage: "180 Countries",
-      duration: "180 Days",
-      data: "80 GB",
-      originalPrice: 70,
-      discountedPrice: 65.0,
-    },
-    {
-      company: "EasyRoam",
-      coverage: "30 Countries",
-      duration: "7 Days",
-      data: "1 GB",
-      originalPrice: 5,
-      discountedPrice: 4.0,
-    },
-    {
-      company: "DataGlobe",
-      coverage: "140 Countries",
-      duration: "365 Days",
-      data: "120 GB",
-      originalPrice: 100,
-      discountedPrice: 90.0,
-    },
-  ];
+  const offers = packages; // Use fetched packages as offers
   // Scroll to top whenever page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -179,7 +62,15 @@ const RegionOffers = () => {
       bgColor: "bg-[#F8FFCD]",
       button:
         "w-full bg-[#8E9D30] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+      badge:
+        "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
+    },
+    "eu-plus-uk": {
+      bgColor: "bg-[#F8FFCD]",
+      button:
+        "w-full bg-[#8E9D30] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
+      badge:
+        "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
     },
     asia: {
       bgColor: "bg-[#FFEAFD]",
@@ -205,7 +96,7 @@ const RegionOffers = () => {
         "w-full bg-[#D72B2B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
       badge: "bg-[#D72B2B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
     },
-    "south-america": {
+    "middle-east-and-north-africa": {
       bgColor: "bg-[#DBFEFF]",
       button:
         "w-full bg-[#08868B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
@@ -257,9 +148,17 @@ const RegionOffers = () => {
     closeModal();
   };
 
-  const handleBuy = (id) => {
-    navigate(`/order-preview/${id}`);
+    const handleBuy = (offer) => {
+    navigate(`/order-preview/${offer.id}`, { state: { offer } });
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="my-10 container mx-auto px-4 py-16">
@@ -281,7 +180,7 @@ const RegionOffers = () => {
             <OfferCard
               key={index}
               company={offer.company}
-              coverage={region}
+              coverage={offer.coverage}
               duration={offer.duration}
               data={offer.data}
               originalPrice={offer.originalPrice}
@@ -289,7 +188,7 @@ const RegionOffers = () => {
               bgColor={currentColorScheme.bgColor}
               button={currentColorScheme.button}
               saleBadge={currentColorScheme.badge}
-              onBuy={() => handleBuy(index)}
+              onBuy={() => handleBuy(offer)}
             />
           ))
         ) : (
@@ -387,7 +286,7 @@ const RegionOffers = () => {
                   <input
                     type="range"
                     min="0"
-                    max="100"
+                    max="500"
                     value={priceRange.max}
                     onChange={handlePriceRangeChange}
                     className="w-full accent-black"

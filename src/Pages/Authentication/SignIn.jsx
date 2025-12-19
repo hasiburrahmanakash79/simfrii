@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FaUser } from "react-icons/fa6";
+import { MdEmail } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
+import { parseJwt, setAuthTokens } from "../../lib/cookie-utils";
+import apiClient from "../../lib/api-client";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -10,41 +12,47 @@ const SignIn = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
-
-  // Dummy credentials
-  const dummyCredentials = {
-    user: { email: "user@example.com", password: "user123", role: "user" },
-    stuff: { email: "stuff@example.com", password: "stuff123", role: "stuff" },
-    admin: { email: "admin@example.com", password: "admin123", role: "admin" },
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const onSubmit = (data) => {
-    // Find matching credential
-    const credential = Object.values(dummyCredentials).find(
-      (cred) => cred.email === data.email && cred.password === data.password
-    );
-
-    if (credential) {
-      // Store user data in localStorage
-      localStorage.setItem("userRole", credential.role);
-      localStorage.setItem("userEmail", credential.email);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const payload = {
+        email_address: data.email,
+        password: data.password,
+      };
+      const response = await apiClient.post("/auth/sign-in", payload);
+      console.log(response);
+      const { access_token, refresh_token } = response.data; // Adjust based on actual response structure
+      setAuthTokens(access_token, refresh_token);
+      const parsedToken = parseJwt(access_token);
+      const role = response.data.role;
+      console.log(role);
 
       // Navigate based on role
-      if (credential.role === "user") {
+      if (role === "user") {
         navigate("/");
-      } else if (credential.role === "stuff") {
+      } else if (role === "staff" || role === "stuff") { // Assuming 'stuff' is a typo for 'staff'
         navigate("/dashboard/stuffOverview");
-      } else if (credential.role === "admin") {
+      } else if (role === "admin") {
         navigate("/dashboard/adminOverview");
+      } else {
+        navigate("/");
       }
-    } else {
-      alert("Invalid email or password!");
+    } catch (error) {
+      console.error("SignIn Error:", error);
+      setError("root", {
+        message: error.response?.data?.message || "Sign in failed. Please check your credentials.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,6 +66,11 @@ const SignIn = () => {
           <p className="text-center text-sm mb-6 text-[#747086]">
             Enter your email and password to access your account.
           </p>
+          {errors.root && (
+            <p className="text-red-500 text-sm text-center mb-4">
+              {errors.root.message}
+            </p>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="">
             <div className="mb-5">
               <label className="block text-sm font-medium mb-1">Email</label>
@@ -66,11 +79,15 @@ const SignIn = () => {
                   type="email"
                   {...register("email", {
                     required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: "Invalid email address",
+                    },
                   })}
                   placeholder="Enter your email"
                   className="w-full border border-base-300 bg-base-200 rounded-full p-2 outline-none"
                 />
-                <FaUser className="absolute inset-y-3 right-3 flex items-center text-gray-500" />
+                <MdEmail className="absolute inset-y-3 right-3 flex items-center text-gray-500" />
               </div>
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">
@@ -86,6 +103,7 @@ const SignIn = () => {
                   type={showPassword ? "text" : "password"}
                   {...register("password", {
                     required: "Password is required",
+                    
                   })}
                   placeholder="********"
                   className="w-full border border-base-300 bg-base-200 rounded-full p-2 outline-none"
@@ -120,7 +138,7 @@ const SignIn = () => {
             <div className="divider">Or Continue with</div>
             {/* Social Login */}
             <div className="flex space-x-4">
-              <button className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
+              <button type="button" className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
                   alt="Google"
@@ -128,18 +146,18 @@ const SignIn = () => {
                 />
                 Google
               </button>
-              <button className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
+              <button type="button" className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
               <img
                 src="https://assets.likefamily.com.au/public/images/socials/apple-icon.png?auto=compress&q=50&ixlib=react-9.3.0"
-                alt="Facebook"
+                alt="Apple"
                 className="w-7 h-7 mr-2"
               />
               Apple
             </button>
             </div>
 
-            <button type="submit" className="btn-primary w-full mt-4">
-              Log In
+            <button type="submit" className="btn-primary w-full mt-4" disabled={isLoading}>
+              {isLoading ? "Logging In..." : "Log In"}
             </button>
           </form>
           <p className="text-center text-sm mt-6">

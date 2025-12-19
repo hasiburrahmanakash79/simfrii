@@ -6,7 +6,7 @@ const LimitedTimeOffers = () => {
   const offers = [
     {
       company: "Airalo",
-      coverage: "137 Countries",
+      coverage: "137",
       duration: "365 Days",
       data: "50 GB",
       originalPrice: 53,
@@ -14,7 +14,7 @@ const LimitedTimeOffers = () => {
     },
     {
       company: "Globetrotter",
-      coverage: "120 Countries",
+      coverage: "120",
       duration: "180 Days",
       data: "30 GB",
       originalPrice: 45,
@@ -22,7 +22,7 @@ const LimitedTimeOffers = () => {
     },
     {
       company: "ConnectSphere",
-      coverage: "150 Countries",
+      coverage: "150",
       duration: "90 Days",
       data: "20 GB",
       originalPrice: 35,
@@ -30,7 +30,7 @@ const LimitedTimeOffers = () => {
     },
     {
       company: "RoamFree",
-      coverage: "100 Countries",
+      coverage: "100",
       duration: "30 Days",
       data: "10 GB",
       originalPrice: 25,
@@ -38,7 +38,7 @@ const LimitedTimeOffers = () => {
     },
     {
       company: "TravelNet",
-      coverage: "80 Countries",
+      coverage: "80",
       duration: "60 Days",
       data: "15 GB",
       originalPrice: 30,
@@ -46,7 +46,7 @@ const LimitedTimeOffers = () => {
     },
     {
       company: "WorldLink",
-      coverage: "200 Countries",
+      coverage: "200",
       duration: "365 Days",
       data: "100 GB",
       originalPrice: 80,

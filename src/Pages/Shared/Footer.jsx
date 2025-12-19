@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import facebook from "../../assets/icons/facebook.svg";
+import simFrii from "../../assets/logo/simFriiLogo.svg";
 import insta from "../../assets/icons/insta.svg";
 import twitter from "../../assets/icons/twitter.svg";
 import youtube from "../../assets/icons/youtube.svg";
@@ -15,8 +16,10 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 container mx-auto p-4">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-6 lg:space-y-0">
             <div className="space-y-3">
-              <div className="text-2xl font-bold text-[#FF962C] tracking-tight">
-                SimFrii.com
+              <div className="w-36">
+                <Link to="/">
+                  <img src={simFrii} alt="" />
+                </Link>
               </div>
               <p className="text-gray-600 max-w-xs">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -169,7 +172,7 @@ const Footer = () => {
           }}
         >
           <div className="">
-            © 2025 <span className="text-[#aa6320]">Akash</span>. All rights
+            © 2025 <span className="text-[#aa6320]">SimFrii</span>. All rights
             reserved.
           </div>
         </div>

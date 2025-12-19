@@ -1,37 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import OfferCard from "../../../components/OfferCard";
+import { useFetchGlobalPackages } from "../../../components/hook/useFetchGlobalPackages";
 
 const GlobaleSIMs = () => {
   const navigate = useNavigate();
-  const offers = [
-    {
-      company: "RoamFree",
-      coverage: "100 Countries",
-      duration: "30 Days",
-      data: "10 GB",
-      originalPrice: 25,
-      discountedPrice: 23.5,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "WorldLink",
-      coverage: "200 Countries",
-      duration: "365 Days",
-      data: "100 GB",
-      originalPrice: 80,
-      discountedPrice: 75.0,
-    },
-  ];
-  const handleBuy = (id) => {
-    navigate(`/order-preview/${id}`);
+  const { packages, loading } = useFetchGlobalPackages();
+// console.log(packages);
+  const slicePackage = packages.slice(0,6)
+
+  const handleBuy = (offer) => {
+    navigate(`/order-preview/${offer.id}`, { state: { offer } });
   };
+  if (loading) {
+    return (
+      <div className="my-10">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="my-10">
@@ -43,25 +29,26 @@ const GlobaleSIMs = () => {
             traveling.
           </p>
         </div>
-        <Link to="/worldwide" className="text-[#FF8911] hover:underline text-end">
+        <Link to="/worldwide?tab=global" className="text-[#FF8911] hover:underline text-end">
           See All
         </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
-        {offers.map((offer, index) => (
+        {slicePackage.map((offer) => (
           <OfferCard
-            key={index}
+            key={offer.id}
+            logo={offer.logo}
             company={offer.company}
             coverage={offer.coverage}
             duration={offer.duration}
-            data={offer.data}
+            data={offer.data + (offer.isUnlimited ? ' (Unlimited)' : '') + (offer.voice ? ` - ${offer.voice} Mins` : '') + (offer.text ? ` - ${offer.text} SMS` : '')}
             originalPrice={offer.originalPrice}
             discountedPrice={offer.discountedPrice}
             bgColor="bg-[#FFF6ED]"
             button="btn-primary"
             saleBadge="saleBadge"
-            onBuy={() => handleBuy(index)}
+            onBuy={() => handleBuy(offer)}
           />
         ))}
       </div>

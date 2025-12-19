@@ -1,15 +1,19 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import simFrii from "../../assets/logo/simFriiLogo.svg";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";
 import SwitchLanguage from "../CurrencyAndLanguage/SwitchLanguage";
 import Currency from "../CurrencyAndLanguage/Currency";
+import { hasCookie, removeAuthTokens } from "../../lib/cookie-utils";
+import useMe from "../../components/hook/useMe";
 
 const Navbar = () => {
+  const { me } = useMe()
+  console.log(me);
   const [isOpen, setIsOpen] = useState(false);
-  const isLoggedIn = true;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const userImage =
@@ -17,13 +21,18 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
 
-  const tabs = [
-    { label: "Language", value: "language", content: <SwitchLanguage/> },
-    { label: "Currency", value: "currency", content: <Currency/> },
-  ];
+  useEffect(() => {
+    setIsLoggedIn(hasCookie("isAuthenticated"));
+  }, []);
 
-  const [activeTab, setActiveTab] = useState("language");
+  // const tabs = [
+  //   { label: "Language", value: "language", content: <SwitchLanguage/> },
+  //   { label: "Currency", value: "currency", content: <Currency/> },
+  // ];
+
+  // const [activeTab, setActiveTab] = useState("language");
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -62,6 +71,15 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout = () => {
+    removeAuthTokens();
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    setShowLogoutModal(false);
+    navigate("/signin");
+  };
+
   const toggleLanguageModal = () => {
     setLanguageModalOpen(!languageModalOpen);
   };
@@ -94,12 +112,12 @@ const Navbar = () => {
           >
             Support
           </a>
-          <a
+          {/* <a
             onClick={toggleLanguageModal}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 font-medium cursor-pointer"
           >
             EN | USD
-          </a>
+          </a> */}
         </div>
 
         {/* Desktop Sign In / User Image */}
@@ -160,7 +178,7 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <button className="rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] hover:scale-105 md:py-2 py-1 px-6 md:text-lg transition-transform duration-300 shadow-lg cursor-pointer">
+            <button onClick={() => navigate("/signin")} className="rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] hover:scale-105 md:py-2 py-1 px-6 md:text-lg transition-transform duration-300 shadow-lg cursor-pointer">
               Sign In
             </button>
           )}
@@ -241,7 +259,7 @@ const Navbar = () => {
           >
             Support
           </a>
-          <a
+          {/* <a
             onClick={(e) => {
               e.preventDefault();
               toggleLanguageModal();
@@ -250,7 +268,7 @@ const Navbar = () => {
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
           >
             EN | USD
-          </a>
+          </a> */}
           <div className="relative">
             <input
               type="text"
@@ -308,7 +326,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              onClick={handleMenuItemClick}
+              onClick={() => { navigate("/signin"); handleMenuItemClick(); }}
               className="w-full bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-colors duration-300 font-medium"
             >
               Sign In
@@ -318,7 +336,7 @@ const Navbar = () => {
       </div>
 
       {/* Language Modal */}
-      {languageModalOpen && (
+      {/* {languageModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className=" bg-white rounded-2xl p-5">
             <div className="flex justify-between text-center items-center gap-3 md:min-w-xl ">
@@ -345,7 +363,7 @@ const Navbar = () => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Shared Modal */}
       <SupportModal
@@ -357,6 +375,7 @@ const Navbar = () => {
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
       />
     </nav>
   );

@@ -4,139 +4,34 @@ import { X } from "lucide-react";
 import OfferCard from "../../components/OfferCard";
 import useModal from "../../components/modal/useModal";
 import filter from "../../assets/icons/filter.svg";
+import useFetchCountries from "../../components/hook/useFetchCountries";
+import { useFetchCountryPackages } from "../../components/hook/useFetchCountryPackages";
 
 const CountryEsim = () => {
   const navigate = useNavigate();
   const { countryName } = useParams();
+  const { countries } = useFetchCountries();
+  const [countryCode, setCountryCode] = useState(null);
+
+  const { packages, loading: packagesLoading } = useFetchCountryPackages(countryCode);
   const [selectedDuration, setSelectedDuration] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
   const [sortOrder, setSortOrder] = useState(null);
   const { isOpen, openModal, closeModal } = useModal();
   const offersPerPage = 6;
 
-  const offers = [
-    {
-      company: "RoamFree",
-      coverage: "100 Countries",
-      duration: "30 Days",
-      data: "10 GB",
-      originalPrice: 25,
-      discountedPrice: 23.5,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "WorldLink",
-      coverage: "200 Countries",
-      duration: "365 Days",
-      data: "100 GB",
-      originalPrice: 80,
-      discountedPrice: 75.0,
-    },
-    {
-      company: "GlobeConnect",
-      coverage: "120 Countries",
-      duration: "7 Days",
-      data: "5 GB",
-      originalPrice: 12,
-      discountedPrice: 10.5,
-    },
-    {
-      company: "SimWorld",
-      coverage: "50 Countries",
-      duration: "14 Days",
-      data: "3 GB",
-      originalPrice: 9,
-      discountedPrice: 8.0,
-    },
-    {
-      company: "AirRoam",
-      coverage: "70 Countries",
-      duration: "21 Days",
-      data: "8 GB",
-      originalPrice: 18,
-      discountedPrice: 16.5,
-    },
-    {
-      company: "eConnect",
-      coverage: "150 Countries",
-      duration: "30 Days",
-      data: "20 GB",
-      originalPrice: 40,
-      discountedPrice: 37.0,
-    },
-    {
-      company: "NomadNet",
-      coverage: "60 Countries",
-      duration: "10 Days",
-      data: "4 GB",
-      originalPrice: 11,
-      discountedPrice: 9.5,
-    },
-    {
-      company: "GlobalEase",
-      coverage: "90 Countries",
-      duration: "45 Days",
-      data: "12 GB",
-      originalPrice: 27,
-      discountedPrice: 25.0,
-    },
-    {
-      company: "FlyNet",
-      coverage: "200 Countries",
-      duration: "90 Days",
-      data: "50 GB",
-      originalPrice: 60,
-      discountedPrice: 55.0,
-    },
-    {
-      company: "TripLink",
-      coverage: "40 Countries",
-      duration: "5 Days",
-      data: "2 GB",
-      originalPrice: 6,
-      discountedPrice: 5.0,
-    },
-    {
-      company: "SkySurf",
-      coverage: "110 Countries",
-      duration: "20 Days",
-      data: "7 GB",
-      originalPrice: 15,
-      discountedPrice: 13.5,
-    },
-    {
-      company: "ConnectGo",
-      coverage: "180 Countries",
-      duration: "180 Days",
-      data: "80 GB",
-      originalPrice: 70,
-      discountedPrice: 65.0,
-    },
-    {
-      company: "EasyRoam",
-      coverage: "30 Countries",
-      duration: "7 Days",
-      data: "1 GB",
-      originalPrice: 5,
-      discountedPrice: 4.0,
-    },
-    {
-      company: "DataGlobe",
-      coverage: "140 Countries",
-      duration: "365 Days",
-      data: "120 GB",
-      originalPrice: 100,
-      discountedPrice: 90.0,
-    },
-  ];
+  // Find country code from countries based on slug
+  useEffect(() => {
+    if (countries.length > 0 && countryName) {
+      const matchedCountry = countries.find(
+        (country) => country.slug.replace(/\s+/g, "-").toLowerCase() === countryName.toLowerCase()
+      );
+      if (matchedCountry) {
+        setCountryCode(matchedCountry.country_code);
+      }
+    }
+  }, [countries, countryName]);
 
   // Scroll to top whenever page changes
   useEffect(() => {
@@ -144,11 +39,12 @@ const CountryEsim = () => {
   }, [currentPage]);
 
   // Filter and sort offers
-  const filteredAndSortedOffers = offers
+  const filteredAndSortedOffers = packages
     .filter(
       (offer) =>
         offer.discountedPrice >= priceRange.min &&
-        offer.discountedPrice <= priceRange.max
+        offer.discountedPrice <= priceRange.max &&
+        (!selectedDuration || offer.duration.toLowerCase().includes(selectedDuration.toLowerCase()))
     )
     .sort((a, b) => {
       if (sortOrder === "lowToHigh") {
@@ -168,6 +64,7 @@ const CountryEsim = () => {
   );
   const totalPages = Math.ceil(filteredAndSortedOffers.length / offersPerPage);
 
+  console.log(currentOffers);
   // Format country name
   const formattedName = countryName
     .split("-")
@@ -205,15 +102,20 @@ const CountryEsim = () => {
     closeModal();
   };
   const handleClearFilters = () => {
-    setPriceRange({ min: 0, max: 100 });
+    setPriceRange({ min: 0, max: 500 });
     setSortOrder(null);
+    setSelectedDuration(null);
     setCurrentPage(1); // Reset to first page
     closeModal();
   };
 
-  const handleBuy = (id) => {
-    navigate(`/order-preview/${id}`);
+  const handleBuy = (offer) => {
+    navigate(`/order-preview/${offer.id}`, { state: { offer } });
   };
+
+  if (packagesLoading || !countryCode) {
+    return <div className="my-10 container mx-auto px-4 py-16">Loading...</div>;
+  }
 
   return (
     <div className="my-10 container mx-auto px-4 py-16">
@@ -231,19 +133,20 @@ const CountryEsim = () => {
       {/* Offers grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
         {currentOffers.length > 0 ? (
-          currentOffers.map((offer, index) => (
+          currentOffers.map((offer) => (
             <OfferCard
-              key={index}
+              key={offer.id}
+              logo={offer.logo}
               company={offer.company}
               coverage={offer.coverage}
               duration={offer.duration}
-              data={offer.data}
+              data={offer.data  + (offer.voice ? ` - ${offer.voice} Mins` : '') + (offer.text ? ` - ${offer.text} SMS` : '')}
               originalPrice={offer.originalPrice}
               discountedPrice={offer.discountedPrice}
               bgColor="bg-[#FFFFFF]"
               button="btn-primary"
               saleBadge="saleBadge"
-              onBuy={() => handleBuy(index)}
+              onBuy={() => handleBuy(offer)}
             />
           ))
         ) : (
@@ -279,7 +182,7 @@ const CountryEsim = () => {
                 onClick={() => setCurrentPage(item)}
                 className={`px-4 py-2 rounded-lg shadow-md border border-orange-200 transition ${
                   currentPage === item
-                    ? "bg-orange-500 text-white"
+                    ? "bg-orange-400 text-white"
                     : "bg-white hover:bg-orange-200"
                 }`}
               >
@@ -341,7 +244,7 @@ const CountryEsim = () => {
                   <input
                     type="range"
                     min="0"
-                    max="100"
+                    max="500"
                     value={priceRange.max}
                     onChange={handlePriceRangeChange}
                     className="w-full accent-black"
