@@ -4,35 +4,23 @@ import simFrii from "../../assets/logo/simFriiLogo.svg";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";
-import SwitchLanguage from "../CurrencyAndLanguage/SwitchLanguage";
-import Currency from "../CurrencyAndLanguage/Currency";
 import { hasCookie, removeAuthTokens } from "../../lib/cookie-utils";
 import useMe from "../../components/hook/useMe";
+import apiClient from "../../lib/api-client"; // Adjust path as needed
 
 const Navbar = () => {
-  const { me } = useMe()
-  console.log(me);
+  const { me } = useMe();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
-  const userImage =
-    "https://www.logoai.com/uploads/resources/2023/06/19/fa7fe9edacbfae0e5ad69f061d0153b8.jpeg";
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoggedIn(hasCookie("isAuthenticated"));
   }, []);
-
-  // const tabs = [
-  //   { label: "Language", value: "language", content: <SwitchLanguage/> },
-  //   { label: "Currency", value: "currency", content: <Currency/> },
-  // ];
-
-  // const [activeTab, setActiveTab] = useState("language");
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -71,23 +59,30 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    removeAuthTokens();
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userEmail");
-    setIsLoggedIn(false);
-    setShowLogoutModal(false);
-    navigate("/signin");
-  };
-
-  const toggleLanguageModal = () => {
-    setLanguageModalOpen(!languageModalOpen);
+  const handleLogout = async () => {
+    try {
+      await apiClient.post("/auth/sign-out", {
+        user_id: me?.id,
+      });
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      removeAuthTokens();
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userEmail");
+      setIsLoggedIn(false);
+      setShowLogoutModal(false);
+      navigate("/signin");
+    }
   };
 
   return (
     <nav className="bg-white border border-gray-100 fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between md:grid grid-cols-3 items-center">
-        <Link to='/' className="text-2xl w-36 font-bold text-orange-600 tracking-tight">
+        <Link
+          to="/"
+          className="text-2xl w-36 font-bold text-orange-600 tracking-tight"
+        >
           <img src={simFrii} alt="" />
         </Link>
 
@@ -146,11 +141,16 @@ const Navbar = () => {
           {isLoggedIn ? (
             <div className="relative">
               <img
-                src={userImage || "https://via.placeholder.com/40"}
+                src={
+                  me?.photo && me?.photo.trim() !== ""
+                    ? me.photo
+                    : `https://i.pravatar.cc/150?u=${me?.id}`
+                }
                 alt="User"
-                className="w-10 h-10 rounded-full border-2 border-orange-400 cursor-pointer"
+                className="w-12 h-12 rounded-full border-2 border-gray-400 mx-auto cursor-pointer"
                 onClick={toggleDropdown}
               />
+
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                   <Link
@@ -178,7 +178,10 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <button onClick={() => navigate("/signin")} className="rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] hover:scale-105 md:py-2 py-1 px-6 md:text-lg transition-transform duration-300 shadow-lg cursor-pointer">
+            <button
+              onClick={() => navigate("/signin")}
+              className="rounded-full text-white font-medium bg-gradient-to-b from-[#FFA943] to-[#E97400] hover:scale-105 md:py-2 py-1 px-6 md:text-lg transition-transform duration-300 shadow-lg cursor-pointer"
+            >
               Sign In
             </button>
           )}
@@ -236,7 +239,8 @@ const Navbar = () => {
               ></path>
             </svg>
           </button>
-          <Link to='/'
+          <Link
+            to="/"
             onClick={handleMenuItemClick}
             className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
           >
@@ -259,16 +263,6 @@ const Navbar = () => {
           >
             Support
           </a>
-          {/* <a
-            onClick={(e) => {
-              e.preventDefault();
-              toggleLanguageModal();
-              handleMenuItemClick();
-            }}
-            className="text-gray-700 hover:text-orange-600 transition-colors duration-300 text-lg font-medium"
-          >
-            EN | USD
-          </a> */}
           <div className="relative">
             <input
               type="text"
@@ -293,11 +287,16 @@ const Navbar = () => {
           {isLoggedIn ? (
             <div className="relative">
               <img
-                src={userImage || "https://via.placeholder.com/40"}
+                src={
+                  me?.photo && me?.photo.trim() !== ""
+                    ? me.photo
+                    : `https://i.pravatar.cc/150?u=${me?.id}`
+                }
                 alt="User"
                 className="w-12 h-12 rounded-full border-2 border-gray-400 mx-auto cursor-pointer"
                 onClick={toggleDropdown}
               />
+
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                   <Link
@@ -326,7 +325,10 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              onClick={() => { navigate("/signin"); handleMenuItemClick(); }}
+              onClick={() => {
+                navigate("/signin");
+                handleMenuItemClick();
+              }}
               className="w-full bg-orange-600 text-white px-6 py-2 rounded-full hover:bg-orange-700 transition-colors duration-300 font-medium"
             >
               Sign In
@@ -334,36 +336,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-
-      {/* Language Modal */}
-      {/* {languageModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className=" bg-white rounded-2xl p-5">
-            <div className="flex justify-between text-center items-center gap-3 md:min-w-xl ">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setActiveTab(tab.value)}
-                  className={`px-10 py-3 rounded-md text-xm transition-all duration-500 cursor-pointer w-full text-center ${
-                    activeTab === tab.value
-                      ? "bg-[#FFF3E7] text-black"
-                      : "text-black hover:bg-white/60"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <div className="py-5 h-[500px] overflow-auto">{tabs.find((tab) => tab.value === activeTab)?.content}</div>
-            <button
-              onClick={toggleLanguageModal}
-              className="btn-primary"
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      )} */}
 
       {/* Shared Modal */}
       <SupportModal

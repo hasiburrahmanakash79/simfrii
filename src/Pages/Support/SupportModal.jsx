@@ -29,6 +29,4 @@ const SupportModal = ({ isOpen, onClose, openChat }) => {
   );
 };
 
-
-
-export { SupportModal as default};
+export { SupportModal as default };

@@ -1,22 +1,14 @@
-
 import { useNavigate } from "react-router-dom";
 import logout from "../assets/icons/logout.svg";
 
-const LogoutModal = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    navigate("/signin");
-  };
-
+const LogoutModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
         <div className="flex flex-col items-center py-5">
-          <img src={logout} alt="" />
+          <img src={logout} alt="Logout icon" />
           <p className="text-gray-600 my-4">
             Are you sure you want to log out?
           </p>
@@ -29,10 +21,7 @@ const LogoutModal = ({ isOpen, onClose }) => {
             Cancel
           </button>
           <button
-            onClick={() => {
-              handleLogout();
-              onClose();
-            }}
+            onClick={onConfirm}
             className="flex-1 px-4 py-2 bg-black text-white rounded-full"
           >
             Log Out

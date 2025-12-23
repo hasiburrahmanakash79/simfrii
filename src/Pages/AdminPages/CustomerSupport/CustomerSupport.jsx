@@ -1,57 +1,146 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import question from "../../../assets/icons/question.svg";
+import useMe from "../../../components/hook/useMe";
+import { getCookie } from "../../../lib/cookie-utils";
+import apiClient from "../../../lib/api-client";
 
 const CustomerSupport = () => {
+  const { me } = useMe();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
+  const [tickets, setTickets] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [ws, setWs] = useState(null);
+  const messagesEndRef = useRef(null);
+  const token = getCookie("access_token");
 
-  const tickets = [
-    {
-      id: "TKT-001",
-      title: "Having problem in installing eSIM",
-      customer: "john@gmail.com",
-      customerName: "John Smith",
-      created: "2 hours ago",
-      status: "Open",
-      messages: [
-        {
-          id: 1,
-          sender: "John Smith",
-          isCustomer: true,
-          message: "Hi, I'm having trouble connecting to the network in Berlin. My eSIM shows as active but I can't get any data connection. Can you help?",
-          timestamp: "2 hours ago"
-        },
-        {
-          id: 2,
-          sender: "Support Team",
-          isCustomer: false,
-          message: "Hello John, I can see your eSIM is active. There might be a temporary network issue in your area. Please try restarting your device and selecting the network manually. I'll also check with our carrier partner.",
-          timestamp: "1 hour ago"
-        }
-      ]
-    },
-    {
-      id: "TKT-002",
-      title: "Connection issue in Germany",
-      customer: "johnsmith@gmail.com",
-      customerName: "John Smith",
-      created: "3 hours ago",
-      status: "Open",
-      messages: [
-        {
-          id: 1,
-          sender: "John Smith",
-          isCustomer: true,
-          message: "I'm experiencing connection issues in Germany. The eSIM is installed but no data is working.",
-          timestamp: "3 hours ago"
-        }
-      ]
+  // Load tickets dynamically on component mount
+  useEffect(() => {
+    if (me && token) {
+      loadTickets();
     }
-  ];
+  }, [me, token]);
+  console.log(me, "ADMIN OR SUPPORT TEAM ______________________ ");
+  console.log(messages, "ADMIN OR SUPPORT TEAM ______________________ ");
+
+  const loadTickets = async () => {
+    try {
+      const response = await apiClient.get("chats");
+      const chats = Array.isArray(response.data) ? response.data : [];
+      // Assuming chats are support-related; filter/map as needed based on backend data
+      const mappedTickets = chats
+        .filter((chat) =>
+          chat.members?.some(
+            (m) => m.email === "staff@gmail.com" || m.email === "admin@gmail.com"
+          )
+        )
+        .map((chat) => ({
+          id: chat.id || chat.chat_id,
+          title: chat.name || "Support Chat",
+          customer: chat.members?.find(
+            (m) => m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com"
+          )?.email || "Unknown",
+          customerName: chat.members?.find(
+            (m) => m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com"
+          )?.name || "Customer",
+          created: chat.created_at || "Unknown",
+          status: "Open", // Assume or derive from backend
+        }));
+      setTickets(mappedTickets);
+    } catch (error) {
+      console.error(
+        "Error loading tickets:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Fetch messages and set up WebSocket when modal opens
+  useEffect(() => {
+    if (isModalOpen && selectedTicket && token && me) {
+      fetchMessages(selectedTicket.id);
+
+      const wsUrl = `ws://10.10.12.62:7000/ws/chat/${selectedTicket.id}?token=${token}`;
+      const socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log("WebSocket connected for admin");
+      };
+
+      socket.onmessage = (event) => {
+         console.log("WebSocket message received:", event.data); // Added logging for debugging
+        try {
+          const data = JSON.parse(event.data);
+          // console.log(data);
+          const content = data.content || data.message;
+          if (content && data.id) {
+            const newMsg = {
+              id: data.id,
+              content,
+              sender: data.sender?.id === me.id ? "Support Team" : selectedTicket.customerName,
+              isCustomer: data.sender?.id !== me.id,
+              timestamp: data.created_at || new Date().toISOString(),
+            };
+            setMessages((prev) => {
+              if (prev.some((msg) => msg.id === newMsg.id)) {
+                return prev;
+              }
+              return [...prev, newMsg];
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      socket.onclose = (event) => {
+        console.log("WebSocket disconnected", event.code, event.reason);
+      };
+
+      socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
+      setWs(socket);
+
+      return () => {
+        if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+          socket.close();
+        }
+      };
+    }
+  }, [isModalOpen, selectedTicket, token, me]);
+
+  const fetchMessages = async (chatId) => {
+    try {
+      const response = await apiClient.get(`chats/${chatId}/messages`);
+      const fetchedMessages = response.data || [];
+      setMessages(
+        fetchedMessages.map((msg) => ({
+          id: msg.id,
+          content: msg.content || msg.message,
+          sender: msg.sender?.id === me.id ? "Support Team" : selectedTicket.customerName,
+          isCustomer: msg.sender?.id !== me.id,
+          timestamp: msg.created_at || "Unknown",
+        }))
+      );
+    } catch (error) {
+      console.error(
+        "Error fetching messages:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
 
   const openModal = (ticket) => {
     setSelectedTicket(ticket);
+    setMessages([]); // Reset messages
     setIsModalOpen(true);
   };
 
@@ -59,13 +148,19 @@ const CustomerSupport = () => {
     setIsModalOpen(false);
     setSelectedTicket(null);
     setReplyMessage("");
+    setMessages([]);
+    if (ws) {
+      ws.close();
+      setWs(null);
+    }
   };
 
   const handleSendReply = () => {
-    if (replyMessage.trim()) {
-      console.log("Sending reply:", replyMessage);
-      setReplyMessage("");
-    }
+    if (!replyMessage.trim() || !selectedTicket || !ws || ws.readyState !== WebSocket.OPEN) return;
+
+    ws.send(JSON.stringify({ content: replyMessage }));
+    setReplyMessage("");
+    // The message will be added via onmessage when the server broadcasts it
   };
 
   return (
@@ -127,7 +222,7 @@ const CustomerSupport = () => {
 
             {/* Messages */}
             <div className="p-4 sm:p-6 max-h-80 sm:max-h-96 overflow-y-auto space-y-3 sm:space-y-4">
-              {selectedTicket.messages.map((message) => (
+              {messages.map((message) => (
                 <div key={message.id} className="flex items-start gap-2 sm:gap-3">
                   <div
                     className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium ${
@@ -141,10 +236,11 @@ const CustomerSupport = () => {
                       <span className="text-xs sm:text-sm font-medium text-gray-900">{message.sender}</span>
                       <span className="text-xs text-gray-500">{message.timestamp}</span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">{message.message}</p>
+                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">{message.content}</p>
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Reply Section */}

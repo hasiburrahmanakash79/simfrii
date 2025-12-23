@@ -1,48 +1,213 @@
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { getCookie } from "../../lib/cookie-utils";
+import apiClient from "../../lib/api-client";
+import useMe from "../../components/hook/useMe";
 
 const ChatModal = ({ isOpen, onClose }) => {
+  const { me } = useMe();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [chatId, setChatId] = useState(null);
+  const [ws, setWs] = useState(null);
+  const [reconnectAttempt, setReconnectAttempt] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [pendingMessages, setPendingMessages] = useState([]);
   const messagesEndRef = useRef(null);
+  const maxReconnectAttempts = 5;
+
+
+
+  console.log(me, "USER-------------this is the user ");
+  console.log(messages, "USER-------------this is the user ");
+
+  const token = getCookie("access_token");
+
+  // Load existing chat ID on modal open
+  useEffect(() => {
+    if (isOpen && chatId === null && me) {
+      loadChatId();
+    }
+  }, [isOpen, chatId, me]);
+
+  const loadChatId = async () => {
+    try {
+      const response = await apiClient.get("chats");
+      console.log(response,"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
+      const chats = Array.isArray(response.data) ? response.data : [];
+      const supportChat = chats.find(
+        (chat) =>
+          chat.name?.includes("Support") ||
+          (chat.members &&
+            chat.members.some(
+              (m) =>
+                m.email === "staff@gmail.com" || m.email === "admin@gmail.com"
+            ))
+      );
+      if (supportChat) {
+        setChatId(supportChat.id || supportChat.chat_id);
+      }
+    } catch (error) {
+      console.error(
+        "Error loading chats:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
 
   // Auto-scroll to the latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send message and get AI response
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
-    const userMessage = input;
-    setInput("");
-    setTimeout(() => {
-      const aiResponse = getAIResponse(userMessage);
-      setMessages((prev) => [...prev, { text: aiResponse, sender: "ai" }]);
-    }, 500);
+  // Set up WebSocket once chatId is available
+  useEffect(() => {
+    if (chatId && token && me && reconnectAttempt < maxReconnectAttempts) {
+      if (ws) {
+        ws.close();
+      }
+
+      const wsUrl = `ws://10.10.12.62:7000/ws/chat/${chatId}?token=${token}`;
+      const socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log("WebSocket connected");
+        setReconnectAttempt(0);
+        setIsLoading(true);
+        fetchMessages().finally(() => {
+          setIsLoading(false);
+          if (pendingMessages.length > 0) {
+            pendingMessages.forEach((msg) => {
+              socket.send(JSON.stringify({ content: msg }));
+            });
+            setPendingMessages([]);
+          }
+        });
+      };
+
+      socket.onmessage = (event) => {
+        console.log("WebSocket message received:", event.data); // Added logging for debugging
+        try {
+          const data = JSON.parse(event.data);
+          console.log(data);
+          const content = data.content || data.message;
+          if (content && data.id) {
+            const newMsg = {
+              id: data.id,
+              content: content,
+              sender: data.sender?.id === me.id,
+            };
+            setMessages((prev) => {
+              if (prev.some((msg) => msg.id === newMsg.id)) {
+                return prev;
+              }
+              return [...prev, newMsg];
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      socket.onclose = (event) => {
+        console.log("WebSocket disconnected", event.code, event.reason);
+        setWs(null);
+        if (event.code !== 1000 && reconnectAttempt < maxReconnectAttempts) {
+          // Abnormal closure
+          const delay = Math.min(30000, 1000 * Math.pow(2, reconnectAttempt));
+          setTimeout(() => {
+            setReconnectAttempt((prev) => prev + 1);
+          }, delay);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        socket.close();
+      };
+
+      setWs(socket);
+
+      return () => {
+        if (
+          socket.readyState === WebSocket.OPEN ||
+          socket.readyState === WebSocket.CONNECTING
+        ) {
+          socket.close();
+        }
+      };
+    }
+  }, [chatId, token, me, reconnectAttempt, pendingMessages]);
+
+  // Fetch initial messages for the chat
+  const fetchMessages = async () => {
+    try {
+      const response = await apiClient.get(`chats/${chatId}/messages`);
+      const fetchedMessages = response.data || []; // Assuming response.data is the array of messages
+      setMessages(
+        fetchedMessages.map((msg) => ({
+          id: msg.id,
+          content: msg.content || msg.message,
+          sender: msg.sender.id === me.id,
+        }))
+      );
+    } catch (error) {
+      console.error(
+        "Error fetching messages:",
+        error.response ? error.response.data : error.message
+      );
+    }
   };
 
-  // Simple AI response logic
-  const getAIResponse = (userMessage) => {
-    const responses = {
-      hi: "Hello! How can I assist you today?",
-      "what are you doing":
-        "Just chilling in the digital realm, ready to answer your questions!",
-      help: "I'm here to help! What's on your mind?",
-      default: `Hmm, not sure about "${userMessage}". Try something else!`,
-    };
-    return responses[userMessage.toLowerCase()] || responses.default;
+  // Create group chat
+  const createGroup = async () => {
+    try {
+      const response = await apiClient.post("chats/group", {
+        name: "Support Chat",
+        members: ["support"], // Adjust if backend expects emails or IDs instead of "support"
+      });
+      const newChatId = response.data.id || response.data.chat_id;
+      setChatId(newChatId);
+      return newChatId;
+    } catch (error) {
+      console.error(
+        "Error creating group:",
+        error.response ? error.response.data : error.message
+      );
+      return null;
+    }
+  };
+
+  // Handle sending message
+  const sendMessage = async () => {
+    if (!input.trim() || !token || !me) return;
+    const userMessage = input;
+    setInput("");
+
+    let currentChatId = chatId;
+    if (!currentChatId) {
+      currentChatId = await createGroup();
+      if (!currentChatId) return; // Failed to create group
+    }
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ content: userMessage }));
+    } else {
+      setPendingMessages((prev) => [...prev, userMessage]);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md h-[80vh] flex flex-col shadow-xl">
+      <div className="bg-white rounded-2xl w-full max-w-lg h-[80vh] flex flex-col shadow-xl">
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800"
+          >
             <ArrowLeft size={24} />
           </button>
           <div className="flex items-center gap-3">
@@ -57,24 +222,30 @@ const ChatModal = ({ isOpen, onClose }) => {
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                msg.sender === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+          {isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <Loader2 className="animate-spin text-orange-400" size={32} />
+            </div>
+          ) : (
+            messages.map((msg) => (
               <div
-                className={`max-w-[70%] px-3 py-1 rounded-2xl ${
-                  msg.sender === "user"
-                    ? "bg-orange-400 text-white"
-                    : "bg-gray-200 text-gray-800"
+                key={msg.id}
+                className={`flex ${
+                  msg.sender  ? "justify-end" : "justify-start"
                 }`}
               >
-                {msg.text}
+                <div
+                  className={`max-w-[70%] px-3 py-1 rounded-2xl ${
+                    msg.sender
+                      ? "bg-orange-400 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {msg.content}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
           <div ref={messagesEndRef} />
         </div>
 

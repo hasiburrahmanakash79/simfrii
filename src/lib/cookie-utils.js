@@ -1,29 +1,30 @@
-
 export const setCookie = (name, value, options = {}) => {
   const defaultOptions = {
     path: "/",
     maxAge: 86400 * 30,
     secure: import.meta.env.VITE_NODE_ENV === "production",
-    sameSite: "strict",
+    SameSite: "strict",
   };
 
   const cookieOptions = { ...defaultOptions, ...options };
   let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
 
   for (const optionKey in cookieOptions) {
-    if (cookieOptions[optionKey] === false) continue;
+    const optionValue = cookieOptions[optionKey];
+    if (optionValue === false || optionValue === undefined) continue;
 
     if (optionKey === "maxAge") {
-      cookieString += `; max-age=${cookieOptions[optionKey]}`;
+      cookieString += `; max-age=${optionValue}`;
     } else if (optionKey === "expires") {
-      cookieString += `; expires=${cookieOptions[optionKey].toUTCString()}`;
+      cookieString += `; expires=${optionValue.toUTCString()}`;
+    } else if (["secure", "httpOnly", "partitioned"].includes(optionKey.toLowerCase())) {
+      cookieString += `; ${optionKey}`;
     } else {
-      cookieString += `; ${optionKey}=${cookieOptions[optionKey]}`;
+      cookieString += `; ${optionKey}=${optionValue}`;
     }
   }
 
   document.cookie = cookieString;
-  
 };
 
 // Get a cookie value by name
@@ -95,36 +96,36 @@ export const setAuthTokens = (access_token, refresh_token) => {
   setCookie("access_token", access_token, {
     maxAge: accessTokenMaxAge,
     secure: import.meta.env.VITE_NODE_ENV === "production",
-    sameSite: "strict",
+    SameSite: "strict",
     path: "/",
   });
 
   setCookie("refresh_token", refresh_token, {
     maxAge: refreshTokenMaxAge,
     secure: import.meta.env.VITE_NODE_ENV === "production",
-    sameSite: "strict",
+    SameSite: "strict",
     path: "/",
   });
 
   setCookie("isAuthenticated", "true", {
     maxAge: authMaxAge,
     secure: import.meta.env.VITE_NODE_ENV === "production",
-    sameSite: "strict",
+    SameSite: "strict",
     path: "/",
   });
 
-  // console.log("Auth tokens set with expiration:");
-  // console.log(`- accessToken: ${accessTokenMaxAge} seconds (30 days)`);
-  // console.log(`- refreshToken: ${refreshTokenMaxAge} seconds (365 days)`);
-  // console.log(`- isAuthenticated: ${authMaxAge} seconds (365 days)`);
+  console.log("Auth tokens set with expiration:");
+  console.log(`- accessToken: ${accessTokenMaxAge} seconds (30 days)`);
+  console.log(`- refreshToken: ${refreshTokenMaxAge} seconds (365 days)`);
+  console.log(`- isAuthenticated: ${authMaxAge} seconds (365 days)`);
 };
 
 // Remove auth tokens
 export const removeAuthTokens = () => {
-  removeCookie("access_token", { path: "/" });
-  removeCookie("refresh_token", { path: "/" });
-  removeCookie("isAuthenticated", { path: "/" });
-  // console.log("All auth tokens removed");
+  removeCookie("access_token", { path: "/", secure: import.meta.env.VITE_NODE_ENV === "production", SameSite: "strict" });
+  removeCookie("refresh_token", { path: "/", secure: import.meta.env.VITE_NODE_ENV === "production", SameSite: "strict" });
+  removeCookie("isAuthenticated", { path: "/", secure: import.meta.env.VITE_NODE_ENV === "production", SameSite: "strict" });
+  console.log("All auth tokens removed");
 };
 
 // Check if token is expired

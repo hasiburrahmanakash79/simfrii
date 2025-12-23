@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
-import { parseJwt, setAuthTokens } from "../../lib/cookie-utils";
+import { setAuthTokens, hasCookie } from "../../lib/cookie-utils";
 import apiClient from "../../lib/api-client";
 
 const SignIn = () => {
@@ -16,6 +16,21 @@ const SignIn = () => {
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (hasCookie("isAuthenticated")) {
+      const role = localStorage.getItem("userRole");
+      if (role === "user") {
+        navigate("/");
+      } else if (role === "staff" || role === "stuff") {
+        navigate("/dashboard/stuffOverview");
+      } else if (role === "admin") {
+        navigate("/dashboard/adminOverview");
+      } else {
+        navigate("/");
+      }
+    }
+  }, [navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -32,9 +47,9 @@ const SignIn = () => {
       console.log(response);
       const { access_token, refresh_token } = response.data; // Adjust based on actual response structure
       setAuthTokens(access_token, refresh_token);
-      const parsedToken = parseJwt(access_token);
       const role = response.data.role;
       console.log(role);
+      localStorage.setItem("userRole", role);
 
       // Navigate based on role
       if (role === "user") {
