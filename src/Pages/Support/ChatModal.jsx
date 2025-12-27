@@ -1,4 +1,4 @@
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
+import { Send, Loader2, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { getCookie } from "../../lib/cookie-utils";
 import apiClient from "../../lib/api-client";
@@ -16,11 +16,6 @@ const ChatModal = ({ isOpen, onClose }) => {
   const messagesEndRef = useRef(null);
   const maxReconnectAttempts = 5;
 
-
-
-  console.log(me, "USER-------------this is the user ");
-  console.log(messages, "USER-------------this is the user ");
-
   const token = getCookie("access_token");
 
   // Load existing chat ID on modal open
@@ -33,19 +28,10 @@ const ChatModal = ({ isOpen, onClose }) => {
   const loadChatId = async () => {
     try {
       const response = await apiClient.get("chats");
-      console.log(response,"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
       const chats = Array.isArray(response.data) ? response.data : [];
-      const supportChat = chats.find(
-        (chat) =>
-          chat.name?.includes("Support") ||
-          (chat.members &&
-            chat.members.some(
-              (m) =>
-                m.email === "staff@gmail.com" || m.email === "admin@gmail.com"
-            ))
-      );
+      const supportChat = chats.find((chat) => chat.members.role !== "user");
       if (supportChat) {
-        setChatId(supportChat.id || supportChat.chat_id);
+        setChatId(supportChat.id);
       }
     } catch (error) {
       console.error(
@@ -86,7 +72,6 @@ const ChatModal = ({ isOpen, onClose }) => {
       };
 
       socket.onmessage = (event) => {
-        console.log("WebSocket message received:", event.data); // Added logging for debugging
         try {
           const data = JSON.parse(event.data);
           console.log(data);
@@ -95,7 +80,7 @@ const ChatModal = ({ isOpen, onClose }) => {
             const newMsg = {
               id: data.id,
               content: content,
-              sender: data.sender?.id === me.id,
+              sender: data.sender_id === me.id,
             };
             setMessages((prev) => {
               if (prev.some((msg) => msg.id === newMsg.id)) {
@@ -110,7 +95,6 @@ const ChatModal = ({ isOpen, onClose }) => {
       };
 
       socket.onclose = (event) => {
-        console.log("WebSocket disconnected", event.code, event.reason);
         setWs(null);
         if (event.code !== 1000 && reconnectAttempt < maxReconnectAttempts) {
           // Abnormal closure
@@ -146,6 +130,7 @@ const ChatModal = ({ isOpen, onClose }) => {
       const fetchedMessages = response.data || []; // Assuming response.data is the array of messages
       setMessages(
         fetchedMessages.map((msg) => ({
+          chatId: msg.chat,
           id: msg.id,
           content: msg.content || msg.message,
           sender: msg.sender.id === me.id,
@@ -203,21 +188,21 @@ const ChatModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg h-[80vh] flex flex-col shadow-xl">
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-          <button
-            onClick={onClose}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft size={24} />
-          </button>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <img
               src="https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
               alt="AI Avatar"
               className="w-8 h-8 rounded-full"
             />
-            <span className="font-semibold text-gray-800">Support</span>
+            <span className="font-semibold text-gray-800">Support Team</span>
           </div>
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <X size={24} />
+          </button>
         </div>
 
         {/* Chat Messages */}
@@ -231,9 +216,14 @@ const ChatModal = ({ isOpen, onClose }) => {
               <div
                 key={msg.id}
                 className={`flex ${
-                  msg.sender  ? "justify-end" : "justify-start"
+                  msg.sender ? "justify-end " : "justify-start"
                 }`}
               >
+                {!msg.sender && (
+                  <div className="bg-blue-500 h-8 w-8 rounded-full flex items-center justify-center mr-1">
+                    <p className="text-white text-sm">ST</p>
+                  </div>
+                )}
                 <div
                   className={`max-w-[70%] px-3 py-1 rounded-2xl ${
                     msg.sender
