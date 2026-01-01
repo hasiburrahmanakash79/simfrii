@@ -48,55 +48,55 @@ const Dashboard = () => {
       title: "Dashboard",
       path: "/dashboard/adminOverview",
       icon: HomeIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "User",
       path: "/dashboard/userList",
       icon: UserIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Orders",
       path: "/dashboard/order",
       icon: OrderIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "eSIM plan management",
       path: "/dashboard/management",
       icon: SimIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Payment",
       path: "/dashboard/payment",
       icon: PaymentIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Upload",
       path: "/dashboard/content",
       icon: CloudIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Analytics",
       path: "/dashboard/analytics",
       icon: AnalyticsIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Support",
       path: "/dashboard/support",
       icon: SupportIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Settings",
       path: "/dashboard/settings",
       icon: SettingIconSvg,
-      role: "Admin",
+      role: "admin",
     },
     {
       title: "Dashboard",
@@ -193,7 +193,7 @@ const Dashboard = () => {
           </nav>
 
           {/* Profile and Logout */}
-          <div className="p-2 absolute bottom-2 w-full">
+          <div className="p-2 absolute bottom-0 w-full bg-white">
             <div className="flex items-center justify-center gap-x-3">
               <div
                 className={`flex items-center gap-x-3 p-2 text-sm ${

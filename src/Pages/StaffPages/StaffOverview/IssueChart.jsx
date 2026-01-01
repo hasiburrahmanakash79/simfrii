@@ -9,40 +9,63 @@ import {
   Cell,
   Tooltip,
 } from "recharts";
+import useStaffOverview from "../../../components/staffHook/useStaffOverview";
 
 const IssueChart = () => {
-  const monthlyData = [
-    { month: "Jan", primary: 44000, secondary: 50000 },
-    { month: "Feb", primary: 25000, secondary: 43000 },
-    { month: "Mar", primary: 32000, secondary: 47000 },
-    { month: "Apr", primary: 25000, secondary: 42000 },
-    { month: "May", primary: 35000, secondary: 43000 },
-    { month: "Jun", primary: 25000, secondary: 44000 },
-    { month: "Jul", primary: 25000, secondary: 33000 },
-    { month: "Aug", primary: 38000, secondary: 44000 },
-    { month: "Sep", primary: 25000, secondary: 43000 },
-    { month: "Oct", primary: 32000, secondary: 44000 },
-    { month: "Nov", primary: 38000, secondary: 43000 },
-    { month: "Dec", primary: 25000, secondary: 42000 },
-  ];
+  const { overview, loading } = useStaffOverview();
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  const ticketData = overview?.monthly_ticket_generate || {};
+
+  console.log(overview);
+  // Dynamically generate monthlyData from ticketData
+  const monthlyData = ticketData.labels.map((month, index) => ({
+    month,
+    primary: ticketData.current_year[index], // Current year
+    secondary: ticketData.last_year[index], // Last year
+  }));
+
+  // Calculate max value for YAxis domain
+  const allValues = [...ticketData.last_year, ...ticketData.current_year];
+  const maxValue = Math.max(...allValues, 1); // Minimum max of 1 to avoid empty chart
+  const yDomain = [0, maxValue * 1.1];
+
+  // Dynamic pie data from last_month_ticket_activity
+  const ticketActivity = overview?.last_month_ticket_activity || {};
+  const openTickets = ticketActivity.open || 0;
+  const pendingTickets = ticketActivity.pending || 0;
+  const resolvedTickets = ticketActivity.solved || 0;
+  const totalTickets = openTickets + pendingTickets + resolvedTickets || 1; // Avoid division by zero
 
   const pieData = [
-    { name: "Countries", value: 70, color: "#027A48" },
-    { name: "Regions", value: 20, color: "#FDE047" },
-    { name: "Global", value: 10, color: "#799EFF" },
+    {
+      name: "Open",
+      value: Math.round((openTickets / totalTickets) * 100),
+      color: "#027A48",
+      count: openTickets,
+    },
+    {
+      name: "Pending",
+      value: Math.round((pendingTickets / totalTickets) * 100),
+      color: "#FDE047",
+      count: pendingTickets,
+    },
+    {
+      name: "Resolved",
+      value: Math.round((resolvedTickets / totalTickets) * 100),
+      color: "#799EFF",
+      count: resolvedTickets,
+    },
   ];
-
-  const formatYAxis = (value) => {
-    return `${value / 1000}K`;
-  };
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-2 sm:p-3 border border-gray-200 rounded shadow-lg">
           <p className="text-sm sm:text-md font-medium mb-1 sm:mb-2 text-gray-900">{`Month: ${label}`}</p>
-          <p className="text-xs sm:text-sm text-gray-600">{`Current year: $${payload[0].value.toLocaleString()}`}</p>
-          <p className="text-xs sm:text-sm text-gray-600">{`Last year: $${payload[1].value.toLocaleString()}`}</p>
+          <p className="text-xs sm:text-sm text-gray-600">{`Current year: ${payload[1].value.toLocaleString()}`}</p>
+          <p className="text-xs sm:text-sm text-gray-600">{`Last year: ${payload[0].value.toLocaleString()}`}</p>
         </div>
       );
     }
@@ -54,7 +77,7 @@ const IssueChart = () => {
       return (
         <div className="bg-white p-2 border border-gray-200 rounded shadow-lg">
           <p className="text-xs sm:text-sm text-gray-900">{`Category: ${payload[0].name}`}</p>
-          <p className="text-xs sm:text-sm text-gray-600">{`Value: ${payload[0].value}%`}</p>
+          <p className="text-xs sm:text-sm text-gray-600">{`Value: ${payload[0].value}% (${payload[0].payload.count})`}</p>
         </div>
       );
     }
@@ -67,8 +90,12 @@ const IssueChart = () => {
         <div className="lg:col-span-2 bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
           <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-1">Issue Generate</h2>
-              <p className="text-xs sm:text-sm text-gray-500">Issues over last year</p>
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-1">
+                Issue Generate
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Issues over last year
+              </p>
             </div>
             <div className="flex flex-wrap gap-3 sm:gap-5">
               <div className="flex items-center gap-2 sm:gap-3">
@@ -98,9 +125,7 @@ const IssueChart = () => {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 10, fill: "#6B7280" }}
-                  tickFormatter={formatYAxis}
-                  domain={[0, 60000]}
-                  ticks={[0, 10000, 20000, 30000, 40000, 50000, 60000]}
+                  domain={yDomain}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar
@@ -120,8 +145,12 @@ const IssueChart = () => {
 
         <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-1">Issue Report</h2>
-            <p className="text-xs sm:text-sm text-gray-500">Last month issue report</p>
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-1">
+              Issue Report
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Last month issue report
+            </p>
           </div>
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64">
@@ -154,7 +183,9 @@ const IssueChart = () => {
                   className="w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2 sm:mr-3"
                   style={{ backgroundColor: item.color }}
                 ></div>
-                <span className="text-xs sm:text-sm text-gray-600">{item.name}</span>
+                <span className="text-xs sm:text-sm text-gray-600">
+                  {item.name}
+                </span>
               </div>
             ))}
           </div>

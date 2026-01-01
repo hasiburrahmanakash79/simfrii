@@ -1,45 +1,64 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import useStaffAnalytics from "../../../components/staffHook/useStaffAnalytics";
 
 const IssueAnalytics = () => {
+  const {analytics, loading} = useStaffAnalytics();
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const openTickets = analytics.summary.total_tickets;
+  const pendingTickets = analytics.summary.total_pending_tickets;
+  const totalSolved = analytics.summary.total_solved_tickets;
+
+  const getChange = (growth) => {
+    return growth.growth_percent === 0 ? null : `${growth.growth_percent}%`;
+  };
+
+  const getChangeType = (status) => {
+    if (status === "no_change") return null;
+    return status;
+  };
+
   const stats = [
     {
-      title: "Open ticket",
-      value: "200",
-      change: "40%",
-      changeType: "increase",
+      title: "Open Tickets",
+      value: openTickets,
+      change: getChange(analytics.summary.open_growth),
+      changeType: getChangeType(analytics.summary.open_growth.status),
       comparison: "vs last month",
     },
     {
-      title: "Pending Ticket",
-      value: "20",
-      change: "20%",
-      changeType: "decrease",
+      title: "Pending Tickets",
+      value: pendingTickets,
+      change: getChange(analytics.summary.pending_growth),
+      changeType: getChangeType(analytics.summary.pending_growth.status),
       comparison: "vs last month",
     },
     {
-      title: "Resolved Today",
-      value: "180",
-      change: "20%",
-      changeType: "decrease",
-      comparison: "From last month",
+      title: "Total Solved",
+      value: totalSolved,
+      change: getChange(analytics.summary.solved_growth),
+      changeType: getChangeType(analytics.summary.solved_growth.status),
+      comparison: "vs last month",
     },
   ];
 
   const planPerformanceData = [
-    { name: "Solve", value: 60, color: "#027A48" },
-    { name: "Pending", value: 25, color: "#FFE066" },
-    { name: "Open", value: 15, color: "#4F8EF7" },
+    { name: "Solved", value: analytics.report_pichart.solved, color: "#027A48" },
+    { name: "Pending", value: analytics.report_pichart.pending, color: "#FFE066" },
+    { name: "Open", value: analytics.report_pichart.open, color: "#4F8EF7" },
   ];
 
   const planUsageData = [
-    { name: "Solve", percentage: 60, color: "#027A48" },
-    { name: "Pending", percentage: 25, color: "#FFE066" },
-    { name: "Open", percentage: 15, color: "#4F8EF7" },
+    { name: "Solved", percentage: analytics.report_progress.solved, color: "#027A48" },
+    { name: "Pending", percentage: analytics.report_progress.pending, color: "#FFE066" },
+    { name: "Open", percentage: analytics.report_progress.open, color: "#4F8EF7" },
   ];
 
   return (
-    <div className=" ">
+    <div>
       <div className="mb-4 sm:mb-6">
         <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">Analytics</h1>
         <p className="text-xs sm:text-sm text-gray-600">Track, manage, and forecast your customer support issues.</p>

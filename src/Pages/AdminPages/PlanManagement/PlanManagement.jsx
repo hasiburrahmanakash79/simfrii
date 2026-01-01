@@ -1,6 +1,7 @@
 import { Calendar, ChevronLeft, ChevronRight, Globe, Layers, Smartphone, TrendingDown, TrendingUp } from "lucide-react";
 import eSime from "../../../assets/icons/eSim.svg";
 import { useState } from "react";
+import SectionTitle from "../../../components/SectionTitle";
 
 const PlanManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -164,10 +165,7 @@ const PlanManagement = () => {
 
   return (
     <div className="">
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">eSIMs Plan Management</h1>
-        <p className="text-xs sm:text-sm text-gray-600">Track, manage, and forecast your customers and orders.</p>
-      </div>
+      <SectionTitle title={"eSIMs Plan Management"} description={"Track, manage and forecast your customers and orders."} />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200">

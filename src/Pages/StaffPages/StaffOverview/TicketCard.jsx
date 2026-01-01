@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import useStaffOverview from "../../../components/staffHook/useStaffOverview";
 
 const MetricCard = ({
   title,
@@ -18,7 +19,6 @@ const MetricCard = ({
     const minValue = Math.min(...points);
     const range = maxValue - minValue || 1;
 
-    // Convert points to coordinates
     const coords = points.map((point, index) => ({
       x: (index / (points.length - 1)) * width,
       y: height - ((point - minValue) / range) * height,
@@ -27,19 +27,18 @@ const MetricCard = ({
     if (coords.length < 2) return "";
 
     let path = `M ${coords[0].x} ${coords[0].y}`;
-
     for (let i = 1; i < coords.length; i++) {
       const prev = coords[i - 1];
       const curr = coords[i];
+      const next = i < coords.length - 1 ? coords[i + 1] : null;
 
       if (i === 1) {
         const midX = (prev.x + curr.x) / 2;
         const midY = (prev.y + curr.y) / 2;
         path += ` Q ${curr.x} ${curr.y} ${midX} ${midY}`;
-      } else if (i === coords.length - 1) {
+      } else if (!next) {
         path += ` Q ${prev.x} ${prev.y} ${curr.x} ${curr.y}`;
       } else {
-        const next = coords[i + 1];
         const midX = (curr.x + next.x) / 2;
         const midY = (curr.y + next.y) / 2;
         path += ` Q ${curr.x} ${curr.y} ${midX} ${midY}`;
@@ -50,6 +49,7 @@ const MetricCard = ({
   };
 
   const TrendIcon = trend === "up" ? TrendingUp : TrendingDown;
+  const gradientId = `gradient-${trend}-${title.replace(/\s+/g, "")}`;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
@@ -58,7 +58,7 @@ const MetricCard = ({
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="">
+        <div>
           <div className="text-3xl font-bold text-gray-900 mb-2">{value}</div>
           <div className="flex items-center gap-1">
             <TrendIcon
@@ -71,18 +71,10 @@ const MetricCard = ({
           </div>
         </div>
 
-        {/* SparkLine chart */}
-        <div className=" w-30 h-12">
+        <div className="w-30 h-12">
           <svg width="120" height="48" className="overflow-visible">
-            {/* Gradient definitions */}
             <defs>
-              <linearGradient
-                id={`gradient-${trend}-${title.replace(/\s+/g, "")}`}
-                x1="0%"
-                y1="0%"
-                x2="0%"
-                y2="100%"
-              >
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop
                   offset="0%"
                   stopColor={trend === "up" ? "#10b981" : "#ef4444"}
@@ -91,26 +83,24 @@ const MetricCard = ({
                 <stop
                   offset="100%"
                   stopColor={trend === "up" ? "#10b981" : "#ef4444"}
-                  stopOpacity="0.00"
+                  stopOpacity="0"
                 />
               </linearGradient>
             </defs>
 
-            {/* Area fill */}
             <path
               d={`${generateSparklinePath(sparklinePoints)} L 120 48 L 0 48 Z`}
-              fill={`url(#gradient-${trend}-${title.replace(/\s+/g, "")})`}
+              fill={`url(#${gradientId})`}
             />
 
-            {/* Main line */}
             <path
               d={generateSparklinePath(sparklinePoints)}
               stroke={trend === "up" ? "#10b981" : "#ef4444"}
               strokeWidth="1.5"
               fill="none"
-              className="drop-shadow-sm"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="drop-shadow-sm"
             />
           </svg>
         </div>
@@ -123,50 +113,66 @@ MetricCard.propTypes = {
   title: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   trend: PropTypes.oneOf(["up", "down"]).isRequired,
-  trendValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
+  trendValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   trendColor: PropTypes.string.isRequired,
   sparklinePoints: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 
 const TicketCard = () => {
-  const totalEarning = [8, 10, 15, 13, 18, 23, 20, 25, 22, 27, 25, 32];
-  const totalOrder = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
-  const totalUser = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
+  const { overview, loading } = useStaffOverview();
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
+  // Shared sparkline data (you can customize per card if needed)
+  const sparklineData = {
+    open: [8, 10, 15, 13, 18, 23, 20, 25, 22, 27, 25, 32],
+    pending: [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32],
+    resolved: [10, 12, 18, 15, 20, 22, 28, 25, 30, 35, 32, 38],
+  };
 
+  // Extract ticket data safely
+  const ticketActivity = overview?.last_month_ticket_activity || {};
+  const openTickets = ticketActivity.open || 0;
+  const pendingTickets = ticketActivity.pending || 0;
+  const resolvedTickets = ticketActivity.solved || 0;
+
+  // Low-code metrics configuration
+  const metrics = [
+    {
+      title: "Open ticket",
+      value: openTickets,
+      trend: "up",
+      trendValue: 1,
+      trendColor: "text-green-600",
+      sparklinePoints: sparklineData.open,
+    },
+    {
+      title: "Pending Ticket",
+      value: pendingTickets,
+      trend: "up",
+      trendValue: 10,
+      trendColor: "text-green-500",
+      sparklinePoints: sparklineData.pending,
+    },
+    {
+      title: "Resolved Today",
+      value: resolvedTickets,
+      trend: "up",
+      trendValue: 10,
+      trendColor: "text-green-500",
+      sparklinePoints: sparklineData.resolved,
+    },
+  ];
 
   return (
-    <div className="">
-      <div className="">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <MetricCard
-            title="Open ticket"
-            value="330"
-            trend="up"
-            trendValue="1"
-            trendColor="text-green-600"
-            sparklinePoints={totalEarning}
-          />
-
-          <MetricCard
-            title="Pending Ticket"
-            value= "210"
-            trend="up"
-            trendValue="10"
-            trendColor="text-green-500"
-            sparklinePoints={totalOrder}
-          />
-          <MetricCard
-            title="Resolved Today"
-            value= "440"
-            trend="up"
-            trendValue="10"
-            trendColor="text-green-500"
-            sparklinePoints={totalUser}
-          />
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {metrics.map((metric) => (
+        <MetricCard
+          key={metric.title}
+          {...metric}
+        />
+      ))}
     </div>
   );
 };
