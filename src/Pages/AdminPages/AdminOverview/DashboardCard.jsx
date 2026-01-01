@@ -129,12 +129,31 @@ MetricCard.propTypes = {
   sparklinePoints: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 
-const DashboardCard = () => {
-  const totalEarning = [8, 10, 15, 13, 18, 23, 20, 25, 22, 27, 25, 32];
-  const totalOrder = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
-  const totalUser = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
+const DashboardCard = ({ dashboardData, loading }) => { 
+  const totalEarningPoints = [8, 10, 15, 13, 18, 23, 20, 25, 22, 27, 25, 32];
+  const totalOrderPoints = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
+  const totalUserPoints = [8, 10, 15, 11, 16, 13, 24, 20, 25, 30, 28, 32];
 
+  console.log(dashboardData, loading);
 
+  if (loading) {
+    return <div>Loading dashboard data...</div>;
+  }
+
+  const earningTrend = dashboardData.earning_growth.status === "decrease" ? "down" : "up";
+  const earningTrendValue = dashboardData.earning_growth.status === "decrease" ? `-${dashboardData.earning_growth.growth_percent}` : dashboardData.earning_growth.growth_percent;
+  const earningTrendColor = dashboardData.earning_growth.status === "decrease" ? "text-red-500" : "text-green-500";
+  const earningValue = `$${dashboardData.total_earning.toFixed(2)}`;
+
+  const orderTrend = dashboardData.order_growth.status === "decrease" ? "down" : "up";
+  const orderTrendValue = dashboardData.order_growth.status === "decrease" ? `-${dashboardData.order_growth.growth_percent}` : dashboardData.order_growth.growth_percent;
+  const orderTrendColor = dashboardData.order_growth.status === "decrease" ? "text-red-500" : "text-green-500";
+  const orderValue = dashboardData.total_orders;
+
+  const userTrend = dashboardData.user_growth.status === "decrease" ? "down" : "up";
+  const userTrendValue = dashboardData.user_growth.status === "decrease" ? `-${dashboardData.user_growth.growth_percent}` : dashboardData.user_growth.growth_percent;
+  const userTrendColor = dashboardData.user_growth.status === "decrease" ? "text-red-500" : "text-green-500";
+  const userValue = dashboardData.total_users;
 
   return (
     <div className="">
@@ -142,28 +161,28 @@ const DashboardCard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
             title="Total Earning"
-            value="330"
-            trend="up"
-            trendValue="1"
-            trendColor="text-green-600"
-            sparklinePoints={totalEarning}
+            value={earningValue}
+            trend={earningTrend}
+            trendValue={earningTrendValue}
+            trendColor={earningTrendColor}
+            sparklinePoints={totalEarningPoints}
           />
 
           <MetricCard
             title="Total Orders"
-            value= "210"
-            trend="up"
-            trendValue="10"
-            trendColor="text-green-500"
-            sparklinePoints={totalOrder}
+            value={orderValue}
+            trend={orderTrend}
+            trendValue={orderTrendValue}
+            trendColor={orderTrendColor}
+            sparklinePoints={totalOrderPoints}
           />
           <MetricCard
             title="Total Users"
-            value= "440"
-            trend="up"
-            trendValue="10"
-            trendColor="text-green-500"
-            sparklinePoints={totalUser}
+            value={userValue}
+            trend={userTrend}
+            trendValue={userTrendValue}
+            trendColor={userTrendColor}
+            sparklinePoints={totalUserPoints}
           />
         </div>
       </div>

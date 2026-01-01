@@ -1,5 +1,3 @@
-import React from 'react';
-
 const SectionTitle = ({title, description}) => {
     return (
         <div className='pb-5'>

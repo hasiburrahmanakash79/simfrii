@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import logout from "../assets/icons/logout.svg";
 
 const LogoutModal = ({ isOpen, onClose, onConfirm }) => {

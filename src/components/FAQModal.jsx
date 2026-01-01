@@ -2,6 +2,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 const FAQModal = ({ isOpen, onClose }) => {
+  const [activeIndex, setActiveIndex] = useState(null);
   if (!isOpen) return null;
 
   const faqs = [
@@ -26,7 +27,7 @@ const FAQModal = ({ isOpen, onClose }) => {
     },
   ];
 
-  const [activeIndex, setActiveIndex] = useState(null);
+  
 
   const handleQuestionClick = (index) => {
     setActiveIndex(activeIndex === index ? null : index);

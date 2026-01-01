@@ -11,27 +11,41 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 
-const RevenueCharts = () => {
-  const monthlyData = [
-    { month: "Jan", primary: 44000, secondary: 50000 },
-    { month: "Feb", primary: 25000, secondary: 43000 },
-    { month: "Mar", primary: 32000, secondary: 47000 },
-    { month: "Apr", primary: 25000, secondary: 42000 },
-    { month: "May", primary: 35000, secondary: 43000 },
-    { month: "Jun", primary: 25000, secondary: 44000 },
-    { month: "Jul", primary: 25000, secondary: 33000 },
-    { month: "Aug", primary: 38000, secondary: 44000 },
-    { month: "Sep", primary: 25000, secondary: 43000 },
-    { month: "Oct", primary: 32000, secondary: 44000 },
-    { month: "Nov", primary: 38000, secondary: 43000 },
-    { month: "Dec", primary: 25000, secondary: 42000 },
-  ];
+const RevenueCharts = ({ loading, barChartData, pieChartData }) => {
+  console.log(barChartData);
+  console.log(pieChartData);
+  console.log(loading);
 
-  const pieData = [
-    { name: "Countries", value: 70, color: "#FF7782" },
-    { name: "Regions", value: 20, color: "#FDE047" },
-    { name: "Global", value: 10, color: "#799EFF" },
-  ];
+  const monthlyData = barChartData
+    ? barChartData.labels.map((month, index) => ({
+        month,
+        primary: barChartData.last_year[index],
+        secondary: barChartData.current_year[index],
+      }))
+    : [];
+
+  const pieData = pieChartData
+    ? [
+        { name: "Local", value: pieChartData.local, color: "#FF7782" },
+        { name: "Regional", value: pieChartData.regional, color: "#FDE047" },
+        { name: "Global", value: pieChartData.global, color: "#799EFF" },
+      ]
+    : [];
+
+  const maxRevenue =
+    monthlyData.length > 0
+      ? Math.max(...monthlyData.flatMap((d) => [d.primary, d.secondary]))
+      : 0;
+
+  const isLarge = maxRevenue > 1000;
+
+  const formatYAxis = (value) => {
+    return isLarge ? `${(value / 1000).toFixed(0)}K` : value.toFixed(2);
+  };
+
+  const formatValue = (value) => {
+    return isLarge ? value.toLocaleString() : value.toFixed(2);
+  };
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -45,17 +59,17 @@ const RevenueCharts = () => {
   const barHeight = isMobile ? 300 : 320;
   const pieSize = isMobile ? 200 : 240;
 
-  const formatYAxis = (value) => {
-    return `${value / 1000}K`;
-  };
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
           <p className="text-md font-medium mb-2 text-gray-900">{`Month: ${label}`}</p>
-          <p className="text-sm text-gray-600">{`Current year: $${payload[0].value.toLocaleString()}`}</p>
-          <p className="text-sm text-gray-600">{`Last year: $${payload[1].value.toLocaleString()}`}</p>
+          <p className="text-sm text-gray-600">{`Last year: $${formatValue(
+            payload[0].value
+          )}`}</p>
+          <p className="text-sm text-gray-600">{`Current year: $${formatValue(
+            payload[1].value
+          )}`}</p>
         </div>
       );
     }
@@ -67,7 +81,9 @@ const RevenueCharts = () => {
       return (
         <div className="bg-white p-2 border border-gray-200 rounded shadow-lg">
           <p className="text-sm text-gray-900">{`Category: ${payload[0].name}`}</p>
-          <p className="text-sm text-gray-600">{`Value: ${payload[0].value}%`}</p>
+          <p className="text-sm text-gray-600">{`Value: ${payload[0].value.toFixed(
+            2
+          )}%`}</p>
         </div>
       );
     }
@@ -87,16 +103,16 @@ const RevenueCharts = () => {
             </div>
             <div className="flex flex-wrap gap-5 items-center justify-center sm:justify-end">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-600 h-4 w-4 rounded-full"></div>
+                <div className="bg-blue-200 h-4 w-4 rounded-full"></div>
                 <p className="text-sm">Last year</p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="bg-blue-400 h-4 w-4 rounded-full"></div>
+                <div className="bg-blue-700 h-4 w-4 rounded-full"></div>
                 <p className="text-sm">Current year</p>
               </div>
             </div>
           </div>
-          <div className="h-[320px] lg:h-[400px] sm:h-80" style={{ minHeight: `${barHeight}px` }}>
+          <div className="h-[280px]" style={{ minHeight: `${barHeight}px` }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={monthlyData}
@@ -113,18 +129,16 @@ const RevenueCharts = () => {
                   tickLine={false}
                   tick={{ fontSize: 12, fill: "#6B7280" }}
                   tickFormatter={formatYAxis}
-                  domain={[0, 60000]}
-                  ticks={[0, 10000, 20000, 30000, 40000, 50000]}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar
-                  dataKey="secondary"
-                  fill="#799EFF"
+                  dataKey="primary"
+                  fill="#bedbff"
                   radius={isMobile ? [10, 10, 10, 10] : [20, 20, 20, 20]}
                 />
                 <Bar
-                  dataKey="primary"
-                  fill="#3D5EFF"
+                  dataKey="secondary"
+                  fill="#1447e6"
                   radius={isMobile ? [10, 10, 10, 10] : [20, 20, 20, 20]}
                 />
               </BarChart>
@@ -140,7 +154,10 @@ const RevenueCharts = () => {
             <p className="text-sm text-gray-500">last month earning activity</p>
           </div>
           <div className="flex justify-center mb-8">
-            <div className="relative" style={{ width: pieSize, height: pieSize }}>
+            <div
+              className="relative"
+              style={{ width: pieSize, height: pieSize }}
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Tooltip content={<PieTooltip />} />
@@ -164,18 +181,17 @@ const RevenueCharts = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-around sm:justify-between space-y-2 sm:space-y-0 gap-4">
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-[#FF7782] mr-3"></div>
-              <span className="text-sm text-gray-600">Countries</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-yellow-300 mr-3"></div>
-              <span className="text-sm text-gray-600">Regions</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-[#799EFF] mr-3"></div>
-              <span className="text-sm text-gray-600">Global</span>
-            </div>
+            {pieData.map((entry, index) => (
+              <div key={index} className="flex items-center">
+                <div
+                  className="w-3 h-3 rounded-full mr-3"
+                  style={{ backgroundColor: entry.color }}
+                ></div>
+                <span className="text-sm text-gray-600">
+                  {entry.name} : {entry.value}%
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

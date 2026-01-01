@@ -11,7 +11,6 @@ import MyEsim from "../Pages/MyEsim/MyEsim";
 import ESIMDetails from "../Pages/MyEsim/ESIMDetails";
 import AccountSettings from "../Pages/AccountSettings/AccountSettings";
 import Dashboard from "../Layouts/Dashboard";
-import AdminOverview from "../Pages/AdminPages/AdminOverview";
 import OrderPreview from "../Pages/OrderPreview/OrderPreview";
 import SuccessPayment from "../Pages/OrderPreview/SuccessPayment";
 import TopUp from "../Pages/TopUp/TopUp";
@@ -31,6 +30,7 @@ import Analytics from "../Pages/AdminPages/Analytics/Analytics";
 import IssueAnalytics from "../Pages/StaffPages/IssueAnalytics/IssueAnalytics";
 import SimPlan from "../Pages/StaffPages/SimPlan/SimPlan";
 import StaffOverview from "../Pages/StaffPages/StaffOverview/StaffOverview";
+import AdminOverview from "../Pages/AdminPages/AdminOverview/AdminOverview";
 const router = createBrowserRouter([
   {
     path: "/",
