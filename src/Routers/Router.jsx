@@ -31,6 +31,7 @@ import IssueAnalytics from "../Pages/StaffPages/IssueAnalytics/IssueAnalytics";
 import SimPlan from "../Pages/StaffPages/SimPlan/SimPlan";
 import StaffOverview from "../Pages/StaffPages/StaffOverview/StaffOverview";
 import AdminOverview from "../Pages/AdminPages/AdminOverview/AdminOverview";
+import UserList from "../Pages/StaffPages/UserList/UserList";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -92,7 +93,7 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "userList",
+        path: "all-user",
         element: <AllUser />,
       },
       {
@@ -144,6 +145,10 @@ const router = createBrowserRouter([
       {
         path: "sim-plan",
         element: <SimPlan />,
+      },
+      {
+        path: "userList",
+        element: <UserList />,
       },
       {
         path: "issue-analytics",

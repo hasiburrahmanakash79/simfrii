@@ -1,12 +1,11 @@
-import { Search, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import SectionTitle from "../../../components/SectionTitle";
-import useAdminUser from "../../../components/adminHook/useAdminUser";
+import useStaffUserList from "../../../components/staffHook/useStaffUserList";
 
-export default function AllUser() {
-  const { userList, loading } = useAdminUser();
-  console.log(userList);
+const UserList = () => {
+  const { userList, loading } = useStaffUserList();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -159,13 +158,7 @@ export default function AllUser() {
                     Location
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Action
                   </th>
                 </tr>
               </thead>
@@ -209,9 +202,6 @@ export default function AllUser() {
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                       {user.location?.trim() || "N/A"}
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap capitalize text-xs sm:text-sm text-gray-900">
-                      {user.role?.trim() || "N/A"}
-                    </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap capitalize">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
@@ -224,11 +214,6 @@ export default function AllUser() {
                       >
                         {user.status?.trim() || "N/A"}
                       </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 ">
-                      <button className="flex text-xs bg-gray-200 px-2 py-0.5 rounded-full items-center gap-1">
-                        <Edit className="w-3"/> Edit
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -348,3 +333,5 @@ export default function AllUser() {
     </div>
   );
 }
+
+export default UserList;

@@ -52,7 +52,7 @@ const Dashboard = () => {
     },
     {
       title: "User",
-      path: "/dashboard/userList",
+      path: "/dashboard/all-user",
       icon: UserIconSvg,
       role: "admin",
     },

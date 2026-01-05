@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import usePaymentList from "../../../components/adminHook/usePaymentList";
 
 const Payment = () => {
+  const {paymentData, loading} = usePaymentList()
+  console.log(paymentData);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 6;
