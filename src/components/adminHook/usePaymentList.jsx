@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../../lib/api-client';
 
-const usePaymentList = () => {
-  const [paymentData, setPaymentData] = useState([]);
+const usePaymentList = (page = 1,  pageSize = 10) => {
+  const [paymentData, setPaymentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPaymentList = async () => {
+      setLoading(true);
       try {
-        const response = await apiClient.get('/dashboard/payment-list');
+        let url = `/dashboard/payment-list?page=${page}&page_size=${pageSize}`;
+        
+        const response = await apiClient.get(url);
         console.log(response);
-        setPaymentData(response.data || []);
+        setPaymentData(response.data || null);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch payment list');
       } finally {
@@ -20,7 +23,7 @@ const usePaymentList = () => {
     };
 
     fetchPaymentList();
-  }, []);
+  }, [page, pageSize]);
 
   return { paymentData, loading, error };
 };

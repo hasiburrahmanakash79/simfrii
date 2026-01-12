@@ -14,6 +14,7 @@ const CustomerSupport = () => {
   const [ws, setWs] = useState(null);
   const messagesEndRef = useRef(null);
   const token = getCookie("access_token");
+  // console.log(messages);
 
   useEffect(() => {
     if (me && token) {
@@ -76,6 +77,7 @@ const CustomerSupport = () => {
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log(data);
           const content = data.content;
           if (content && data.id) {
             const newMsg = {
@@ -125,15 +127,16 @@ const CustomerSupport = () => {
     try {
       const response = await apiClient.get(`chats/${chatId}/messages`);
       const fetchedMessages = response.data || [];
+      console.log(fetchedMessages);
       setMessages(
         fetchedMessages.map((msg) => ({
           id: msg.id,
           content: msg.content || msg.message,
           sender:
-            msg.sender?.id === me.id
+            msg.sender?.role === 'admin' || msg.sender?.role === 'staff'
               ? "Support Team"
               : selectedTicket.customerName,
-          isCustomer: msg.sender?.id !== me.id,
+          isCustomer: msg.sender?.role !==  'admin' && msg.sender?.role !== 'staff',
           timestamp: msg.created_at || "Unknown",
         }))
       );

@@ -8,9 +8,9 @@ const IssueAnalytics = () => {
     return <div>Loading...</div>;
   }
 
-  const openTickets = analytics.summary.total_tickets;
-  const pendingTickets = analytics.summary.total_pending_tickets;
-  const totalSolved = analytics.summary.total_solved_tickets;
+  const openTickets = analytics.summary?.total_tickets;
+  const pendingTickets = analytics.summary?.total_pending_tickets;
+  const totalSolved = analytics.summary?.total_solved_tickets;
 
   const getChange = (growth) => {
     return growth.growth_percent === 0 ? null : `${growth.growth_percent}%`;

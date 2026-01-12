@@ -1,29 +1,27 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../lib/api-client";
 
-
-
 const useAdminAnalytics = () => {
-    const [adminAnalytics, setOrderList] = useState([]);
+  const [adminAnalytics, setAdminAnalytics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchOrderList = async () => {
+    const fetchAdminAnalytics = async () => {
       try {
-        const response = await apiClient.get('/dashboard/admin-analytics');
-        setOrderList(response.data || []);
+        const response = await apiClient.get("/dashboard/admin-analytics");
+        setAdminAnalytics(response.data || []);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch order list');
+        setError(err.response?.data?.message || "Failed to fetch admin analytics");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrderList();
+    fetchAdminAnalytics();
   }, []);
 
-  return { orderList, loading, error };
+  return { adminAnalytics, loading, error };
 };
 
 export default useAdminAnalytics;

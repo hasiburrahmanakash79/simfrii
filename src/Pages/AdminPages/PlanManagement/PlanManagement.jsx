@@ -1,9 +1,20 @@
 import { Calendar, ChevronLeft, ChevronRight, Globe, Layers, Smartphone, TrendingDown, TrendingUp } from "lucide-react";
 import eSime from "../../../assets/icons/eSim.svg";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SectionTitle from "../../../components/SectionTitle";
+import usePackageData from "../../../components/adminHook/usePackageData";
 
 const PlanManagement = () => {
+  const {airaloData, packageData} = usePackageData();
+  const allPlans = useMemo(() => {
+      return airaloData.flatMap((country) =>
+        country.operators.flatMap((operator) =>
+          operator.packages.map((pkg) => ({ country, operator, pkg }))
+        )
+      );
+    }, [airaloData]);
+  console.log(allPlans);
+  console.log(airaloData);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 4;
@@ -18,46 +29,6 @@ const PlanManagement = () => {
       texts: "1000 SMS",
       originalPrice: 25,
       discountedPrice: 23.5,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      calls: "200 Minutes",
-      texts: "2000 SMS",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      calls: "200 Minutes",
-      texts: "2000 SMS",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      calls: "200 Minutes",
-      texts: "2000 SMS",
-      originalPrice: 30,
-      discountedPrice: 28.0,
-    },
-    {
-      company: "TravelNet",
-      coverage: "80 Countries",
-      duration: "60 Days",
-      data: "15 GB",
-      calls: "200 Minutes",
-      texts: "2000 SMS",
-      originalPrice: 30,
-      discountedPrice: 28.0,
     },
   ];
 
