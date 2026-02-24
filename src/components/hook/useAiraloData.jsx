@@ -3,7 +3,7 @@ import apiClient from "../../lib/api-client";
 import airalo from "../../assets/logo/airalo.png";
 import useFetchRegions from "./useFetchRegions";
 
-export const useFetchCountryPackages = (countryCode, regionName) => {
+export const useAiraloData = (countryCode, regionName) => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

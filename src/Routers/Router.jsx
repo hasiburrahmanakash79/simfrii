@@ -32,6 +32,7 @@ import SimPlan from "../Pages/StaffPages/SimPlan/SimPlan";
 import StaffOverview from "../Pages/StaffPages/StaffOverview/StaffOverview";
 import AdminOverview from "../Pages/AdminPages/AdminOverview/AdminOverview";
 import UserList from "../Pages/StaffPages/UserList/UserList";
+import CountryWiseAllSim from "../Pages/WorldWideESim/CountryWiseAllSim";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       },
       {
         path: "/worldwide-esim/:countryName",
+        element: <CountryWiseAllSim />,
+      },
+      {
+        path:"/esim/:countryName/:provider",
         element: <CountryEsim />,
       },
       {

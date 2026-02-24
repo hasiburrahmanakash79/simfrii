@@ -4,39 +4,60 @@ import { X } from "lucide-react";
 import OfferCard from "../../../components/OfferCard";
 import filter from "../../../assets/icons/filter.svg";
 import useModal from "../../../components/modal/useModal";
-import { useFetchRegionPackages } from "../../../components/hook/useFetchRegionPackages";
+import useYesimData from "../../../components/hook/useYesimData";
+import useNomadData from "../../../components/hook/useNomadData";
+import useMayaMobileData from "../../../components/hook/useMayaMobileData";
+import { useAiraloData } from "../../../components/hook/useAiraloData";
+import OfferCardOther from "../../../components/OfferCardOther";
 
-const RegionOffers = () => {
-  const [selectedDuration, setSelectedDuration] = useState(null);
-  const navigate = useNavigate();
-  const { regionName } = useParams();
+const ProviderPlans = ({ provider, regionName, filters }) => {
+  const { priceRange, sortOrder, selectedDuration, selectedProviders } = filters;
   const [currentPage, setCurrentPage] = useState(1);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
-  const [sortOrder, setSortOrder] = useState(null);
-  const { isOpen, openModal, closeModal } = useModal();
-
-  const { packages, loading, error } = useFetchRegionPackages(regionName)
-  console.log(packages);  
   const offersPerPage = 6;
 
-  const offers = packages; // Use fetched packages as offers
-  // Scroll to top whenever page changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+  let data = [];
+  let loading = true;
+
+  if (provider === "airalo") {
+    const res = useAiraloData(null, regionName);
+    data = res.packages;
+    loading = res.loading;
+  } else if (provider === "nomad") {
+    const res = useNomadData(null, regionName);
+    data = res.nomadData;
+    loading = res.loading;
+  } else if (provider === "mayamobile") {
+    const res = useMayaMobileData(null, regionName);
+    data = res.mayaMobileData;
+    loading = res.loading;
+  } else if (provider === "yesim") {
+    const res = useYesimData(null, regionName);
+    data = res.yesimData;
+    loading = res.loading;
+  }
+
+  // Normalize duration for filtering
+  const normalizeDuration = (dur) => {
+    return dur.toLowerCase().replace(/\s+/g, "").replace("days", "day").replace("day", "day");
+  };
 
   // Filter and sort offers
-  const filteredAndSortedOffers = offers
+  const filteredAndSortedOffers = data
     .filter(
-      (offer) =>
-        offer.discountedPrice >= priceRange.min &&
-        offer.discountedPrice <= priceRange.max
+      (offer) => {
+        const price = offer.discountedPrice || offer.originalPrice || 0;
+        const matchesPrice = price >= priceRange.min && price <= priceRange.max;
+        const matchesDuration = !selectedDuration || normalizeDuration(offer.duration).includes(normalizeDuration(selectedDuration));
+        return matchesPrice && matchesDuration;
+      }
     )
     .sort((a, b) => {
+      const priceA = a.discountedPrice || a.originalPrice || 0;
+      const priceB = b.discountedPrice || b.originalPrice || 0;
       if (sortOrder === "lowToHigh") {
-        return a.discountedPrice - b.discountedPrice;
+        return priceA - priceB;
       } else if (sortOrder === "highToLow") {
-        return b.discountedPrice - a.discountedPrice;
+        return priceB - priceA;
       }
       return 0;
     });
@@ -44,74 +65,38 @@ const RegionOffers = () => {
   // Pagination calculation
   const indexOfLastOffer = currentPage * offersPerPage;
   const indexOfFirstOffer = indexOfLastOffer - offersPerPage;
-  const currentOffers = filteredAndSortedOffers.slice(
-    indexOfFirstOffer,
-    indexOfLastOffer
-  );
+  const currentOffers = filteredAndSortedOffers.slice(indexOfFirstOffer, indexOfLastOffer);
   const totalPages = Math.ceil(filteredAndSortedOffers.length / offersPerPage);
 
-  // Format country name
-  const region = regionName
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  useEffect(() => {
+    setCurrentPage(1); // Reset page when filters change
+  }, [filters]);
 
-  // Define color schemes for each region
-  const regionColorSchemes = {
-    africa: {
-      bgColor: "bg-[#F8FFCD]",
-      button:
-        "w-full bg-[#8E9D30] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge:
-        "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    "eu-plus-uk": {
-      bgColor: "bg-[#F8FFCD]",
-      button:
-        "w-full bg-[#8E9D30] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge:
-        "bg-[#8E9D30] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    asia: {
-      bgColor: "bg-[#FFEAFD]",
-      button:
-        "w-full bg-[#792873] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#792873] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    oceania: {
-      bgColor: "bg-[#E9F4FF]",
-      button:
-        "w-full bg-[#077DB5] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#077DB5] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    europe: {
-      bgColor: "bg-[#E9FFE7]",
-      button:
-        "w-full bg-[#319628] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#319628] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    "north-america": {
-      bgColor: "bg-[#FFE7E7]",
-      button:
-        "w-full bg-[#D72B2B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#D72B2B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
-    "middle-east-and-north-africa": {
-      bgColor: "bg-[#DBFEFF]",
-      button:
-        "w-full bg-[#08868B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-      badge: "bg-[#08868B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-    },
+  // Scroll to top whenever page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  const navigate = useNavigate();
+
+  const handleBuy = (offer) => {
+    if (provider === "yesim" && offer.url) {
+      window.location.href = offer.url;
+    } else {
+      navigate(`/order-preview/${offer.id}`, { state: { offer } });
+    }
   };
 
-  // Get the color scheme for the current region (default to white if region not found)
-  const currentColorScheme = regionColorSchemes[regionName.toLowerCase()] || {
-    bgColor: "bg-white",
-    button: "w-full bg-[#08868B] hover:scale-105 text-white font-semibold py-2 px-6 rounded-full text-lg mt-8 transition-transform duration-300 shadow-lg cursor-pointer",
-    badge: "bg-[#08868B] text-white px-4 py-1.5 rounded-full text-sm font-medium",
-  };
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center col-span-3 h-32">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+    </div>
+  );
 
-  // Helper function for pagination range
+  const NoOffersMessage = () => (
+    <p className="text-gray-600 col-span-3 text-center">No offers available.</p>
+  );
+
   const getPaginationRange = () => {
     const range = [];
     const maxVisible = 5;
@@ -130,76 +115,61 @@ const RegionOffers = () => {
     return range;
   };
 
-  // Filter modal handlers
-  const handlePriceRangeChange = (e) => {
-    setPriceRange({ ...priceRange, max: parseInt(e.target.value) });
-  };
-  const handleSort = (order) => {
-    setSortOrder(order);
-  };
-  const handleApplyFilters = () => {
-    setCurrentPage(1); // Reset to first page when applying filters
-    closeModal();
-  };
-  const handleClearFilters = () => {
-    setPriceRange({ min: 0, max: 100 });
-    setSortOrder(null);
-    setCurrentPage(1); // Reset to first page
-    closeModal();
-  };
+  if (!selectedProviders.includes(provider)) return null;
 
-    const handleBuy = (offer) => {
-    navigate(`/order-preview/${offer.id}`, { state: { offer } });
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  let CardComponent = provider === "airalo" || provider === "nomad" ? OfferCard : OfferCardOther;
+  let title = provider.charAt(0).toUpperCase() + provider.slice(1) + " Plans";
 
   return (
-    <div className="my-10 container mx-auto px-4 py-16">
-      <div className="flex items-center justify-between mb-10">
-        <h1 className="text-3xl font-medium">{region} eSIM Plans</h1>
-        <div
-          className="border border-gray-300  rounded-full flex px-4 py-2 cursor-pointer"
-          onClick={openModal}
-        >
-          <img src={filter} alt="" />
-          <span className="ml-2 text-gray-600">Filters</span>
-        </div>
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="text-2xl font-medium">{title}</h1>
       </div>
 
       {/* Offers grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
-        {currentOffers.length > 0 ? (
-          currentOffers.map((offer, index) => (
-            <OfferCard
-              key={index}
-              company={offer.company}
-              coverage={offer.coverage}
-              duration={offer.duration}
-              data={offer.data}
-              originalPrice={offer.originalPrice}
-              discountedPrice={offer.discountedPrice}
-              bgColor={currentColorScheme.bgColor}
-              button={currentColorScheme.button}
-              saleBadge={currentColorScheme.badge}
-              onBuy={() => handleBuy(offer)}
-            />
-          ))
+        {loading ? (
+          <LoadingSpinner />
+        ) : currentOffers.length > 0 ? (
+          currentOffers.map((offer, index) => {
+            const key = offer.id || index;
+            let companyName;
+            if (provider === "airalo") companyName = offer.company;
+            else if (provider === "nomad") companyName = offer.short_info;
+            else if (provider === "mayamobile") companyName = offer.short_info;
+            else if (provider === "yesim") companyName = offer.planName;
+
+            let originalPrice = offer.originalPrice;
+            let discountedPrice = offer.discountedPrice;
+
+            return (
+              <CardComponent
+                key={key}
+                logo={offer.logo}
+                company={companyName}
+                coverage={offer.coverage}
+                duration={offer.duration}
+                data={
+                  offer.data +
+                  (offer.voice ? ` - ${offer.voice} Mins` : "") +
+                  (offer.text ? ` - ${offer.text} SMS` : "")
+                }
+                originalPrice={originalPrice || discountedPrice}
+                discountedPrice={discountedPrice}
+                bgColor="bg-[#FFFFFF]"
+                button="btn-primary"
+                saleBadge="saleBadge"
+                onBuy={() => handleBuy(offer)}
+              />
+            );
+          })
         ) : (
-          <p className="text-gray-600 col-span-3 text-center">
-            No offers available for the selected filters.
-          </p>
+          <NoOffersMessage />
         )}
       </div>
 
       {/* Pagination */}
-      {filteredAndSortedOffers.length > 0 && (
+      {filteredAndSortedOffers.length > offersPerPage && (
         <div className="flex justify-center items-center gap-3 mt-12">
           <button
             disabled={currentPage === 1}
@@ -246,6 +216,71 @@ const RegionOffers = () => {
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const RegionOffers = () => {
+  const navigate = useNavigate();
+  const { regionName } = useParams();
+  const [selectedDuration, setSelectedDuration] = useState(null);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
+  const [sortOrder, setSortOrder] = useState(null);
+  const [selectedProviders, setSelectedProviders] = useState(["airalo", "nomad", "mayamobile", "yesim"]); // Default all
+  const { isOpen, openModal, closeModal } = useModal();
+
+  const filters = { priceRange, sortOrder, selectedDuration, selectedProviders };
+
+  // Format region name
+  const formattedRegion = regionName
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  // Filter modal handlers
+  const handlePriceRangeChange = (e) => {
+    setPriceRange({ ...priceRange, max: parseInt(e.target.value) });
+  };
+  const handleSort = (order) => {
+    setSortOrder(order);
+  };
+  const handleProviderToggle = (provider) => {
+    setSelectedProviders((prev) =>
+      prev.includes(provider)
+        ? prev.filter((p) => p !== provider)
+        : [...prev, provider]
+    );
+  };
+  const handleApplyFilters = () => {
+    closeModal();
+  };
+  const handleClearFilters = () => {
+    setPriceRange({ min: 0, max: 500 });
+    setSortOrder(null);
+    setSelectedDuration(null);
+    setSelectedProviders(["airalo", "nomad", "mayamobile", "yesim"]);
+    closeModal();
+  };
+
+  return (
+    <div className="my-10 container mx-auto px-4 py-16">
+      <div className="flex items-center justify-between mb-10">
+        <h1 className="text-3xl font-medium">{formattedRegion} eSIM Plans</h1>
+        <div
+          className="border border-gray-300 rounded-full flex px-4 py-2 cursor-pointer"
+          onClick={openModal}
+        >
+          <img src={filter} alt="" />
+          <span className="ml-2 text-gray-600">Filters</span>
+        </div>
+      </div>
+
+      <div className="space-y-10">
+        <ProviderPlans provider="airalo" regionName={regionName} filters={filters} />
+        <ProviderPlans provider="nomad" regionName={regionName} filters={filters} />
+        <ProviderPlans provider="mayamobile" regionName={regionName} filters={filters} />
+        <ProviderPlans provider="yesim" regionName={regionName} filters={filters} />
+      </div>
 
       {/* Modal */}
       {isOpen && (
@@ -259,6 +294,22 @@ const RegionOffers = () => {
             </button>
             <h2 className="text-xl font-medium mb-4">Filter</h2>
             <div className="space-y-4">
+              <div>
+                <p className="text-gray-700 mb-2">Providers</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {["airalo", "nomad", "mayamobile", "yesim"].map((prov) => (
+                    <label key={prov} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedProviders.includes(prov)}
+                        onChange={() => handleProviderToggle(prov)}
+                        className="mr-2"
+                      />
+                      {prov.charAt(0).toUpperCase() + prov.slice(1)}
+                    </label>
+                  ))}
+                </div>
+              </div>
               <button
                 className={`w-full text-left text-gray-800 p-2 rounded border border-gray-200 ${
                   sortOrder === "lowToHigh"
@@ -297,7 +348,7 @@ const RegionOffers = () => {
               <div>
                 <p className="text-gray-700 mb-2 text-sm sm:text-base">Duration</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {["3day", "7day", "15day", "30day", "45day", "100day", "6month", "1year"].map((duration) => (
+                  {["3 Days", "7 Days", "15 Days", "30 Days", "45 Days", "100 Days", "6 Months", "1 Year"].map((duration) => (
                     <button
                       key={duration}
                       onClick={() => setSelectedDuration(duration)}
@@ -305,7 +356,7 @@ const RegionOffers = () => {
                         selectedDuration === duration ? "bg-gray-100" : "hover:bg-gray-100"
                       }`}
                     >
-                      {duration === "6month" ? "6 Months" : duration === "1year" ? "1 Year" : `${duration.replace("day", " Days")}`}
+                      {duration}
                     </button>
                   ))}
                 </div>

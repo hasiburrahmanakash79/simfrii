@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../../lib/api-client';
 import airalo from '../../assets/logo/airalo.png'
-import nomad from '../../assets/logo/nomad.png'
-import holaFly from '../../assets/logo/holafly.png'
 export const useFetchRegionPackages = (slug) => {
   console.log(slug);
   const [packages, setPackages] = useState([]);
@@ -46,47 +44,6 @@ export const useFetchRegionPackages = (slug) => {
                   fairUsagePolicy: pkg.fair_usage_policy,
                 });
               });
-            });
-          });
-        }
-        // Holafly (if any)
-        if (data.holafly && data.holafly.length > 0) {
-          // Assume similar structure; adjust if needed
-          data.holafly.forEach(pkg => {
-            normalizedPackages.push({
-              id: pkg.id,
-              logo: holaFly,
-              provider: 'holafly',
-              company: 'Holafly',
-              coverage: pkg.coverage.length,
-              duration: `${pkg.day} Days`,
-              data: pkg.is_unlimited ? 'Unlimited' : pkg.data,
-              originalPrice: pkg.price,
-              discountedPrice: pkg.price, // Adjust if there's discount
-              voice: pkg.voice,
-              text: pkg.text,
-              isUnlimited: pkg.is_unlimited,
-              fairUsagePolicy: pkg.fair_usage_policy,
-            });
-          });
-        }
-        // Nomad
-        if (data.nomad && data.nomad.length > 0) {
-          data.nomad.forEach(pkg => {
-            normalizedPackages.push({
-              id: pkg.id,
-              logo: nomad,
-              provider: 'nomad',
-              company: 'Nomad',
-              coverage: pkg.coverage.length,
-              duration: `${pkg.duration} ${pkg.duration_unit}`,
-              data: `${pkg.amount} ${pkg.amount_unit}`,
-              originalPrice: pkg.price,
-              discountedPrice: pkg.price,
-              voice: null,
-              text: null,
-              isUnlimited: false,
-              fairUsagePolicy: null,
             });
           });
         }

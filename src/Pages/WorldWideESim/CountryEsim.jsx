@@ -6,14 +6,18 @@ import useModal from "../../components/modal/useModal";
 import filter from "../../assets/icons/filter.svg";
 import useFetchCountries from "../../components/hook/useFetchCountries";
 import { useFetchCountryPackages } from "../../components/hook/useFetchCountryPackages";
+import useNomadData from "../../components/hook/useNomadData";
+import useMayaMobileData from "../../components/hook/useMayaMobileData";
+import useYesimData from "../../components/hook/useYesimData";
+import OfferCardOther from "../../components/OfferCardOther";
 
 const CountryEsim = () => {
   const navigate = useNavigate();
-  const { countryName } = useParams();
-  const { countries } = useFetchCountries();
+  const { countryName, provider } = useParams();
+  const { countries, loading: countriesLoading } = useFetchCountries();
   const [countryCode, setCountryCode] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
-  const { packages, loading: packagesLoading } = useFetchCountryPackages(countryCode);
   const [selectedDuration, setSelectedDuration] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 500 });
@@ -21,14 +25,39 @@ const CountryEsim = () => {
   const { isOpen, openModal, closeModal } = useModal();
   const offersPerPage = 6;
 
+  // Fetch provider-specific data
+  let data = [];
+  let loading = true;
+  if (provider === "airalo") {
+    const res = useFetchCountryPackages(countryCode);
+    data = res.packages;
+    loading = res.loading;
+  } else if (provider === "nomad") {
+    const res = useNomadData(countryCode);
+    data = res.nomadData;
+    loading = res.loading;
+  } else if (provider === "mayamobile") {
+    const res = useMayaMobileData(countryCode);
+    data = res.mayaMobileData;
+    loading = res.loading;
+  } else if (provider === "yesim") {
+    const res = useYesimData(countryCode);
+    data = res.yesimData;
+    loading = res.loading;
+  }
+
   // Find country code from countries based on slug
   useEffect(() => {
     if (countries.length > 0 && countryName) {
       const matchedCountry = countries.find(
-        (country) => country.slug.replace(/\s+/g, "-").toLowerCase() === countryName.toLowerCase()
+        (country) =>
+          country.slug.replace(/\s+/g, "-").toLowerCase() ===
+          countryName.toLowerCase()
       );
       if (matchedCountry) {
         setCountryCode(matchedCountry.country_code);
+      } else {
+        setNotFound(true);
       }
     }
   }, [countries, countryName]);
@@ -38,19 +67,29 @@ const CountryEsim = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
+  // Normalize duration for filtering
+  const normalizeDuration = (dur) => {
+    return dur.toLowerCase().replace(/\s+/g, "").replace("days", "day");
+  };
+
   // Filter and sort offers
-  const filteredAndSortedOffers = packages
+  const filteredAndSortedOffers = data
     .filter(
       (offer) =>
-        offer.discountedPrice >= priceRange.min &&
-        offer.discountedPrice <= priceRange.max &&
-        (!selectedDuration || offer.duration.toLowerCase().includes(selectedDuration.toLowerCase()))
+        (offer.discountedPrice || offer.originalPrice) >= priceRange.min &&
+        (offer.discountedPrice || offer.originalPrice) <= priceRange.max &&
+        (!selectedDuration ||
+          normalizeDuration(offer.duration).includes(
+            normalizeDuration(selectedDuration)
+          ))
     )
     .sort((a, b) => {
+      const priceA = a.discountedPrice || a.originalPrice;
+      const priceB = b.discountedPrice || b.originalPrice;
       if (sortOrder === "lowToHigh") {
-        return a.discountedPrice - b.discountedPrice;
+        return priceA - priceB;
       } else if (sortOrder === "highToLow") {
-        return b.discountedPrice - a.discountedPrice;
+        return priceB - priceA;
       }
       return 0;
     });
@@ -64,12 +103,18 @@ const CountryEsim = () => {
   );
   const totalPages = Math.ceil(filteredAndSortedOffers.length / offersPerPage);
 
-  console.log(currentOffers);
   // Format country name
   const formattedName = countryName
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
+  // Format provider name
+  let formattedProvider = "";
+  if (provider === "airalo") formattedProvider = "Airalo";
+  else if (provider === "nomad") formattedProvider = "Nomad";
+  else if (provider === "mayamobile") formattedProvider = "Maya Mobile";
+  else if (provider === "yesim") formattedProvider = "Yesim";
 
   // Helper function for pagination range
   const getPaginationRange = () => {
@@ -113,14 +158,40 @@ const CountryEsim = () => {
     navigate(`/order-preview/${offer.id}`, { state: { offer } });
   };
 
-  if (packagesLoading || !countryCode) {
-    return <div className="my-10 container mx-auto px-4 py-16">Loading...</div>;
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center col-span-3 h-32">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+    </div>
+  );
+
+  const NoOffersMessage = () => (
+    <p className="text-gray-600 col-span-3 text-center">No offers available.</p>
+  );
+
+  if (countriesLoading || loading || !countryCode) {
+    return (
+      <div className="my-10 container mx-auto px-4 py-16 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (notFound || !formattedProvider) {
+    return (
+      <div className="my-10 container mx-auto px-4 py-16 text-center">
+        <p className="text-2xl font-medium text-gray-600">
+          {notFound ? "Country not found." : "Provider not found."}
+        </p>
+      </div>
+    );
   }
 
   return (
     <div className="my-10 container mx-auto px-4 py-16">
       <div className="flex items-center justify-between mb-10">
-        <h1 className="text-3xl font-medium">{formattedName} eSIM Plans</h1>
+        <h1 className="text-3xl font-medium">
+          {formattedName} {formattedProvider} eSIM Plans
+        </h1>
         <div
           className="border border-gray-300 hover:bg-[#FFF6ED] rounded-full flex px-4 py-2 cursor-pointer"
           onClick={openModal}
@@ -133,26 +204,55 @@ const CountryEsim = () => {
       {/* Offers grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
         {currentOffers.length > 0 ? (
-          currentOffers.map((offer) => (
-            <OfferCard
-              key={offer.id}
-              logo={offer.logo}
-              company={offer.company}
-              coverage={offer.coverage}
-              duration={offer.duration}
-              data={offer.data  + (offer.voice ? ` - ${offer.voice} Mins` : '') + (offer.text ? ` - ${offer.text} SMS` : '')}
-              originalPrice={offer.originalPrice}
-              discountedPrice={offer.discountedPrice}
-              bgColor="bg-[#FFFFFF]"
-              button="btn-primary"
-              saleBadge="saleBadge"
-              onBuy={() => handleBuy(offer)}
-            />
-          ))
+          currentOffers.map((offer, index) => {
+            const key = offer.id || index;
+            let CardComponent =
+              provider === "airalo" || provider === "nomad"
+                ? OfferCard
+                : OfferCardOther;
+            let companyName;
+            if (provider === "airalo") companyName = offer.company;
+            else if (provider === "nomad") companyName = offer.short_info;
+            else if (provider === "mayamobile") companyName = offer.short_info;
+            else if (provider === "yesim") companyName = offer.planName;
+
+            let originalPrice;
+            let discountedPrice;
+            if (provider === "airalo") {
+              originalPrice = offer.originalPrice;
+              discountedPrice = offer.discountedPrice;
+            } else if (
+              provider === "nomad" ||
+              provider === "mayamobile"
+            ) {
+              originalPrice = offer.discountedPrice;
+            } else if (provider === "yesim") {
+              originalPrice = offer.originalPrice;
+            }
+
+            return (
+              <CardComponent
+                key={key}
+                logo={offer.logo}
+                company={companyName}
+                coverage={offer.coverage}
+                duration={offer.duration}
+                data={
+                  offer.data +
+                  (offer.voice ? ` - ${offer.voice} Mins` : "") +
+                  (offer.text ? ` - ${offer.text} SMS` : "")
+                }
+                originalPrice={originalPrice}
+                discountedPrice={discountedPrice}
+                bgColor="bg-[#FFFFFF]"
+                button="btn-primary"
+                saleBadge="saleBadge"
+                onBuy={() => handleBuy(offer)}
+              />
+            );
+          })
         ) : (
-          <p className="text-gray-600 col-span-3 text-center">
-            No offers available for the selected filters.
-          </p>
+          <NoOffersMessage />
         )}
       </div>
 

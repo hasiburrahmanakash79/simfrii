@@ -13,7 +13,7 @@ export const useFetchGlobalPackages = () => {
     const fetchPackages = async () => {
       try {
         const response = await apiClient.get(
-          "/esim_providers/global-packages?page=1&limit=500"
+          "/esim_providers/global-packages?page=1&limit=20"
         );
         const data = response.data;
         // Flatten and normalize packages (similar to country packages)
