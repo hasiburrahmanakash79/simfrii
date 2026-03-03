@@ -18,14 +18,17 @@ const OfferCard = ({
       className={`rounded-2xl border border-gray-200 p-6 shadow-sm ${bgColor}`}
     >
       {/* Header with logo and sale badge */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="">
             <img src={logo} alt="" className=" h-6 md:h-8 " />
           </div>
-          <h2 className="md:text-lg text-md font-semibold text-gray-900">{company}</h2>
+          
         </div>
         <div className={`${saleBadge}`}>ON SALE</div>
+      </div>
+      <div>
+        <h2 className="md:text-lg text-md font-semibold text-gray-900 py-5">{company}</h2>
       </div>
 
       {/* Plan details */}

@@ -20,35 +20,31 @@ const IssueChart = () => {
 
   console.log(overview);
   // Dynamically generate monthlyData from ticketData
-  const monthlyData = ticketData.labels.map((month, index) => ({
+  const monthlyData = ticketData?.labels?.map((month, index) => ({
     month,
-    primary: ticketData.current_year[index], // Current year
-    secondary: ticketData.last_year[index], // Last year
-  }));
+    primary: ticketData?.current_year?.[index] ?? 0, // Current year, default to 0 if undefined
+    secondary: ticketData?.last_year?.[index] ?? 0, // Last year, default to 0 if undefined
+  })) ?? []; // Default to empty array if labels is undefined
 
   // Calculate max value for YAxis domain
-  const allValues = [...ticketData.last_year, ...ticketData.current_year];
-  const maxValue = Math.max(...allValues, 1); // Minimum max of 1 to avoid empty chart
+  const lastYearValues = ticketData?.last_year ?? [];
+  const currentYearValues = ticketData?.current_year ?? [];
+  const allValues = [...lastYearValues, ...currentYearValues];
+  const maxValue = allValues.length > 0 ? Math.max(...allValues) : 1; // Minimum max of 1 to avoid empty chart
   const yDomain = [0, maxValue * 1.1];
 
   // Dynamic pie data from last_month_ticket_activity
   const ticketActivity = overview?.last_month_ticket_activity || {};
-  const openTickets = ticketActivity.open || 0;
-  const pendingTickets = ticketActivity.pending || 0;
-  const resolvedTickets = ticketActivity.solved || 0;
-  const totalTickets = openTickets + pendingTickets + resolvedTickets || 1; // Avoid division by zero
+  const pendingTickets = ticketActivity?.pending || 0;
+  const resolvedTickets = ticketActivity?.solved || 0;
+  const totalTickets = pendingTickets + resolvedTickets || 1; // Avoid division by zero
 
   const pieData = [
-    {
-      name: "Open",
-      value: Math.round((openTickets / totalTickets) * 100),
-      color: "#027A48",
-      count: openTickets,
-    },
+    
     {
       name: "Pending",
       value: Math.round((pendingTickets / totalTickets) * 100),
-      color: "#FDE047",
+      color: "#027A48",
       count: pendingTickets,
     },
     {
@@ -64,8 +60,8 @@ const IssueChart = () => {
       return (
         <div className="bg-white p-2 sm:p-3 border border-gray-200 rounded shadow-lg">
           <p className="text-sm sm:text-md font-medium mb-1 sm:mb-2 text-gray-900">{`Month: ${label}`}</p>
-          <p className="text-xs sm:text-sm text-gray-600">{`Current year: ${payload[1].value.toLocaleString()}`}</p>
-          <p className="text-xs sm:text-sm text-gray-600">{`Last year: ${payload[0].value.toLocaleString()}`}</p>
+          <p className="text-xs sm:text-sm text-gray-600">{`Current year: ${payload[1]?.value.toLocaleString()}`}</p>
+          <p className="text-xs sm:text-sm text-gray-600">{`Last year: ${payload[0]?.value.toLocaleString()}`}</p>
         </div>
       );
     }
@@ -168,7 +164,7 @@ const IssueChart = () => {
                     startAngle={90}
                     endAngle={450}
                   >
-                    {pieData.map((entry, index) => (
+                    {pieData?.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -177,7 +173,7 @@ const IssueChart = () => {
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-            {pieData.map((item, index) => (
+            {pieData?.map((item, index) => (
               <div key={index} className="flex items-center">
                 <div
                   className="w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-2 sm:mr-3"

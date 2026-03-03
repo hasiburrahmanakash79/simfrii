@@ -1,22 +1,13 @@
 import { useState } from "react";
-import user from '../assets/images/user.png'
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import logo from "../assets/logo/simFriiIcon.svg";
+import { LogOut, Menu, X } from "lucide-react";
+import logo from "../assets/logo/simfriiSymbol.svg";
 import Logout from "../assets/icons/signout.svg";
-import HomeIconSvg from "../assets/icons/Home.svg";
-import UserIconSvg from "../assets/icons/Users.svg";
-import SimIconSvg from "../assets/icons/simcard.svg";
-import OrderIconSvg from "../assets/icons/order.svg";
-import PaymentIconSvg from "../assets/icons/payment.svg";
-import CloudIconSvg from "../assets/icons/cloud.svg";
-import AnalyticsIconSvg from "../assets/icons/analytics.svg";
-import SupportIconSvg from "../assets/icons/support.svg";
-import SettingIconSvg from "../assets/icons/setting.svg";
 import useMe from "../components/hook/useMe";
 import apiClient from "../lib/api-client";
 import { removeAuthTokens } from "../lib/cookie-utils";
 import LogoutModal from "../components/LogoutModal";
+import {Analytics, Home, Orders, Payment, PlanManage, ProfileUser, Settings, Support, Upload, Users } from "../assets/icons/icons";
 
 const Dashboard = () => {
   const { me } = useMe();
@@ -46,86 +37,86 @@ const Dashboard = () => {
   const menus = [
     {
       title: "Dashboard",
-      path: "/dashboard/adminOverview",
-      icon: HomeIconSvg,
+      path: "/adminOverview",
+      icon: (isActive) => <Home isActive={isActive} />,
       role: "admin",
     },
     {
       title: "User",
-      path: "/dashboard/all-user",
-      icon: UserIconSvg,
+      path: "/all-user",
+      icon: (isActive) => <Users isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Orders",
-      path: "/dashboard/order",
-      icon: OrderIconSvg,
+      path: "/order",
+      icon: (isActive) => <Orders isActive={isActive} />,
       role: "admin",
     },
     {
       title: "eSIM plan management",
-      path: "/dashboard/management",
-      icon: SimIconSvg,
+      path: "/management",
+      icon: (isActive) => <PlanManage isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Payment",
-      path: "/dashboard/payment",
-      icon: PaymentIconSvg,
+      path: "/payment",
+      icon: (isActive) => <Payment isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Upload",
-      path: "/dashboard/content",
-      icon: CloudIconSvg,
+      path: "/content",
+      icon: (isActive) => <Upload isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Analytics",
-      path: "/dashboard/analytics",
-      icon: AnalyticsIconSvg,
+      path: "/analytics",
+      icon: (isActive) => <Analytics isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Support",
-      path: "/dashboard/support",
-      icon: SupportIconSvg,
+      path: "/support",
+      icon: (isActive) => <Support isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Settings",
-      path: "/dashboard/settings",
-      icon: SettingIconSvg,
+      path: "/settings",
+      icon: (isActive) => <Settings isActive={isActive} />,
       role: "admin",
     },
     {
       title: "Dashboard",
-      path: "/dashboard/stuffOverview",
-      icon: HomeIconSvg,
+      path: "/stuffOverview",
+      icon: (isActive) => <Home isActive={isActive} />,
       role: "staff",
     },
     {
       title: "User",
-      path: "/dashboard/userList",
-      icon: UserIconSvg,
+      path: "/userList",
+      icon: (isActive) => <Users isActive={isActive} />,
       role: "staff",
     },
     {
       title: "eSIM plan management",
-      path: "/dashboard/sim-plan",
-      icon: SimIconSvg,
+      path: "/management",
+      icon: (isActive) => <PlanManage isActive={isActive} />,
       role: "staff",
     },
     {
       title: "Analytics",
-      path: "/dashboard/issue-analytics",
-      icon: AnalyticsIconSvg,
+      path: "/issue-analytics",
+      icon: (isActive) => <Analytics isActive={isActive} />,
       role: "staff",
     },
     {
       title: "Support",
-      path: "/dashboard/support",
-      icon: SupportIconSvg,
+      path: "/support",
+      icon: (isActive) => <Support isActive={isActive} />,
       role: "staff",
     },
   ];
@@ -162,34 +153,32 @@ const Dashboard = () => {
 
           {/* Navigation Menu */}
           <nav className="p-3 space-y-2 flex-1">
-            {filteredMenus.map((menu, index) => (
-              <Link
-                key={index}
-                to={menu.path}
-                className={`flex items-center p-2 text-sm rounded-lg transition-colors ${
-                  location.pathname === menu.path ||
-                  (location.pathname === "/dashboard" &&
-                    menu.path.includes("Overview"))
-                    ? "bg-[#fffaea] text-[#ff9900]"
-                    : "text-gray-600 hover:bg-[#fffaea]"
-                }`}
-                aria-label={menu.title}
-                onClick={() => setIsSidebarOpen(false)} // Close sidebar on mobile after click
-              >
-                <img
-                  src={menu.icon}
-                  alt={`${menu.title} icon`}
-                  className="w-6 h-6"
-                />
-                <span
-                  className={`${
-                    isSidebarOpen ? "block" : "hidden md:block"
-                  } ml-3`}
+            {filteredMenus.map((menu, index) => {
+              const isActive = location.pathname === menu.path ||
+                (location.pathname === "/" && menu.path.includes("Overview"));
+              return (
+                <Link
+                  key={index}
+                  to={menu.path}
+                  className={`flex items-center p-2 text-sm rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-[#fffaea] text-[#FF8242]"
+                      : "text-gray-600 hover:bg-[#fffaea]"
+                  }`}
+                  aria-label={menu.title}
+                  onClick={() => setIsSidebarOpen(false)} // Close sidebar on mobile after click
                 >
-                  {menu.title}
-                </span>
-              </Link>
-            ))}
+                  {menu.icon(isActive)}
+                  <span
+                    className={`${
+                      isSidebarOpen ? "block" : "hidden md:block"
+                    } ml-3`}
+                  >
+                    {menu.title}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Profile and Logout */}
@@ -202,19 +191,7 @@ const Dashboard = () => {
                 aria-label="Profile"
               >
                 <div>
-                  <img
-                    src={
-                      me?.avatar && me.avatar.trim() !== ""
-                        ? me.avatar
-                        : user
-                    }
-                    alt="Profile"
-                    className="md:w-10 w-7 rounded-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null; // prevent infinite loop
-                      e.currentTarget.src = user
-                    }}
-                  />
+                  <ProfileUser/>
                 </div>
                 <span>
                   <p className="font-bold">{me.full_name}</p>
@@ -223,10 +200,10 @@ const Dashboard = () => {
               </div>
               <button 
                 onClick={() => setShowLogoutModal(true)}
-                className="text-gray-600 hover:text-[#4776EB] cursor-pointer"
+                className="text-[#FF8242] hover:text-[#ec6a29] cursor-pointer"
                 aria-label="Logout"
               >
-                <img src={Logout} alt="Logout" className="w-10" />
+                <LogOut/>
               </button>
             </div>
           </div>

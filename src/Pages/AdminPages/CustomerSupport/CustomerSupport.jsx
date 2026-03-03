@@ -3,6 +3,7 @@ import question from "../../../assets/icons/question.svg";
 import useMe from "../../../components/hook/useMe";
 import { getCookie } from "../../../lib/cookie-utils";
 import apiClient from "../../../lib/api-client";
+import { CircleQuestionMark, MessageCircleMoreIcon } from "lucide-react";
 
 const CustomerSupport = () => {
   const { me } = useMe();
@@ -30,8 +31,8 @@ const CustomerSupport = () => {
         .filter((chat) =>
           chat.members?.some(
             (m) =>
-              m.email === "staff@gmail.com" || m.email === "admin@gmail.com"
-          )
+              m.email === "staff@gmail.com" || m.email === "admin@gmail.com",
+          ),
         )
         .map((chat) => ({
           id: chat.id || chat.chat_id,
@@ -39,12 +40,12 @@ const CustomerSupport = () => {
           customer:
             chat.members?.find(
               (m) =>
-                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com"
+                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com",
             )?.email || "Unknown",
           customerName:
             chat.members?.find(
               (m) =>
-                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com"
+                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com",
             )?.name || "Customer",
           created: chat.created_at || "Unknown",
           status: "Open",
@@ -53,7 +54,7 @@ const CustomerSupport = () => {
     } catch (error) {
       console.error(
         "Error loading tickets:",
-        error.response ? error.response.data : error.message
+        error.response ? error.response.data : error.message,
       );
     }
   };
@@ -133,17 +134,18 @@ const CustomerSupport = () => {
           id: msg.id,
           content: msg.content || msg.message,
           sender:
-            msg.sender?.role === 'admin' || msg.sender?.role === 'staff'
+            msg.sender?.role === "admin" || msg.sender?.role === "staff"
               ? "Support Team"
               : selectedTicket.customerName,
-          isCustomer: msg.sender?.role !==  'admin' && msg.sender?.role !== 'staff',
+          isCustomer:
+            msg.sender?.role !== "admin" && msg.sender?.role !== "staff",
           timestamp: msg.created_at || "Unknown",
-        }))
+        })),
       );
     } catch (error) {
       console.error(
         "Error fetching messages:",
-        error.response ? error.response.data : error.message
+        error.response ? error.response.data : error.message,
       );
     }
   };
@@ -210,7 +212,7 @@ const CustomerSupport = () => {
         <div className="p-4 sm:p-5 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <h1 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
-              Support Tickets
+              Support
             </h1>
             <input
               type="text"
@@ -228,11 +230,9 @@ const CustomerSupport = () => {
                 className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <img
-                    src={question}
-                    alt="Question icon"
-                    className="w-6 h-6 sm:w-8 sm:h-8"
-                  />
+                  <div className="bg-[#09b285] rounded-full p-2 text-white">
+                    <MessageCircleMoreIcon />
+                  </div>
                   <div>
                     <p className="text-sm sm:text-base font-medium text-gray-900">
                       {ticket.title}
@@ -244,7 +244,7 @@ const CustomerSupport = () => {
                 </div>
                 <button
                   onClick={() => openModal(ticket)}
-                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300 transition-colors"
+                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm rounded-full bg-orange-100 text-[#EC7C0C] hover:bg-orange-200 transition-colors"
                 >
                   Open
                 </button>
@@ -269,7 +269,7 @@ const CustomerSupport = () => {
               </h2>
               <div className="text-red-600 space-y-1 bg-red-50 w-full p-3 rounded-lg text-xs sm:text-sm">
                 <p className="font-medium">
-                  Ticket: {selectedTicket.id} || {selectedTicket.title}
+                  {selectedTicket.id} || {selectedTicket.title}
                 </p>
                 <p>Customer: {selectedTicket.customer}</p>
                 <p>Created: {formatDateTime(selectedTicket.created)}</p>
@@ -277,36 +277,54 @@ const CustomerSupport = () => {
             </div>
 
             {/* Messages */}
-            <div className="p-4 max-h-80 sm:max-h-96 overflow-y-auto space-y-3 sm:space-y-4">
+            <div className="p-4 max-h-[350] sm:max-h-[400px] overflow-y-auto space-y-3 sm:space-y-4">
               {messages.map((message) => (
                 <div
-                  key={message.id}
-                  className="flex items-start gap-2 sm:gap-3"
-                >
-                  <div
-                    className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium ${
-                      message.isCustomer ? "bg-blue-500" : "bg-purple-500"
-                    }`}
-                  >
-                    {message.sender
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs sm:text-sm font-medium text-gray-900">
-                        {message.sender}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {formatDateTime(message.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                      {message.content}
-                    </p>
-                  </div>
-                </div>
+  key={message.id}
+  className={`flex gap-2 sm:gap-3 ${
+    message.isCustomer ? "justify-start" : "justify-end"
+  }`}
+>
+  <div
+    className={`group flex items-start gap-2 sm:gap-3 max-w-[70%] ${
+      message.isCustomer ? "" : "flex-row-reverse text-right"
+    }`}
+  >
+    {/* Avatar */}
+    <div
+      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium ${
+        message.isCustomer ? "bg-[#EC7C0C]" : "bg-purple-500"
+      }`}
+    >
+      {message.sender
+        .split(" ")
+        .map((n) => n[0])
+        .join("")}
+    </div>
+
+    {/* Message Content */}
+    <div className="relative">
+      <p 
+        className={`text-xs sm:text-sm text-gray-700 leading-relaxed p-2 rounded-lg text-left ${
+          message.isCustomer ? "bg-gray-100" : "bg-purple-100"
+        }`}
+      >
+        {message.content}
+      </p>
+
+      {/* Timestamp - Hidden by default, shown on hover */}
+      <div
+        className={`absolute top-1/2 -translate-y-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white p-1 rounded shadow z-10 ${
+          message.isCustomer
+            ? "left-full ml-2"  // Right side for customer (left-aligned message)
+            : "right-full mr-2 text-right"  // Left side for sender (right-aligned message)
+        }`}
+      >
+        {formatDateTime(message.timestamp)}
+      </div>
+    </div>
+  </div>
+</div>
               ))}
               <div ref={messagesEndRef} />
             </div>
@@ -320,7 +338,7 @@ const CustomerSupport = () => {
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
                 placeholder="Type your response here..."
-                className="w-full h-20 sm:h-24 p-3 text-xs sm:text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-20 sm:h-24 p-3 text-xs sm:text-sm border border-gray-300 rounded-lg resize-none outline-none"
               />
               <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-3">
                 <button
@@ -331,7 +349,7 @@ const CustomerSupport = () => {
                 </button>
                 <button
                   onClick={handleSendReply}
-                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm bg-[#4776EB] text-white rounded-lg hover:bg-[#3a5fd5] transition-colors"
+                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm bg-[#EC7C0C] text-white rounded-lg hover:bg-[#d6700a] transition-colors"
                 >
                   Send reply
                 </button>

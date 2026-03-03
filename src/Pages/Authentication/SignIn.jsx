@@ -23,9 +23,9 @@ const SignIn = () => {
       if (role === "user") {
         navigate("/");
       } else if (role === "staff" || role === "stuff") {
-        navigate("/dashboard/stuffOverview");
+        navigate("/stuffOverview");
       } else if (role === "admin") {
-        navigate("/dashboard/adminOverview");
+        navigate("/adminOverview");
       } else {
         navigate("/");
       }
@@ -55,9 +55,9 @@ const SignIn = () => {
       if (role === "user") {
         navigate("/");
       } else if (role === "staff" || role === "stuff") { // Assuming 'stuff' is a typo for 'staff'
-        navigate("/dashboard/stuffOverview");
+        navigate("/stuffOverview");
       } else if (role === "admin") {
-        navigate("/dashboard/adminOverview");
+        navigate("/adminOverview");
       } else {
         navigate("/");
       }
@@ -138,49 +138,18 @@ const SignIn = () => {
               )}
             </div>
             <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-1 text-xs">
-                <input type="checkbox" />
-                <p>Remember me</p>
-              </div>
+             
+              <div></div>
               <div>
-                <Link to="/email" className="text-xs text-[#fda852]">
+                <Link to="/forgat-password" className="text-xs text-[#fda852]">
                   Forget Password
                 </Link>
               </div>
             </div>
-
-            {/* Divider */}
-            <div className="divider">Or Continue with</div>
-            {/* Social Login */}
-            <div className="flex space-x-4">
-              <button type="button" className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="w-5 h-5 mr-2"
-                />
-                Google
-              </button>
-              <button type="button" className="flex-1 flex items-center justify-center border border-base-300 rounded-full py-2 hover:bg-gray-100">
-              <img
-                src="https://assets.likefamily.com.au/public/images/socials/apple-icon.png?auto=compress&q=50&ixlib=react-9.3.0"
-                alt="Apple"
-                className="w-7 h-7 mr-2"
-              />
-              Apple
-            </button>
-            </div>
-
             <button type="submit" className="btn-primary w-full mt-4" disabled={isLoading}>
               {isLoading ? "Logging In..." : "Log In"}
             </button>
           </form>
-          <p className="text-center text-sm mt-6">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-[#fda852] hover:underline">
-              Register
-            </Link>
-          </p>
         </div>
       </div>
     </div>

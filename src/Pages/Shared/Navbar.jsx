@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import simFrii from "../../assets/logo/simFriiLogo.svg";
+import simFrii from "../../assets/logo/SimFriiBlack.svg";
 import SupportModal from "../Support/SupportModal";
 import ChatModal from "../Support/ChatModal";
 import LogoutModal from "../../components/LogoutModal";

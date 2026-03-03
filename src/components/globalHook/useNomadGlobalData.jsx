@@ -1,34 +1,20 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../../lib/api-client';
 import nomad from "../../assets/logo/nomad.png";
-import useFetchRegions from './useFetchRegions';
 
-const useNomadData = (countryCode, regionName) => {
+const useNomadGlobalData = () => {
   const [nomadData, setNomadData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { regions} = useFetchRegions();
 
-    const region = regions.find((c) => c.slug === regionName);
-  const findRegionName = region?.slug;
-  console.log(findRegionName);
 
 
   useEffect(() => {
-    if (!countryCode && !findRegionName) return;
-
     const fetchPackages = async () => {
       try {
-        let queryParams = "page=1&limit=100";
-        if (countryCode) {
-          queryParams = `country=${countryCode}&${queryParams}`;
-        }
-        if (findRegionName) {
-          queryParams = `slug=${findRegionName}&${queryParams}`;
-        }
-
+       
         const response = await apiClient.get(
-          `/esim_providers/nomad/region-packages?${queryParams}`
+          `/esim_providers/nomad/global-packages`
         );
         const data = response.data;
 
@@ -51,7 +37,7 @@ const useNomadData = (countryCode, regionName) => {
               coverage: pkg.coverage.length,
               duration: `${pkg.duration} Days`, 
               data: `${pkg.amount} ${pkg.amount_unit}`,
-              originalPrice: null, 
+              originalPrice: pkg.price, 
               discountedPrice: pkg.price,
               voice: null, // Not provided
               text: null, // Not provided
@@ -72,9 +58,10 @@ const useNomadData = (countryCode, regionName) => {
     };
 
     fetchPackages();
-  }, [countryCode, findRegionName]);
+  }, []);
 
   return { nomadData, loading, error };
 };
 
-export default useNomadData;
+
+export default useNomadGlobalData;

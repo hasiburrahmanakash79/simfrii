@@ -7,7 +7,7 @@ const PopularCountries = () => {
   const sliceCountries = countries?.slice(0, 16);
 
   return (
-    <div className="my-10">
+    <div className="mb-10">
       <h2 className="md:text-3xl text-xl font-medium mb-4">
         Popular Countries
       </h2>

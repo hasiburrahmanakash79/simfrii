@@ -12,6 +12,7 @@ import usePaymentList from "../../../components/adminHook/usePaymentList";
 const Payment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { paymentData, loading } = usePaymentList(currentPage);
+  console.log(paymentData);
 
   const payments = paymentData?.payments || [];
   const summary = paymentData?.summary || {};
@@ -52,7 +53,7 @@ const Payment = () => {
         comparison: "vs last month",
       },
       {
-        title: "Paid Earnings",
+        title: "Total Paid",
         value: summary.paid_earning || 0,
         change: getChange(
           summary.paid_growth || { growth_percent: 0, status: "no change" }

@@ -1,14 +1,33 @@
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Calendar,
+  MapPin,
+  Mail,
+  User,
+  IdCard,
+  Phone,
+  Shield,
+} from "lucide-react";
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import SectionTitle from "../../../components/SectionTitle";
-import useStaffUserList from "../../../components/staffHook/useStaffUserList";
+import useAdminUser from "../../../components/adminHook/useAdminUser";
+import apiClient from "../../../lib/api-client";
 
-const UserList = () => {
-  const { userList, loading } = useStaffUserList();
+export default function UserList() {
+  // Assume useAdminUser returns refetch function for refreshing data after updates
+  const { userList, loading, refetch } = useAdminUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [editRole, setEditRole] = useState("");
+  const [editStatus, setEditStatus] = useState("");
 
   const avatarColors = [
     "bg-purple-100 text-purple-600",
@@ -43,15 +62,15 @@ const UserList = () => {
             ?.toLowerCase()
             ?.includes(searchQuery?.toLowerCase()) ||
           user?.email?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-          user?.location?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+          user?.location?.toLowerCase()?.includes(searchQuery?.toLowerCase()),
       ),
-    [userList, searchQuery]
+    [userList, searchQuery],
   );
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const currentUsers = filteredUsers.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
@@ -61,7 +80,32 @@ const UserList = () => {
   const handleNextPage = () =>
     currentPage < totalPages && setCurrentPage(currentPage + 1);
 
- 
+  const handleOpenDetails = (user) => {
+    setSelectedUser(user);
+    setShowDetailsModal(true);
+  };
+
+  const handleOpenEdit = () => {
+    setEditRole(selectedUser.role || "user");
+    setEditStatus(selectedUser.status || "active");
+    setShowEditModal(true);
+    setShowDetailsModal(false);
+  };
+
+  const handleSubmitEdit = async () => {
+    try {
+      await apiClient.patch("/dashboard/user-list", {
+        user_id: selectedUser.id,
+        role: editRole,
+        status: editStatus,
+      });
+      setShowEditModal(false);
+      refetch(); // Refresh the user list after update
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      // Handle error (e.g., show toast or alert)
+    }
+  };
 
   const renderPaginationButtons = () => {
     const buttons = [];
@@ -76,14 +120,14 @@ const UserList = () => {
         buttons.push(
           <span key="ellipsis1" className="text-gray-500 text-xs sm:text-sm">
             ...
-          </span>
+          </span>,
         );
       for (let i = start; i <= end; i++) buttons.push(renderButton(i));
       if (currentPage < totalPages - 2)
         buttons.push(
           <span key="ellipsis2" className="text-gray-500 text-xs sm:text-sm">
             ...
-          </span>
+          </span>,
         );
       buttons.push(renderButton(totalPages));
     }
@@ -96,8 +140,8 @@ const UserList = () => {
       onClick={() => handlePageChange(i)}
       className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs sm:text-sm font-medium rounded-md transition-colors ${
         currentPage === i
-          ? "text-black bg-purple-100"
-          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+         ? "bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white"
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
       }`}
     >
       {i}
@@ -116,7 +160,7 @@ const UserList = () => {
       />
       <div className="border border-gray-200 p-4 sm:p-5 rounded-2xl bg-white">
         <div className="mb-4 sm:mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3">
             <h1 className="text-lg sm:text-xl md:text-2xl font-medium">
               All Users
             </h1>
@@ -158,18 +202,22 @@ const UserList = () => {
                     Location
                   </th>
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {currentUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr
+                    key={user.id}
+                    onClick={() => handleOpenDetails(user)}
+                    className="hover:bg-gray-50 cursor-pointer"
+                  >
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <Link
-                        to={`/dashboard/userDetail/${user.id}`}
-                        className="flex items-center"
-                      >
+                      <div className="flex items-center">
                         <div
                           className={`h-8 w-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium ${
                             avatarColors[
@@ -185,10 +233,14 @@ const UserList = () => {
                             : "N/A"}
                         </div>
                         <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">{user.full_name?.trim() || "N/A"}</p>
-                          <p className="text-xs text-gray-400">USER ID: {user.id}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {user.full_name?.trim() || "N/A"}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            USER ID: {user.id}
+                          </p>
                         </div>
-                      </Link>
+                      </div>
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                       {user.email?.trim() || "N/A"}
@@ -202,14 +254,17 @@ const UserList = () => {
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                       {user.location?.trim() || "N/A"}
                     </td>
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap capitalize text-xs sm:text-sm text-gray-900">
+                      {user.role?.trim() || "N/A"}
+                    </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap capitalize">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           user.status === "active"
                             ? "bg-green-100 text-green-800"
-                            : user.status === "suspend"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
+                            : user.status === "suspended"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
                         }`}
                       >
                         {user.status?.trim() || "N/A"}
@@ -220,7 +275,7 @@ const UserList = () => {
                 {!currentUsers.length && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-4 sm:px-6 py-12 text-center text-gray-500 text-xs sm:text-sm"
                     >
                       No users found.
@@ -234,13 +289,11 @@ const UserList = () => {
             {currentUsers.map((user) => (
               <div
                 key={user.id}
-                className="bg-white border border-gray-200 rounded-lg p-4"
+                onClick={() => handleOpenDetails(user)}
+                className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer"
               >
                 <div className="flex justify-between items-start">
-                  <Link
-                    to={`/dashboard/userDetail/${user.id}`}
-                    className="flex items-center"
-                  >
+                  <div className="flex items-center">
                     <div
                       className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium ${
                         avatarColors[
@@ -263,7 +316,7 @@ const UserList = () => {
                         {user.email?.trim() || "N/A"}
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </div>
                 <div className="mt-3 space-y-2 text-xs">
                   <div>
@@ -282,9 +335,9 @@ const UserList = () => {
                       className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                         user.status === "active"
                           ? "bg-green-100 text-green-800"
-                          : user.status === "suspend"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                          : user.status === "suspended"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
                       }`}
                     >
                       {user.status?.trim() || "N/A"}
@@ -305,11 +358,11 @@ const UserList = () => {
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className={`flex items-center px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
-                currentPage === 1
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              } rounded-md`}
+               className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
+                      currentPage  === 1
+                        ? "text-orange-200 cursor-not-allowed"
+                        : "text-orange-500 hover:bg-orange-100"
+                    }`}
             >
               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
             </button>
@@ -319,19 +372,154 @@ const UserList = () => {
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className={`flex items-center px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
-                currentPage === totalPages
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              } rounded-md`}
+              className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
+                      currentPage === totalPages
+                        ? "text-orange-200 cursor-not-allowed"
+                        : "text-orange-500 hover:bg-orange-100"
+                    }`}
             >
               Next <ChevronRight className="h-4 w-4 ml-1" />
             </button>
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      {showDetailsModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          
+          <div className="flex items-center justify-center  max-w-md w-full">
+            {/* User Info */}
+            <div className="w-full max-w-md sm:max-w-lg md:max-w-xl">
+              {/* Profile Card */}
+              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
+                <div className="text-center mb-4 sm:mb-6">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
+                    {selectedUser.full_name?.trim() || "N/A"}
+                  </h1>
+                  <div className="space-y-2 sm:space-y-3 text-left">
+                    <div className="flex items-center text-gray-600">
+                      <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        {selectedUser.phone_number?.trim() || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <IdCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        {selectedUser.id}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        {selectedUser.email?.trim() || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        {selectedUser.location?.trim() || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        {formatDate(selectedUser.joined_date)}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        <span className="font-medium">Role:</span>{" "}
+                        {selectedUser.role?.trim() || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
+                        <span className="font-medium">Status:</span>{" "}
+                        {selectedUser.status?.trim() || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowDetailsModal(false)}
+                    className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={handleOpenEdit}
+                    className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full relative">
+            <button
+              onClick={() => setShowEditModal(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <h2 className="text-xl font-medium mb-4">Edit User</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Role
+                </label>
+                <select
+                  value={editRole}
+                  onChange={(e) => setEditRole(e.target.value)}
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="user">User</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="active">Active</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitEdit}
+                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default UserList;

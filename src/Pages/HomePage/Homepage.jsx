@@ -10,10 +10,10 @@ const Homepage = () => {
     <div>
       <Hero />
       <div className="container mx-auto px-4 py-10">
-        <RewardOffer />
+        {/* <RewardOffer /> */}
         <PopularCountries />
         <Regions />
-        <LimitedTimeOffers />
+        {/* <LimitedTimeOffers /> */}
         <GlobaleSIMs />
       </div>
     </div>

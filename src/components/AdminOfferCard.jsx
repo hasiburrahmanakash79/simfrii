@@ -1,15 +1,14 @@
 import { Globe, Calendar, Smartphone, Layers } from "lucide-react";
 
-const OfferCardOther = ({
+const AdminOfferCard = ({
   company,
   coverage,
   duration,
   data,
   originalPrice,
   bgColor,
-  button,
-  saleBadge,
-  onBuy,
+  onHide,
+  onPublish,
   logo,
 }) => {
   return (
@@ -17,14 +16,15 @@ const OfferCardOther = ({
       className={`rounded-2xl border border-gray-200 p-6 shadow-sm ${bgColor}`}
     >
       {/* Header with logo and sale badge */}
-      <div className="flex items-center justify-between ">
-        <div >
-          <img src={logo} alt="" className=" h-5 " />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="">
+            <img src={logo} alt="" className=" h-6 md:h-8 " />
+          </div>
         </div>
-        <div className={`${saleBadge}`}>ON SALE</div>
       </div>
-      <div className="py-5">
-        <h2 className="md:text-lg text-md font-semibold text-gray-900">
+      <div>
+        <h2 className="md:text-lg text-md font-semibold text-gray-900 py-5">
           {company}
         </h2>
       </div>
@@ -91,19 +91,31 @@ const OfferCardOther = ({
             </span>
           </div>
           <div className="text-right">
+            {/* <span className="text-xs sm:text-sm text-gray-500">USD </span> */}
             <span className="text-xs sm:text-sm text-gray-900 font-semibold">
-              €{originalPrice}
+              ${originalPrice}
             </span>
+            {/* <span className="text-xs sm:text-sm text-gray-900 font-semibold ml-1">${discountedPrice}</span> */}
           </div>
         </div>
       </div>
 
-      {/* Buy now button */}
-      <button onClick={onBuy} className={`${button}`}>
-        See Details
-      </button>
+    
+
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6">
+        {onHide && (
+          <button onClick={onHide} className="w-full border border-orange-500 text-orange-500 bg-white hover:bg-orange-50 font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors">
+            Hide
+          </button>
+        )}
+        {onPublish && (
+          <button onClick={onPublish} className="w-full bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors">
+            Publish
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
-export default OfferCardOther;
+export default AdminOfferCard;

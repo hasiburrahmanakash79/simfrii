@@ -1,13 +1,10 @@
 import PropTypes from "prop-types";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import useStaffOverview from "../../../components/staffHook/useStaffOverview";
 
 const MetricCard = ({
   title,
   value,
   trend,
-  trendValue,
-  trendColor,
   sparklinePoints,
 }) => {
   const generateSparklinePath = (points) => {
@@ -48,19 +45,18 @@ const MetricCard = ({
     return path;
   };
 
-  const TrendIcon = trend === "up" ? TrendingUp : TrendingDown;
   const gradientId = `gradient-${trend}-${title.replace(/\s+/g, "")}`;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-gray-600 text-lg font-semibold">{title}</h3>
-      </div>
+    <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 relative">
+      
 
       <div className="flex items-center justify-between">
-        <div>
-          <div className="text-3xl font-bold text-gray-900 mb-2">{value}</div>
-          <div className="flex items-center gap-1">
+        <div><div className="flex items-center justify-between mb-2">
+        <h3 className="text-xs sm:text-sm font-medium text-gray-600">{title}</h3>
+      </div>
+          <div className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-2">{value}</div>
+          {/* <div className="flex items-center gap-1">
             <TrendIcon
               size={16}
               className={trend === "up" ? "text-green-500" : "text-red-500"}
@@ -68,7 +64,7 @@ const MetricCard = ({
             <span className={`text-sm font-medium ${trendColor}`}>
               {trendValue}% vs last month
             </span>
-          </div>
+          </div> */}
         </div>
 
         <div className="w-30 h-12">
@@ -120,6 +116,7 @@ MetricCard.propTypes = {
 
 const TicketCard = () => {
   const { overview, loading } = useStaffOverview();
+  console.log(overview.summary);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -132,15 +129,16 @@ const TicketCard = () => {
   };
 
   // Extract ticket data safely
-  const ticketActivity = overview?.last_month_ticket_activity || {};
-  const openTickets = ticketActivity.open || 0;
-  const pendingTickets = ticketActivity.pending || 0;
-  const resolvedTickets = ticketActivity.solved || 0;
+  const ticketData =  overview.summary || {}
+  // const ticketActivity = overview?.last_month_ticket_activity || {};
+  const openTickets = ticketData.total_tickets || 0;
+  const pendingTickets = ticketData.total_pending_tickets || 0;
+  const resolvedTickets = ticketData.total_solved_tickets || 0;
 
   // Low-code metrics configuration
   const metrics = [
     {
-      title: "Open ticket",
+      title: "Total tickets",
       value: openTickets,
       trend: "up",
       trendValue: 1,
@@ -148,7 +146,7 @@ const TicketCard = () => {
       sparklinePoints: sparklineData.open,
     },
     {
-      title: "Pending Ticket",
+      title: "This month tickets",
       value: pendingTickets,
       trend: "up",
       trendValue: 10,
@@ -156,7 +154,15 @@ const TicketCard = () => {
       sparklinePoints: sparklineData.pending,
     },
     {
-      title: "Resolved Today",
+      title: "This month pending tickets",
+      value: pendingTickets,
+      trend: "up",
+      trendValue: 10,
+      trendColor: "text-green-500",
+      sparklinePoints: sparklineData.pending,
+    },
+    {
+      title: "This month resolved tickets",
       value: resolvedTickets,
       trend: "up",
       trendValue: 10,
@@ -166,7 +172,7 @@ const TicketCard = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       {metrics.map((metric) => (
         <MetricCard
           key={metric.title}

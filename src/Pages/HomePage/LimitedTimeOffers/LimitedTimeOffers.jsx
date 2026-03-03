@@ -62,7 +62,7 @@ const LimitedTimeOffers = () => {
     <div className="my-10">
       <h1 className="md:text-3xl text-xl font-medium mb-4">Limited Time Offers</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
         {offers.map((offer, index) => (
           <OfferCard
             key={index}

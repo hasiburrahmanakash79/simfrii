@@ -1,39 +1,21 @@
 import { useState, useEffect } from "react";
 import apiClient from "../../lib/api-client";
-import yesim from "../../assets/logo/yesim.webp"; // Assuming the Maya logo path; adjust if needed
-import useFetchCountries from "./useFetchCountries";
-import useFetchRegions from "./useFetchRegions";
+import yesim from "../../assets/logo/yesim.webp"; 
 
-const useYesimData = (countryCode, regionName) => {
+const useYesimGlobalData = () => {
   const [yesimData, setYesimData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { countries } = useFetchCountries();
-  const { regions } = useFetchRegions();
-
-  const country = countries.find((c) => c?.country_code === countryCode);
-  const formattedName = country?.title;
-
-  const region = regions.find((c) => c.slug === regionName);
-  const findRegionName = region?.slug;
 
   useEffect(() => {
-    if (!formattedName && !findRegionName) return;
 
     const fetchPackages = async () => {
       try {
-        let queryParams = "";
-        if (formattedName) {
-          queryParams += `country=${formattedName}`;
-        }
-        if (findRegionName) {
-          if (queryParams) queryParams += "&";
-          queryParams += `region=${findRegionName}`;
-        }
+        
 
         const response = await apiClient.get(
-          `/esim_providers/yesim/products?${queryParams}`
+          `/esim_providers/ubigi/global-packages`
         );
         const data = response.data;
         // Flatten and normalize packages
@@ -66,15 +48,13 @@ const useYesimData = (countryCode, regionName) => {
           const price = pkg.prices?.EUR || pkg.price || "0";
 
           return {
-            // Fields matching your Maya card / OfferCard props
             id: pkg.url || pkg.directLink || `${pkg.country_code}-${pkg.period}-${pkg.capacity}`,
             logo: yesim,
             company: "Yesim",
             coverage: pkg.coverages?.length || 1,
             duration: durationStr,
             data: dataStr,
-            originalPrice: price,           // Yesim mostly shows final price
-            // discountedPrice: null,       // add if Yesim ever sends discount info
+            originalPrice: price,
             sim_type: "eSIM",
             provider: "yesim",
             country_iso2: pkg.country_code?.toUpperCase(),
@@ -103,9 +83,10 @@ const useYesimData = (countryCode, regionName) => {
     };
 
     fetchPackages();
-  }, [formattedName, findRegionName]);
+  }, []);
 
   return { yesimData, loading, error };
 };
 
-export default useYesimData;
+
+export default useYesimGlobalData;

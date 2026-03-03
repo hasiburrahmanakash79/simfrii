@@ -1,166 +1,168 @@
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { FaLeftLong } from "react-icons/fa6";
 import { useNavigate, useLocation } from "react-router-dom";
 import apiClient from "../../lib/api-client";
-const OtpVerification = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  console.log(location);
-  const userId = location.state?.userId; // Assuming passed from Signup via navigate state
-  const email = location.state?.email; // Optional: if you want to display the email, assume passed
+import { ArrowLeft } from "lucide-react";
 
+const OtpVerification = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-  } = useForm({ defaultValues: { otp0: "", otp1: "", otp2: "", otp3: "" } });
+  } = useForm();
+
   const [timer, setTimer] = useState(60);
   const [resendEnabled, setResendEnabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [apiError, setApiError] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user_id = location.state?.user_id || '';
+  const email = location.state?.email || '';
+  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+
+  const onSubmit = async (data) => {
+    const otp = `${data.otp0}${data.otp1}${data.otp2}${data.otp3}`;
+    setApiError(null);
+    try {
+      const response = await apiClient.post("/auth/verify-reset-code", {
+        user_id: user_id,
+        verification_code: otp,
+      });
+      // On success, navigate to reset password page
+      navigate("/reset-password", { state: { user_id, secret_key: response.data.secret_key } });
+    } catch (error) {
+      console.error("OTP Verification Error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "OTP verification failed. Please try again.";
+      setApiError(errorMessage);
+    }
+  };
 
   useEffect(() => {
-    let countdown;
     if (timer > 0) {
-      countdown = setInterval(() => setTimer((prev) => prev - 1), 1000);
+      const countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(countdown);
     } else {
       setResendEnabled(true);
     }
-    return () => clearInterval(countdown);
   }, [timer]);
 
   const handleResendOtp = async () => {
-    if (resendEnabled && userId) {
-      setIsLoading(true);
-      setErrorMessage("");
+    if (resendEnabled) {
+      setTimer(60);
+      setResendEnabled(false);
+      setApiError(null);
       try {
-        await apiClient.post("/auth/resend-verification-code", { user_id: userId });
-        setTimer(60);
-        setResendEnabled(false);
+        await apiClient.post("/auth/forgot-password", {
+          email_address: email,
+        });
       } catch (error) {
         console.error("Resend OTP Error:", error);
-        setErrorMessage(error.response?.data?.message || "Failed to resend OTP. Please try again.");
-      } finally {
-        setIsLoading(false);
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to resend OTP. Please try again.";
+        setApiError(errorMessage);
       }
     }
   };
 
-  const onSubmit = async (data) => {
-    const otp = Object.values(data).join("");
-    if (!userId) {
-      setErrorMessage("User ID is missing. Please try signing up again.");
-      return;
-    }
-    setIsLoading(true);
-    setErrorMessage("");
-    try {
-      await apiClient.post("/auth/verify-email", {
-        user_id: userId,
-        verification_code: otp,
-      });
-      navigate("/signin"); // Or change to '/signin' if it's for signup verification
-    } catch (error) {
-      console.error("OTP Verification Error:", error);
-      setErrorMessage(error.response?.data?.message || "OTP verification failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+  const handleInputChange = (formOnChange) => (e, index) => {
+    const { value } = e.target;
+    if (!/^\d*$/.test(value)) return; // Allow only digits
+    formOnChange(e);
+    if (value.length === 1 && index < 3) {
+      inputRefs[index + 1].current.focus();
     }
   };
 
-  const handleInputChange = (e, index) => {
-    const value = e.target.value;
-    // Only allow digits
-    if (!/^[0-9]$/.test(value) && value !== "") {
-      setValue(`otp${index}`, ""); // Clear invalid input
-      return;
-    }
-    if (value.length === 1 && index < 3) {
-      document.getElementsByName(`otp${index + 1}`)[0].focus();
-    } else if (value.length === 0 && index > 0) {
-      document.getElementsByName(`otp${index - 1}`)[0].focus();
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && e.target.value === "" && index > 0) {
+      inputRefs[index - 1].current.focus();
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8D3AD] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-4 text-gray-800">
-          Check your email
-        </h2>
-        <p className="text-center text-sm sm:text-base mb-6 text-[#747086]">
-          Please enter the four verification code we sent to {email || "your email"}
-        </p>
-
-        {errorMessage && (
-          <p className="text-red-500 text-sm text-center mb-4">
-            {errorMessage}
+    <div className="min-h-screen place-content-center bg-[#F8D3AD]  p-5">
+      {/* Right Side */}
+      <div className="flex items-center justify-center p-8">
+        <div className="max-w-lg w-full bg-white rounded-3xl shadow-md p-10">
+          <h2 className="text-2xl font-bold text-center mb-2">
+            Verify Your E-mail
+          </h2>
+          <p className="text-center text-sm mb-6">
+            We have sent a 4-digit verification code to your email.
           </p>
-        )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex justify-center gap-3 sm:gap-4">
-            {["otp0", "otp1", "otp2", "otp3"].map((name, index) => (
-              <input
-                key={name}
-                name={name}
-                {...register(name, {
-                  required: "This field is required",
-                  pattern: {
-                    value: /^[0-9]$/,
-                    message: "Only numbers are allowed",
-                  },
-                })}
-                type="text"
-                maxLength={1}
-                className={`w-16 h-12  text-center border rounded-full text-lg outline-none focus:border-[#fda852] transition-colors ${
-                  errors[name] ? "border-red-500" : "border-gray-300"
-                }`}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            ))}
-          </div>
-          {Object.keys(errors).length > 0 && (
-            <p className="text-red-500 text-sm text-center">
-              {errors[Object.keys(errors)[0]]?.message ||
-                "Please fill all OTP fields correctly"}
-            </p>
+          {/* Display API error if any */}
+          {apiError && (
+            <p className="text-red-500 text-sm text-center mb-4">{apiError}</p>
           )}
 
-          <p className="text-center text-sm sm:text-base mt-4">
-            {resendEnabled ? (
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                className="text-[#fda852] hover:underline"
-                disabled={isLoading}
-              >
-                Resend OTP
-              </button>
-            ) : (
-              <span className="text-gray-500">Resend OTP in {timer}s</span>
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="flex space-x-4 justify-center">
+              {[0, 1, 2, 3].map((index) => {
+                const { onChange: formOnChange, ref: formRef, ...rest } = register(`otp${index}`, { required: true, maxLength: 1 });
+                return (
+                  <input
+                    key={index}
+                    {...rest}
+                    ref={(el) => {
+                      formRef(el);
+                      inputRefs[index].current = el;
+                    }}
+                    type="text"
+                    maxLength="1"
+                    onChange={(e) => handleInputChange(formOnChange)(e, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    className="w-16 h-12 text-center border border-base-300 bg-base-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-300 text-lg"
+                  />
+                );
+              })}
+            </div>
+            {Object.keys(errors).length > 0 && (
+              <p className="text-red-500 text-sm text-center">
+                Please fill all OTP fields
+              </p>
             )}
-          </p>
 
-          <button
-            type="submit"
-            className="w-full bg-[#fda852] text-white py-2 rounded-full hover:bg-[#f8b862] transition-colors"
-            disabled={isLoading}
-          >
-            {isLoading ? "Verifying..." : "Verify OTP"}
-          </button>
-        </form>
+            {/* Resend OTP with Timer */}
+            <p className="text-center text-sm">
+              {resendEnabled ? (
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  className="text-[#fda852] hover:underline"
+                >
+                  Resend OTP
+                </button>
+              ) : (
+                <span className="text-gray-500">Resend OTP in {timer}s</span>
+              )}
+            </p>
 
-        <div className="flex justify-center mt-6">
+            <button
+              type="submit"
+              className="btn-primary"
+            >
+              Verify OTP
+            </button>
+          </form>
+          {/* Back Button */}
+          <div className="flex justify-center mt-6">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-[#fda852] hover:underline"
+            className="flex items-center gap-2 text-[#fda852] cursor-pointer"
           >
             <ArrowLeft size={18} />
             <span>Back</span>
           </button>
+        </div>
         </div>
       </div>
     </div>

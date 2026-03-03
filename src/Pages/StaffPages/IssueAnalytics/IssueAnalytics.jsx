@@ -1,6 +1,7 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import useStaffAnalytics from "../../../components/staffHook/useStaffAnalytics";
+import SectionTitle from "../../../components/SectionTitle";
 
 const IssueAnalytics = () => {
   const {analytics, loading} = useStaffAnalytics();
@@ -59,10 +60,10 @@ const IssueAnalytics = () => {
 
   return (
     <div>
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">Analytics</h1>
-        <p className="text-xs sm:text-sm text-gray-600">Track, manage, and forecast your customer support issues.</p>
-      </div>
+      <SectionTitle
+        title={"Analytics"}
+        description={"Track, manage, and forecast your customer support issues."}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
         {stats.map((stat, index) => (
           <div

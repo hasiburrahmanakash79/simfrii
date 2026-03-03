@@ -155,8 +155,14 @@ const CountryEsim = () => {
   };
 
   const handleBuy = (offer) => {
+  if (provider === "yesim" && offer.url) {
+    window.location.href = offer.url;
+  } else if (provider === "mayamobile" && offer.url_direct) {
+    window.location.href = offer.url_direct;
+  } else {
     navigate(`/order-preview/${offer.id}`, { state: { offer } });
-  };
+  }
+};
 
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center col-span-3 h-32">
@@ -202,7 +208,7 @@ const CountryEsim = () => {
       </div>
 
       {/* Offers grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
         {currentOffers.length > 0 ? (
           currentOffers.map((offer, index) => {
             const key = offer.id || index;

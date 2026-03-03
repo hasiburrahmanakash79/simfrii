@@ -11,19 +11,22 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import useFetchCountries from "../../components/hook/useFetchCountries";
 
 const OrderPreview = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location);
+  const {countries} = useFetchCountries()
+  console.log(countries);
   const offer = location.state?.offer || {};
   console.log(offer);
-  const countries = offer.countries || [];
+  const countriess = offer.countries || [];
+  console.log(countriess);
 
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showCardSelectionModal, setShowCardSelectionModal] = useState(false);
 
-  const first11Countries = countries.slice(0, 9);
+  const first11Countries = countriess.slice(0, 11);
 
   const openCountryModal = () => {
     setShowCountryModal(true);

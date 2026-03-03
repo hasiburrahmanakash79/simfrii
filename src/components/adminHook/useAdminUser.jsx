@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../lib/api-client';
 
 const useAdminUser = () => {
@@ -7,22 +6,25 @@ const useAdminUser = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchUserList = async () => {
-      try {
-        const response = await apiClient.get('/dashboard/user-list');
-        setUserList(response.data.data || []);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch user list');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUserList = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    fetchUserList();
+      const response = await apiClient.get('/dashboard/user-list');
+      setUserList(response.data.data || []);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch user list');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { userList, loading, error };
+  useEffect(() => {
+    fetchUserList();
+  }, [fetchUserList]);
+
+  return { userList, loading, error, refetch: fetchUserList };
 };
 
 export default useAdminUser;

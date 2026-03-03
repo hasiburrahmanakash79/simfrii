@@ -91,7 +91,7 @@ const RevenueCharts = ({ loading, barChartData, pieChartData }) => {
   };
 
   return (
-    <div className="min-h-screen mt-7">
+    <div className="mt-7">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">

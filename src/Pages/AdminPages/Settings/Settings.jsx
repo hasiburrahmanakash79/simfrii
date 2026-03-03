@@ -1,49 +1,55 @@
 import { useState } from "react";
-import question from "../../../assets/icons/question.svg";
+import useAdminUser from "../../../components/adminHook/useAdminUser";
+import apiClient from "../../../lib/api-client";
+import { CircleQuestionMark } from "lucide-react";
 
 const Settings = () => {
+  const { userList, loading, refetch } = useAdminUser();
+  const staffs = userList.filter((user) => user.role === "staff");
+  console.log(staffs);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [permissions, setPermissions] = useState({
-    dashboardAccess: false,
-    viewUsers: false,
-    editUsers: false,
-    suspendUsers: false,
-    viewPlans: false,
-    editPlans: false,
-  });
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [permissions, setPermissions] = useState();
 
-  const tickets = [
-    {
-      id: "TKT-001",
-      title: "Super Admin",
-      customer: "john@gmail.com",
-      customerName: "John Smith",
-    },
-    {
-      id: "TKT-002",
-      title: "Support Staff",
-      customer: "support@gmail.com",
-      customerName: "Support User",
-    },
-  ];
-
-  const openModal = (ticket) => {
-    setPermissions({
-      dashboardAccess: ticket.title === "Super Admin",
-      viewUsers: ticket.title === "Super Admin",
-      editUsers: false,
-      suspendUsers: false,
-      viewPlans: ticket.title === "Super Admin",
-      editPlans: false,
-    });
-    setSelectedTicket(ticket);
-    setIsModalOpen(true);
+  const openModal = (staff) => {
+    apiClient
+      .get(`/dashboard/user-permissions?user_id=${staff.id}`)
+      .then((res) => {
+        console.log(res);
+        const perms = res.data.data.permissions;
+        setPermissions({
+          dashboardAccess: perms.can_view_dashboard,
+          analytics: perms.can_view_analytics ,
+          viewUsers: perms.can_view_users ,
+          editUsers: perms.can_edit_users ,
+          suspendUsers: perms.can_suspend_users ,
+          viewPlans: perms.can_view_plans ,
+          editPlans: perms.can_edit_plans,
+        });
+        setSelectedStaff(staff);
+        setIsModalOpen(true);
+      })
+      .catch((err) => {
+        console.error(err);
+        // Fallback to defaults on error
+        setPermissions({
+          dashboardAccess: false,
+          analytics: false,
+          viewUsers: false,
+          editUsers: false,
+          suspendUsers: false,
+          viewPlans: false,
+          editPlans: false,
+        });
+        setSelectedStaff(staff);
+        setIsModalOpen(true);
+      });
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedTicket(null);
+    setSelectedStaff(null);
   };
 
   const handleCheckboxChange = (e) => {
@@ -55,12 +61,33 @@ const Settings = () => {
   };
 
   const handleUpdate = () => {
-    console.log("Updated permissions for", selectedTicket.title, permissions);
-    closeModal();
+    const body = {
+      user_id: selectedStaff.id,
+      can_view_dashboard: permissions.dashboardAccess,
+      can_view_analytics: permissions.analytics,
+      can_view_users: permissions.viewUsers,
+      can_edit_users: permissions.editUsers,
+      can_suspend_users: permissions.suspendUsers,
+      can_view_plans: permissions.viewPlans,
+      can_edit_plans: permissions.editPlans,
+    };
+
+    apiClient
+      .patch("/dashboard/user-permissions", body)
+      .then((response) => {
+        console.log(response);
+        console.log("Updated successfully");
+        closeModal();
+      })
+      .catch((err) => {
+        console.error("Update failed");
+        console.error(err);
+      });
+      refetch()
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-6">
+    <div className="">
       <div className="mb-4 sm:mb-6">
         <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">Settings</h1>
         <p className="text-xs sm:text-sm text-gray-600">System configuration and roles</p>
@@ -71,19 +98,21 @@ const Settings = () => {
         </div>
 
         <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-          {tickets.length > 0 ? (
-            tickets.map((ticket) => (
-              <div key={ticket.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          {staffs.length > 0 ? (
+            staffs.map((staff) => (
+              <div key={staff.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <img src={question} alt="Role icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <div className="bg-[#09b285] rounded-full p-2 text-white">
+                    <CircleQuestionMark />
+                  </div>
                   <div>
-                    <p className="text-sm sm:text-base font-medium text-gray-900">{ticket.title}</p>
-                    <p className="text-xs sm:text-sm text-gray-500">{ticket.customer}</p>
+                    <p className="text-sm sm:text-base font-medium text-gray-900">{staff.full_name}</p>
+                    <p className="text-xs sm:text-sm text-gray-500">{staff.email}</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => openModal(ticket)}
-                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300 transition-colors"
+                  onClick={() => openModal(staff)}
+                  className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm rounded-full bg-orange-100 text-[#EC7C0C] hover:bg-orange-200 transition-colors"
                 >
                   Edit
                 </button>
@@ -95,17 +124,17 @@ const Settings = () => {
         </div>
       </div>
 
-      {isModalOpen && selectedTicket && (
+      {isModalOpen && selectedStaff && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 sm:p-6">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
               <div className="mb-4 sm:mb-6">
-                <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">Edit Role</h2>
+                <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">Edit Permissions</h2>
               </div>
 
               <div className="bg-blue-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-xs sm:text-sm">
-                <h3 className="text-blue-600 font-medium mb-1">{selectedTicket.title}</h3>
-                <p className="text-gray-600">Configure permissions for this role</p>
+                <h3 className="text-blue-600 font-medium mb-1">{selectedStaff.full_name} ({selectedStaff.role})</h3>
+                <p className="text-gray-600">Configure permissions for this user</p>
               </div>
 
               <div className="mb-4 sm:mb-6">
@@ -118,7 +147,17 @@ const Settings = () => {
                     onChange={handleCheckboxChange}
                     className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <span className="text-xs sm:text-sm text-gray-600">View dashboard and analytics</span>
+                  <span className="text-xs sm:text-sm text-gray-600">View dashboard</span>
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  <input
+                    type="checkbox"
+                    name="analytics"
+                    checked={permissions.analytics}
+                    onChange={handleCheckboxChange}
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-xs sm:text-sm text-gray-600">View analytics</span>
                 </div>
               </div>
 

@@ -1,51 +1,23 @@
 import { useState, useEffect } from "react";
 import apiClient from "../../lib/api-client";
-import maya from "../../assets/logo/maya-mobile-logo.png"; // Assuming the Maya logo path; adjust if needed
-import useFetchCountries from "./useFetchCountries";
-import useFetchRegions from "./useFetchRegions";
+import maya from "../../assets/logo/maya-mobile-logo.png";
 
-const useMayaMobileData = (countryCode, regionName) => {
+const useMayaGlobalData = () => {
   const [mayaMobileData, setMayaMobileData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { regions} = useFetchRegions();
-  
-    const region = regions.find((c) => c.slug === regionName);
-  const findRegionName = region?.slug;
 
-
-  const { countries } = useFetchCountries();
-  const country = countries.find((c) => c?.country_code === countryCode);
-  const formattedName = country?.title;
- 
   useEffect(() => {
-    if (!formattedName && !findRegionName) return;
-
     const fetchPackages = async () => {
       try {
-        let queryParams = "";
-        if (formattedName) {
-          queryParams += `country=${formattedName}`;
-        }
-        if (findRegionName) {
-          if (queryParams) queryParams += "&";
-          queryParams += `region=${findRegionName}`;
-        }
-
         const response = await apiClient.get(
-          `/esim_providers/maya/products?${queryParams}`
+          `esim_providers/maya/products?global=Global`,
         );
-        // const response = await apiClient.get(
-        //   `/esim_providers/maya/products?country=${formattedName}`,
-        // );
         const data = response.data;
-console.log(data);
         // Flatten and normalize packages
         const normalizedPackages = [];
 
-        // Assuming the response data is an array of packages (or under a key like 'maya')
-        // Adjust if the structure is { maya: [...] } or similar based on actual API
-        const packages = Array.isArray(data) ? data : (data.maya || []);
+        const packages = Array.isArray(data) ? data : data.maya || [];
 
         if (packages.length > 0) {
           packages.forEach((pkg) => {
@@ -61,13 +33,20 @@ console.log(data);
               company: pkg.country_name,
               coverage: pkg.countries_supported.length,
               duration: `${pkg.duration_days} Days`,
-              data: pkg.unlimited_data ? 'Unlimited' : `${pkg.data_gb} GB`,
-              originalPrice: pkg.on_sale ? (parseFloat(pkg.price_usd) / (1 - pkg.discount_pct / 100)).toFixed(2) : null,
+              data: pkg.unlimited_data ? "Unlimited" : `${pkg.data_gb} GB`,
+              originalPrice: pkg.on_sale
+                ? (
+                    parseFloat(pkg.price_usd) /
+                    (1 - pkg.discount_pct / 100)
+                  ).toFixed(2)
+                : null,
               discountedPrice: pkg.price_usd,
-              voice: pkg.service_voice ? 'Included' : null, // Adjusted based on boolean; customize if mins are available
-              text: pkg.service_sms ? 'Included' : null, // Adjusted based on boolean
+              voice: pkg.service_voice ? "Included" : null, // Adjusted based on boolean; customize if mins are available
+              text: pkg.service_sms ? "Included" : null, // Adjusted based on boolean
               isUnlimited: !!pkg.unlimited_data,
-              fairUsagePolicy: pkg.dataCap ? `${pkg.dataCap} ${pkg.dataUnit} per ${pkg.dataCapPer}` : null,
+              fairUsagePolicy: pkg.dataCap
+                ? `${pkg.dataCap} ${pkg.dataUnit} per ${pkg.dataCapPer}`
+                : null,
               // Additional fields from response to "show all data" in normalized form
               country_iso2: pkg.country_iso2,
               country_iso3: pkg.country_iso3,
@@ -113,9 +92,9 @@ console.log(data);
     };
 
     fetchPackages();
-  }, [formattedName, findRegionName]);
+  }, []);
 
   return { mayaMobileData, loading, error };
 };
 
-export default useMayaMobileData;
+export default useMayaGlobalData;

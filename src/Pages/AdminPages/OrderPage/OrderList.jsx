@@ -190,9 +190,6 @@ const OrderList = () => {
           Showing {filteredOrders.length} of {pagination.total || 0} orders
         </p>
 
-        {/* TABLE & MOBILE UI — 100% UNCHANGED */}
-        {/* You already had this correct, so rendering filteredOrders instead */}
-
         {/* Desktop */}
         <div className="hidden sm:block overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

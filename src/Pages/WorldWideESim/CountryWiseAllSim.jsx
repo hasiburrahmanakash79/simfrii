@@ -7,6 +7,7 @@ import useMayaMobileData from "../../components/hook/useMayaMobileData";
 import useYesimData from "../../components/hook/useYesimData";
 import OfferCardOther from "../../components/OfferCardOther";
 import { useAiraloData } from "../../components/hook/useAiraloData";
+import useUbigiData from "../../components/hook/useUbigiData";
 
 const CountryWiseAllSim = () => {
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ const CountryWiseAllSim = () => {
     countryCode,
     null,
   );
+  const { ubigiData, loading: ubigiLoading } = useUbigiData(
+    countryCode,
+    null,
+  );
+  console.log(ubigiData);
   const { yesimData, loading: yesimLoading } = useYesimData(countryCode, null);
 
   // Find country code from countries based on slug
@@ -78,13 +84,14 @@ const CountryWiseAllSim = () => {
   const slicedNomadPackages = nomadData.slice(0, 3);
   const slicedMayaMobilePackages = mayaMobileData.slice(0, 3);
   const slicedYesimPackages = yesimData.slice(0, 3);
+  const slicedUbigiPackages = ubigiData.slice(0, 3);
 
   return (
     <div className="my-10 container mx-auto px-4 py-16">
       <div className="mb-5 text-center">
         <p className="font-semibold text-3xl">{formattedName} eSIM</p>
       </div>
-      <div className="space-y-10">
+      <div className="space-y-7">
         {/* Airalo Plans */}
         {(packagesLoading || slicedAiraloPackages.length > 0) && (
           <div>
@@ -101,7 +108,7 @@ const CountryWiseAllSim = () => {
             </div>
 
             {/* Offers grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
               {packagesLoading ? (
                 <LoadingSpinner />
               ) : (
@@ -146,13 +153,56 @@ const CountryWiseAllSim = () => {
             </div>
 
             {/* Offers grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
               {nomadLoading ? (
                 <LoadingSpinner />
               ) : (
                 slicedNomadPackages.map((offer) => (
                   <OfferCard
                     key={offer.id}
+                    logo={offer.logo}
+                    company={offer.short_info}
+                    coverage={offer.coverage}
+                    duration={offer.duration}
+                    data={
+                      offer.data +
+                      (offer.voice ? ` - ${offer.voice} Mins` : "") +
+                      (offer.text ? ` - ${offer.text} SMS` : "")
+                    }
+                    originalPrice={offer.discountedPrice}
+                    bgColor="bg-[#FFFFFF]"
+                    button="btn-primary"
+                    saleBadge="saleBadge"
+                    onBuy={() => handleBuy(offer)}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+        {/* ubigi Plans */}
+        {(ubigiLoading || slicedUbigiPackages.length > 0) && (
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <h1 className="text-2xl font-medium">Nomad Plans</h1>
+              <div>
+                <Link
+                  to={`/esim/${countryName}/ubigi`}
+                  className="text-[#E97400] hover:underline font-medium"
+                >
+                  See all
+                </Link>
+              </div>
+            </div>
+
+            {/* Offers grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
+              {ubigiLoading ? (
+                <LoadingSpinner />
+              ) : (
+                slicedUbigiPackages.map((offer, index) => (
+                  <OfferCard
+                    key={index}
                     logo={offer.logo}
                     company={offer.short_info}
                     coverage={offer.coverage}
@@ -190,7 +240,7 @@ const CountryWiseAllSim = () => {
             </div>
 
             {/* Offers grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
               {mayaLoading ? (
                 <LoadingSpinner />
               ) : (
@@ -210,7 +260,9 @@ const CountryWiseAllSim = () => {
                     bgColor="bg-[#FFFFFF]"
                     button="btn-primary"
                     saleBadge="saleBadge"
-                    onBuy={() => handleBuy(offer)}
+                    onBuy={() => {
+                      if (offer.url_direct) window.location.href = offer.url_direct;
+                    }}
                   />
                 ))
               )}
@@ -234,7 +286,7 @@ const CountryWiseAllSim = () => {
             </div>
 
             {/* Offers grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7">
               {yesimLoading ? (
                 <LoadingSpinner />
               ) : (
