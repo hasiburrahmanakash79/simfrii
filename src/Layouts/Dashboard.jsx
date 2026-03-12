@@ -7,7 +7,18 @@ import useMe from "../components/hook/useMe";
 import apiClient from "../lib/api-client";
 import { removeAuthTokens } from "../lib/cookie-utils";
 import LogoutModal from "../components/LogoutModal";
-import {Analytics, Home, Orders, Payment, PlanManage, ProfileUser, Settings, Support, Upload, Users } from "../assets/icons/icons";
+import {
+  Analytics,
+  Home,
+  Orders,
+  Payment,
+  PlanManage,
+  ProfileUser,
+  Settings,
+  Support,
+  Upload,
+  Users,
+} from "../assets/icons/icons";
 
 const Dashboard = () => {
   const { me } = useMe();
@@ -17,6 +28,10 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const userRole = localStorage.getItem("userRole") || "staff";
+
+  const can_view_plans = me?.permissions?.can_view_plans;
+  const can_view_users = me?.permissions?.can_view_users;
+  const can_view_analytics = me?.permissions?.can_view_analytics;
 
   const handleLogout = async () => {
     try {
@@ -95,27 +110,40 @@ const Dashboard = () => {
       icon: (isActive) => <Home isActive={isActive} />,
       role: "staff",
     },
-    {
-      title: "User",
-      path: "/userList",
-      icon: (isActive) => <Users isActive={isActive} />,
-      role: "staff",
-    },
-    {
-      title: "eSIM plan management",
-      path: "/management",
-      icon: (isActive) => <PlanManage isActive={isActive} />,
-      role: "staff",
-    },
-    {
-      title: "Analytics",
-      path: "/issue-analytics",
-      icon: (isActive) => <Analytics isActive={isActive} />,
-      role: "staff",
-    },
+    ...(can_view_users
+      ? [
+          {
+            title: "User",
+            path: "/userList",
+            icon: (isActive) => <Users isActive={isActive} />,
+            role: "staff",
+          },
+        ]
+      : []),
+
+    ...(can_view_plans
+      ? [
+          {
+            title: "eSIM plan management",
+            path: "/plan_management",
+            icon: (isActive) => <PlanManage isActive={isActive} />,
+            role: "staff",
+          },
+        ]
+      : []),
+    ...(can_view_analytics
+      ? [
+          {
+            title: "Analytics",
+            path: "/issue-analytics",
+            icon: (isActive) => <Analytics isActive={isActive} />,
+            role: "staff",
+          },
+        ]
+      : []),
     {
       title: "Support",
-      path: "/support",
+      path: "/user_support",
       icon: (isActive) => <Support isActive={isActive} />,
       role: "staff",
     },
@@ -147,14 +175,15 @@ const Dashboard = () => {
         {/* Sidebar Content */}
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Logo Section */}
-          <div className="p-2 flex flex-col items-center justify-center mt-7">
+          <div className="p-2 flex flex-col items-center justify-center">
             <img src={logo} alt="Logo" className="w-12 md:w-24" />
           </div>
 
           {/* Navigation Menu */}
           <nav className="p-3 space-y-2 flex-1">
             {filteredMenus.map((menu, index) => {
-              const isActive = location.pathname === menu.path ||
+              const isActive =
+                location.pathname === menu.path ||
                 (location.pathname === "/" && menu.path.includes("Overview"));
               return (
                 <Link
@@ -183,27 +212,27 @@ const Dashboard = () => {
 
           {/* Profile and Logout */}
           <div className="p-2 absolute bottom-0 w-full bg-white">
-            <div className="flex items-center justify-center gap-x-3">
+            <div className="flex items-center justify-between gap-x-3">
               <div
-                className={`flex items-center gap-x-3 p-2 text-sm ${
+                className={`flex items-center gap-x-4 p-2 text-sm ${
                   isSidebarOpen ? "flex" : "hidden md:flex"
                 }`}
                 aria-label="Profile"
               >
                 <div>
-                  <ProfileUser/>
+                  <ProfileUser />
                 </div>
                 <span>
                   <p className="font-bold">{me.full_name}</p>
                   <p className="text-xs hidden md:block">{me.role}</p>
                 </span>
               </div>
-              <button 
+              <button
                 onClick={() => setShowLogoutModal(true)}
-                className="text-[#FF8242] hover:text-[#ec6a29] cursor-pointer"
+                className="text-[#FF8242] hover:text-[#ec6a29] cursor-pointer mr-2"
                 aria-label="Logout"
               >
-                <LogOut/>
+                <LogOut />
               </button>
             </div>
           </div>

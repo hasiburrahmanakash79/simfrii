@@ -1,7 +1,4 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import SectionTitle from "../../../components/SectionTitle";
 import { useAiraloPackage } from "../../../components/adminHook/useAiraloPackage";
@@ -10,6 +7,7 @@ import useNomadPackage from "../../../components/adminHook/useNomadPackage";
 import apiClient from "../../../lib/api-client";
 import Swal from "sweetalert2";
 import OfferCardSkeleton from "../../../components/OfferCardSkeleton";
+import useUbigiPackage from "../../../components/adminHook/useUbigiPackage";
 
 const PlanManagement = () => {
   const {
@@ -17,26 +15,28 @@ const PlanManagement = () => {
     loading,
     refetch: refetchAiralo,
   } = useAiraloPackage();
-  console.log(airaloPackages);
   const {
     nomadData,
     loading: loadingNomad,
     refetch: refetchNomad,
   } = useNomadPackage();
-  console.log(nomadData);
+  const { ubigiData, loading: loadingUbigi, refetch: refetchUbigi} = useUbigiPackage();
+  console.log(ubigiData);
   const [searchQuery, setSearchQuery] = useState("");
 
   const itemsPerPage = 6;
 
-  const TotalPlane = airaloPackages.length + nomadData.length;
+  const TotalPlane = airaloPackages.length + nomadData.length + ubigiData.length;
 
   const TotalPublishPlan =
     (airaloPackages?.filter((item) => item.publish).length || 0) +
-    (nomadData?.filter((item) => item.publish).length || 0);
+    (nomadData?.filter((item) => item.publish).length || 0) +
+    (ubigiData?.filter((item) => item.publish).length || 0);
 
   const TotalUnpublishPlan =
     (airaloPackages?.filter((item) => !item.publish).length || 0) +
-    (nomadData?.filter((item) => !item.publish).length || 0);
+    (nomadData?.filter((item) => !item.publish).length || 0) +
+    (ubigiData?.filter((item) => !item.publish).length || 0);
 
   const formattedTotal = TotalPlane.toLocaleString();
   const formattedPublishPlan = TotalPublishPlan.toLocaleString();
@@ -68,6 +68,7 @@ const PlanManagement = () => {
 
   const filteredAiraloPackages = filterOffers(airaloPackages);
   const filteredNomadPackages = filterOffers(nomadData);
+  const filteredUbigiPackages = filterOffers(ubigiData);
 
   const [currentPageAiralo, setCurrentPageAiralo] = useState(1);
   const totalPagesAiralo = Math.ceil(
@@ -89,6 +90,16 @@ const PlanManagement = () => {
     startIndexNomad + itemsPerPage,
   );
 
+  const [currentPageUbigi, setCurrentPageUbigi] = useState(1);
+  const totalPagesUbigi = Math.ceil(
+    filteredUbigiPackages.length / itemsPerPage,
+  );
+  const startIndexUbigi = (currentPageUbigi - 1) * itemsPerPage;
+  const currentUbigiPackages = filteredUbigiPackages.slice(
+    startIndexUbigi,
+    startIndexUbigi + itemsPerPage,
+  );
+
   const [showModal, setShowModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [actionType, setActionType] = useState(null);
@@ -97,6 +108,7 @@ const PlanManagement = () => {
     setSearchQuery(e.target.value);
     setCurrentPageAiralo(1);
     setCurrentPageNomad(1);
+    setCurrentPageUbigi(1);
   };
 
   const handleHide = (offer) => {
@@ -124,20 +136,26 @@ const PlanManagement = () => {
         refetchAiralo();
       } else if (selectedOffer.provider === "nomad") {
         refetchNomad();
+      } else if (selectedOffer.provider === "ubigi") {
+        refetchUbigi();
       }
       Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Status updated successfully",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+              toast: true,
+              position: "top-end",
+              icon: "success",
+              title: "Status updated successfully",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+            })
+      
       setShowModal(false);
       setSelectedOffer(null);
       setActionType(null);
     } catch (err) {
       console.error("Error updating publish status:", err);
       Swal.fire({
+        toast: true,
         position: "top-end",
         icon: "error",
         title: "Failed to update status",
@@ -433,40 +451,122 @@ const PlanManagement = () => {
               )}
             </div>
           )}
+          {/* Ubigi Plans */}
+          {(loadingUbigi || filteredUbigiPackages.length > 0) && (
+            <div>
+              <h1 className="text-2xl font-medium">Ubigi Plans</h1>
+              <p className="text-xs sm:text-sm text-gray-600">{`Showing ${currentUbigiPackages.length} of ${filteredUbigiPackages.length} plans`}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-7 mt-4">
+                {loadingUbigi ? (
+                  <OfferCardSkeleton count={itemsPerPage} />
+                ) : (
+                  currentUbigiPackages.map((offer) => (
+                    <AdminOfferCard
+                      key={offer.id}
+                      logo={offer.logo}
+                      company={offer.short_info}
+                      coverage={offer.coverage}
+                      duration={offer.duration}
+                      data={
+                        offer.data +
+                        (offer.voice ? ` - ${offer.voice} Mins` : "") +
+                        (offer.text ? ` - ${offer.text} SMS` : "")
+                      }
+                      originalPrice={offer.originalPrice}
+                      discountedPrice={offer.originalPrice}
+                      bgColor="bg-[#FFFFFF]"
+                      button="btn-primary"
+                      saleBadge="saleBadge"
+                      onHide={offer.publish ? () => handleHide(offer) : null}
+                      onPublish={
+                        !offer.publish ? () => handlePublish(offer) : null
+                      }
+                    />
+                  ))
+                )}
+              </div>
+              {totalPagesUbigi > 1 && (
+                <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 mt-4">
+                  <button
+                    onClick={() =>
+                      setCurrentPageUbigi((prev) =>
+                        prev > 1 ? prev - 1 : prev,
+                      )
+                    }
+                    disabled={currentPageUbigi === 1}
+                    className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
+                      currentPageUbigi === 1
+                        ? "text-orange-200 cursor-not-allowed"
+                        : "text-orange-500 hover:bg-orange-100"
+                    }`}
+                  >
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                    Previous
+                  </button>
+                  <div className="flex space-x-1 sm:space-x-2">
+                    {renderPaginationButtons(
+                      currentPageUbigi,
+                      totalPagesUbigi,
+                      setCurrentPageUbigi,
+                    )}
+                  </div>
+                  <button
+                    onClick={() =>
+                      setCurrentPageUbigi((prev) =>
+                        prev < totalPagesUbigi ? prev + 1 : prev,
+                      )
+                    }
+                    disabled={currentPageUbigi === totalPagesUbigi}
+                    className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
+                      currentPageUbigi === totalPagesUbigi
+                        ? "text-orange-200 cursor-not-allowed"
+                        : "text-orange-500 hover:bg-orange-100"
+                    }`}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 sm:mr-2" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
-  <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-    
-    {/* Header */}
-    <h2 className="text-xl font-semibold text-gray-900">
-      Confirm Action
-    </h2>
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+            {/* Header */}
+            <h2 className="text-xl font-semibold text-gray-900">
+              Confirm Action
+            </h2>
 
-    {/* Message */}
-    <p className="mt-4 text-md text-gray-600">
-      Are you sure you want to <span className="text-orange-500 font-bold uppercase">{actionType}</span> this plan?
-    </p>
+            {/* Message */}
+            <p className="mt-4 text-md text-gray-600">
+              Are you sure you want to{" "}
+              <span className="text-orange-500 font-bold uppercase">
+                {actionType}
+              </span>{" "}
+              this plan?
+            </p>
 
-    {/* Buttons */}
-    <div className="mt-6 flex justify-end gap-3">
-      <button
-        onClick={() => setShowModal(false)}
-        className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition"
-      >
-        Cancel
-      </button>
+            {/* Buttons */}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
 
-      <button
-        onClick={handleConfirm}
-        className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-b from-[#FFA943] to-[#E97400] rounded-lg hover:opacity-90 transition"
-      >
-        Confirm
-      </button>
-    </div>
-  </div>
-</div>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-b from-[#FFA943] to-[#E97400] rounded-lg hover:opacity-90 transition"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

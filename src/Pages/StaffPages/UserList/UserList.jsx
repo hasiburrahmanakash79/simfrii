@@ -15,9 +15,11 @@ import { useState, useMemo } from "react";
 import SectionTitle from "../../../components/SectionTitle";
 import useAdminUser from "../../../components/adminHook/useAdminUser";
 import apiClient from "../../../lib/api-client";
+import useMe from "../../../components/hook/useMe";
 
 export default function UserList() {
   // Assume useAdminUser returns refetch function for refreshing data after updates
+  const { me } = useMe();
   const { userList, loading, refetch } = useAdminUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -140,8 +142,8 @@ export default function UserList() {
       onClick={() => handlePageChange(i)}
       className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs sm:text-sm font-medium rounded-md transition-colors ${
         currentPage === i
-         ? "bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          ? "bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white"
+          : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
       }`}
     >
       {i}
@@ -358,11 +360,11 @@ export default function UserList() {
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-               className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
-                      currentPage  === 1
-                        ? "text-orange-200 cursor-not-allowed"
-                        : "text-orange-500 hover:bg-orange-100"
-                    }`}
+              className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
+                currentPage === 1
+                  ? "text-orange-200 cursor-not-allowed"
+                  : "text-orange-500 hover:bg-orange-100"
+              }`}
             >
               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
             </button>
@@ -373,10 +375,10 @@ export default function UserList() {
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
               className={`flex items-center px-3 py-2 text-xs sm:text-sm rounded-lg border transition-colors ${
-                      currentPage === totalPages
-                        ? "text-orange-200 cursor-not-allowed"
-                        : "text-orange-500 hover:bg-orange-100"
-                    }`}
+                currentPage === totalPages
+                  ? "text-orange-200 cursor-not-allowed"
+                  : "text-orange-500 hover:bg-orange-100"
+              }`}
             >
               Next <ChevronRight className="h-4 w-4 ml-1" />
             </button>
@@ -387,7 +389,6 @@ export default function UserList() {
       {/* Details Modal */}
       {showDetailsModal && selectedUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          
           <div className="flex items-center justify-center  max-w-md w-full">
             {/* User Info */}
             <div className="w-full max-w-md sm:max-w-lg md:max-w-xl">
@@ -451,12 +452,15 @@ export default function UserList() {
                   >
                     Close
                   </button>
-                  <button
+                  {
+                    me?.permissions?.can_edit_users ?  <button
                     onClick={handleOpenEdit}
                     className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"
                   >
                     Edit
-                  </button>
+                  </button> : null
+                  }
+                  
                 </div>
               </div>
             </div>

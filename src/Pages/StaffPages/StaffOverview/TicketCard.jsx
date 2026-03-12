@@ -132,8 +132,9 @@ const TicketCard = () => {
   const ticketData =  overview.summary || {}
   // const ticketActivity = overview?.last_month_ticket_activity || {};
   const openTickets = ticketData.total_tickets || 0;
-  const pendingTickets = ticketData.total_pending_tickets || 0;
-  const resolvedTickets = ticketData.total_solved_tickets || 0;
+  const thisMonth = ticketData.total_this_month || 0;
+  const pendingTickets = ticketData.pending_this_month || 0;
+  const resolvedTickets = ticketData.solved_this_month || 0;
 
   // Low-code metrics configuration
   const metrics = [
@@ -147,7 +148,7 @@ const TicketCard = () => {
     },
     {
       title: "This month tickets",
-      value: pendingTickets,
+      value: thisMonth,
       trend: "up",
       trendValue: 10,
       trendColor: "text-green-500",

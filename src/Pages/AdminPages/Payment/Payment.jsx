@@ -276,7 +276,7 @@ const Payment = () => {
                     </td>
                     <td className="p-5">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        className={`px-2 py-1 rounded-full capitalize text-xs font-medium ${getStatusColor(
                           service.payment_status
                         )}`}
                       >
@@ -315,7 +315,7 @@ const Payment = () => {
                     {service.package_name}
                   </Link>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    className={`px-2 py-1 rounded-full text-xs capitalize font-medium ${getStatusColor(
                       service.payment_status
                     )}`}
                   >

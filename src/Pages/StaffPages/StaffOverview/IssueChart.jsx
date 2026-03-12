@@ -44,13 +44,13 @@ const IssueChart = () => {
     {
       name: "Pending",
       value: Math.round((pendingTickets / totalTickets) * 100),
-      color: "#027A48",
+      color: "#FDE047",
       count: pendingTickets,
     },
     {
       name: "Resolved",
       value: Math.round((resolvedTickets / totalTickets) * 100),
-      color: "#799EFF",
+      color: "#027A48",
       count: resolvedTickets,
     },
   ];

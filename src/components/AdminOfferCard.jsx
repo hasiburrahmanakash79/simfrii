@@ -1,4 +1,5 @@
 import { Globe, Calendar, Smartphone, Layers } from "lucide-react";
+import useMe from "./hook/useMe";
 
 const AdminOfferCard = ({
   company,
@@ -11,6 +12,7 @@ const AdminOfferCard = ({
   onPublish,
   logo,
 }) => {
+  const { me } = useMe();
   return (
     <div
       className={`rounded-2xl border border-gray-200 p-6 shadow-sm ${bgColor}`}
@@ -100,20 +102,26 @@ const AdminOfferCard = ({
         </div>
       </div>
 
-    
-
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6">
-        {onHide && (
-          <button onClick={onHide} className="w-full border border-orange-500 text-orange-500 bg-white hover:bg-orange-50 font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors">
-            Hide
-          </button>
-        )}
-        {onPublish && (
-          <button onClick={onPublish} className="w-full bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors">
-            Publish
-          </button>
-        )}
-      </div>
+      {me?.permissions?.can_edit_plans ? (
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6">
+          {onHide && (
+            <button
+              onClick={onHide}
+              className="w-full border border-orange-500 text-orange-500 bg-white hover:bg-orange-50 font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors"
+            >
+              Hide
+            </button>
+          )}
+          {onPublish && (
+            <button
+              onClick={onPublish}
+              className="w-full bg-gradient-to-b from-[#FFA943] to-[#E97400] text-white font-semibold py-3 px-4 rounded-full text-xs sm:text-sm transition-colors"
+            >
+              Publish
+            </button>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };

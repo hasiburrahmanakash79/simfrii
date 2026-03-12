@@ -12,6 +12,7 @@ const useAdminUser = () => {
       setError(null);
 
       const response = await apiClient.get('/dashboard/user-list');
+      console.log(response);
       setUserList(response.data.data || []);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch user list');

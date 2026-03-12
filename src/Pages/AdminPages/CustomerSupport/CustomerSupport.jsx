@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import question from "../../../assets/icons/question.svg";
 import useMe from "../../../components/hook/useMe";
 import { getCookie } from "../../../lib/cookie-utils";
 import apiClient from "../../../lib/api-client";
-import { CircleQuestionMark, MessageCircleMoreIcon } from "lucide-react";
+import {
+  MessageCircleMoreIcon,
+  Search,
+} from "lucide-react";
 
 const CustomerSupport = () => {
   const { me } = useMe();
@@ -13,9 +15,9 @@ const CustomerSupport = () => {
   const [tickets, setTickets] = useState([]);
   const [messages, setMessages] = useState([]);
   const [ws, setWs] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // Added for search
   const messagesEndRef = useRef(null);
   const token = getCookie("access_token");
-  // console.log(messages);
 
   useEffect(() => {
     if (me && token) {
@@ -78,7 +80,6 @@ const CustomerSupport = () => {
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log(data);
           const content = data.content;
           if (content && data.id) {
             const newMsg = {
@@ -87,7 +88,7 @@ const CustomerSupport = () => {
               sender:
                 data?.sender_id === me?.id
                   ? me?.name || "Support Team"
-                  : "Customer",
+                  : selectedTicket.customerName,
               isCustomer: data.sender_id !== me.id,
               timestamp: data.created_at || new Date().toISOString(),
             };
@@ -128,7 +129,6 @@ const CustomerSupport = () => {
     try {
       const response = await apiClient.get(`chats/${chatId}/messages`);
       const fetchedMessages = response.data || [];
-      console.log(fetchedMessages);
       setMessages(
         fetchedMessages.map((msg) => ({
           id: msg.id,
@@ -198,6 +198,13 @@ const CustomerSupport = () => {
     return `${time}, Date: ${formattedDate.replaceAll("/", "-")}`;
   };
 
+  // Filter tickets based on search query
+  const filteredTickets = tickets.filter((ticket) =>
+    ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    ticket.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    ticket.customerName.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   return (
     <div className="">
       <div className="mb-4 sm:mb-6">
@@ -208,26 +215,29 @@ const CustomerSupport = () => {
           Handle customer support requests
         </p>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="p-4 sm:p-5 border-b border-gray-200">
+      <div className="  max-w-6xl mx-auto">
+        <div className="md:mb-10 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-            <h1 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
-              Support
-            </h1>
-            <input
-              type="text"
-              placeholder="Search tickets..."
-              className="w-full sm:w-64 md:w-80 px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            <span></span>
+            <div className="bg-white shadow  shadow-gray-200 rounded-lg flex items-center">
+              <Search className="w-5 ms-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search tickets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-64 md:w-80 px-3 sm:px-4 py-3 text-xs sm:text-sm  outline-none"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-          {tickets.length > 0 ? (
-            tickets.map((ticket) => (
+        <div className=" space-y-3 sm:space-y-4">
+          {filteredTickets.length > 0 ? (
+            filteredTickets.map((ticket) => (
               <div
                 key={ticket.id}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-6 bg-white rounded-xl shadow-md shadow-gray-200 transition-colors"
               >
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="bg-[#09b285] rounded-full p-2 text-white">
@@ -277,55 +287,60 @@ const CustomerSupport = () => {
             </div>
 
             {/* Messages */}
-            <div className="p-4 max-h-[350] sm:max-h-[400px] overflow-y-auto space-y-3 sm:space-y-4">
-              {messages.map((message) => (
-                <div
-  key={message.id}
-  className={`flex gap-2 sm:gap-3 ${
-    message.isCustomer ? "justify-start" : "justify-end"
-  }`}
->
-  <div
-    className={`group flex items-start gap-2 sm:gap-3 max-w-[70%] ${
-      message.isCustomer ? "" : "flex-row-reverse text-right"
-    }`}
-  >
-    {/* Avatar */}
-    <div
-      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium ${
-        message.isCustomer ? "bg-[#EC7C0C]" : "bg-purple-500"
-      }`}
-    >
-      {message.sender
-        .split(" ")
-        .map((n) => n[0])
-        .join("")}
-    </div>
+            <div className="p-4 max-h-[350px] sm:max-h-[400px] overflow-y-auto space-y-3 sm:space-y-4">
+              {messages.length > 0 ? (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex gap-2 sm:gap-3 ${
+                      message.isCustomer ? "justify-start" : "justify-end"
+                    }`}
+                  >
+                    <div
+                      className={`group flex items-start gap-2 sm:gap-3 max-w-[70%] ${
+                        message.isCustomer ? "" : "flex-row-reverse text-right"
+                      }`}
+                    >
+                      {/* Avatar */}
+                      <div
+                        className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium ${
+                          message.isCustomer ? "bg-[#EC7C0C]" : "bg-purple-500"
+                        }`}
+                      >
+                        {message.sender
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </div>
 
-    {/* Message Content */}
-    <div className="relative">
-      <p 
-        className={`text-xs sm:text-sm text-gray-700 leading-relaxed p-2 rounded-lg text-left ${
-          message.isCustomer ? "bg-gray-100" : "bg-purple-100"
-        }`}
-      >
-        {message.content}
-      </p>
-
-      {/* Timestamp - Hidden by default, shown on hover */}
-      <div
-        className={`absolute top-1/2 -translate-y-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white p-1 rounded shadow z-10 ${
-          message.isCustomer
-            ? "left-full ml-2"  // Right side for customer (left-aligned message)
-            : "right-full mr-2 text-right"  // Left side for sender (right-aligned message)
-        }`}
-      >
-        {formatDateTime(message.timestamp)}
-      </div>
-    </div>
-  </div>
-</div>
-              ))}
+                      {/* Message Content */}
+                      <div className="relative">
+                        <p
+                          className={`text-xs sm:text-sm text-gray-700 leading-relaxed p-2 rounded-lg text-left ${
+                            message.isCustomer ? "bg-gray-100" : "bg-purple-100"
+                          }`}
+                        >
+                          {message.content}
+                        </p>
+ 
+                        <div
+                          className={`absolute top-1/2 -translate-y-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white p-1 rounded shadow z-10 ${
+                            message.isCustomer
+                              ? "left-full ml-2"  
+                              : "right-full mr-2 text-right"  
+                          }`}
+                        >
+                          {formatDateTime(message.timestamp)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-gray-500 text-xs sm:text-sm">
+                  No messages in this conversation yet.
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 

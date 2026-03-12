@@ -29,11 +29,12 @@ import CustomerSupport from "../Pages/AdminPages/CustomerSupport/CustomerSupport
 import Settings from "../Pages/AdminPages/Settings/Settings";
 import Analytics from "../Pages/AdminPages/Analytics/Analytics";
 import IssueAnalytics from "../Pages/StaffPages/IssueAnalytics/IssueAnalytics";
-import SimPlan from "../Pages/StaffPages/SimPlan/SimPlan";
 import StaffOverview from "../Pages/StaffPages/StaffOverview/StaffOverview";
 import AdminOverview from "../Pages/AdminPages/AdminOverview/AdminOverview";
 import UserList from "../Pages/StaffPages/UserList/UserList";
 import AdminProtected from "./AdminProtected";
+import StaffProtected from "./StaffProtected";
+import PermissionRoute from "./PermissionRoute";
 const router = createBrowserRouter([
   // {
   //   path: "/",
@@ -96,10 +97,7 @@ const router = createBrowserRouter([
       {
         element: <AdminProtected />,
         children: [
-          
-        ],
-      },
-{
+          {
             path: "/adminOverview",
             element: <AdminOverview />,
           },
@@ -148,22 +146,42 @@ const router = createBrowserRouter([
             path: "/settings",
             element: <Settings />,
           },
+        ],
+      },
+
       // Stuff dashboard
       {
-        path: "/stuffOverview",
-        element: <StaffOverview />,
-      },
-      {
-        path: "/sim-plan",
-        element: <SimPlan />,
-      },
-      {
-        path: "/userList",
-        element: <UserList />,
-      },
-      {
-        path: "/issue-analytics",
-        element: <IssueAnalytics />,
+        element: <StaffProtected />,
+        children: [
+          {
+            path: "/stuffOverview",
+            element: <StaffOverview />,
+          },
+          {
+            path: "/plan_management",
+            element: (
+              <PermissionRoute permission="can_view_plans">
+                <PlanManagement />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/user_support",
+            element:  <CustomerSupport />,
+          },
+          {
+            path: "/userList",
+            element: <PermissionRoute permission="can_view_users">
+                <UserList />
+              </PermissionRoute> ,
+          },
+          {
+            path: "/issue-analytics",
+            element:<PermissionRoute permission="can_view_analytics">
+                <IssueAnalytics />,
+              </PermissionRoute> 
+          },
+        ],
       },
     ],
   },

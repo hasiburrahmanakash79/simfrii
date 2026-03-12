@@ -2,54 +2,45 @@ import { useState } from "react";
 import useAdminUser from "../../../components/adminHook/useAdminUser";
 import apiClient from "../../../lib/api-client";
 import { CircleQuestionMark } from "lucide-react";
+import Swal from "sweetalert2";   // ← npm install sweetalert2 (একবার রান করো)
 
 const Settings = () => {
-  const { userList, loading, refetch } = useAdminUser();
+  const { userList, refetch } = useAdminUser();
   const staffs = userList.filter((user) => user.role === "staff");
-  console.log(staffs);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
-  const [permissions, setPermissions] = useState();
+  const [permissions, setPermissions] = useState({});
 
-  const openModal = (staff) => {
-    apiClient
-      .get(`/dashboard/user-permissions?user_id=${staff.id}`)
-      .then((res) => {
-        console.log(res);
-        const perms = res.data.data.permissions;
-        setPermissions({
-          dashboardAccess: perms.can_view_dashboard,
-          analytics: perms.can_view_analytics ,
-          viewUsers: perms.can_view_users ,
-          editUsers: perms.can_edit_users ,
-          suspendUsers: perms.can_suspend_users ,
-          viewPlans: perms.can_view_plans ,
-          editPlans: perms.can_edit_plans,
-        });
-        setSelectedStaff(staff);
-        setIsModalOpen(true);
-      })
-      .catch((err) => {
-        console.error(err);
-        // Fallback to defaults on error
-        setPermissions({
-          dashboardAccess: false,
-          analytics: false,
-          viewUsers: false,
-          editUsers: false,
-          suspendUsers: false,
-          viewPlans: false,
-          editPlans: false,
-        });
-        setSelectedStaff(staff);
-        setIsModalOpen(true);
+  const openModal = async (staff) => {
+
+    try {
+      const response = await apiClient.get(
+        `/dashboard/user-permissions?user_id=${staff.id}`
+      );
+
+      const fetchedPermissions = response.data.data.permissions;
+console.log(fetchedPermissions);
+      setSelectedStaff(staff);
+      setPermissions({
+        dashboardAccess: fetchedPermissions.can_view_dashboard,
+        analytics: fetchedPermissions.can_view_analytics,
+        viewUsers: fetchedPermissions.can_view_users,
+        editUsers: fetchedPermissions.can_edit_users,
+        suspendUsers: fetchedPermissions.can_suspend_users,
+        viewPlans: fetchedPermissions.can_view_plans,
+        editPlans: fetchedPermissions.can_edit_plans,
       });
+      setIsModalOpen(true);
+    } catch (error) {
+      // error handle করলে পরে toast দিতে পারবে
+    }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedStaff(null);
+    setPermissions({});
   };
 
   const handleCheckboxChange = (e) => {
@@ -60,8 +51,10 @@ const Settings = () => {
     }));
   };
 
-  const handleUpdate = () => {
-    const body = {
+  const handleUpdate = async () => {
+    if (!selectedStaff) return;
+
+    const payload = {
       user_id: selectedStaff.id,
       can_view_dashboard: permissions.dashboardAccess,
       can_view_analytics: permissions.analytics,
@@ -72,18 +65,33 @@ const Settings = () => {
       can_edit_plans: permissions.editPlans,
     };
 
-    apiClient
-      .patch("/dashboard/user-permissions", body)
-      .then((response) => {
-        console.log(response);
-        console.log("Updated successfully");
-        closeModal();
-      })
-      .catch((err) => {
-        console.error("Update failed");
-        console.error(err);
+    try {
+      await apiClient.patch("/dashboard/user-permissions", payload);
+      console.log(payload);
+
+      // ✅ Success Sweet Toast (Top Right)
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Permissions updated successfully!",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
       });
-      refetch()
+
+      closeModal();
+      refetch();   // ← list refresh হবে (status / data update)
+    } catch (error) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        title: "Update failed! Please try again.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    }
   };
 
   return (
@@ -92,6 +100,7 @@ const Settings = () => {
         <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">Settings</h1>
         <p className="text-xs sm:text-sm text-gray-600">System configuration and roles</p>
       </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="p-4 sm:p-5 border-b border-gray-200">
           <h1 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">Role Management</h1>
@@ -100,30 +109,35 @@ const Settings = () => {
         <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           {staffs.length > 0 ? (
             staffs.map((staff) => (
-              <div key={staff.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div
+                key={staff.id}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="bg-[#09b285] rounded-full p-2 text-white">
-                    <CircleQuestionMark />
+                    <CircleQuestionMark size={20} />
                   </div>
                   <div>
                     <p className="text-sm sm:text-base font-medium text-gray-900">{staff.full_name}</p>
                     <p className="text-xs sm:text-sm text-gray-500">{staff.email}</p>
                   </div>
                 </div>
+
                 <button
                   onClick={() => openModal(staff)}
                   className="w-full sm:w-auto px-4 py-1.5 text-xs sm:text-sm rounded-full bg-orange-100 text-[#EC7C0C] hover:bg-orange-200 transition-colors"
                 >
-                  Edit
+                  Edit Permissions
                 </button>
               </div>
             ))
           ) : (
-            <div className="text-center py-6 text-gray-500 text-xs sm:text-sm">No roles found.</div>
+            <div className="text-center py-6 text-gray-500 text-xs sm:text-sm">No staff members found.</div>
           )}
         </div>
       </div>
 
+      {/* Modal */}
       {isModalOpen && selectedStaff && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 sm:p-6">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -133,42 +147,48 @@ const Settings = () => {
               </div>
 
               <div className="bg-blue-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-xs sm:text-sm">
-                <h3 className="text-blue-600 font-medium mb-1">{selectedStaff.full_name} ({selectedStaff.role})</h3>
+                <h3 className="text-blue-600 font-medium mb-1">
+                  {selectedStaff.full_name} ({selectedStaff.role})
+                </h3>
                 <p className="text-gray-600">Configure permissions for this user</p>
               </div>
 
+              {/* Dashboard Access */}
               <div className="mb-4 sm:mb-6">
                 <h4 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">Dashboard Access</h4>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    name="dashboardAccess"
-                    checked={permissions.dashboardAccess}
-                    onChange={handleCheckboxChange}
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-xs sm:text-sm text-gray-600">View dashboard</span>
-                </div>
-                <div className="flex items-center gap-3 mt-3">
-                  <input
-                    type="checkbox"
-                    name="analytics"
-                    checked={permissions.analytics}
-                    onChange={handleCheckboxChange}
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-xs sm:text-sm text-gray-600">View analytics</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="dashboardAccess"
+                      checked={permissions.dashboardAccess || false}
+                      onChange={handleCheckboxChange}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-xs sm:text-sm text-gray-600">View dashboard</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="analytics"
+                      checked={permissions.analytics || false}
+                      onChange={handleCheckboxChange}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-xs sm:text-sm text-gray-600">View analytics</span>
+                  </div>
                 </div>
               </div>
 
+              {/* User Management */}
               <div className="mb-4 sm:mb-6">
                 <h4 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">User Management</h4>
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       name="viewUsers"
-                      checked={permissions.viewUsers}
+                      checked={permissions.viewUsers || false}
                       onChange={handleCheckboxChange}
                       className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
@@ -178,7 +198,7 @@ const Settings = () => {
                     <input
                       type="checkbox"
                       name="editUsers"
-                      checked={permissions.editUsers}
+                      checked={permissions.editUsers || false}
                       onChange={handleCheckboxChange}
                       className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
@@ -188,7 +208,7 @@ const Settings = () => {
                     <input
                       type="checkbox"
                       name="suspendUsers"
-                      checked={permissions.suspendUsers}
+                      checked={permissions.suspendUsers || false}
                       onChange={handleCheckboxChange}
                       className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
@@ -197,14 +217,15 @@ const Settings = () => {
                 </div>
               </div>
 
+              {/* Plan Management */}
               <div className="mb-4 sm:mb-6">
                 <h4 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">Plan Management</h4>
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       name="viewPlans"
-                      checked={permissions.viewPlans}
+                      checked={permissions.viewPlans || false}
                       onChange={handleCheckboxChange}
                       className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
@@ -214,7 +235,7 @@ const Settings = () => {
                     <input
                       type="checkbox"
                       name="editPlans"
-                      checked={permissions.editPlans}
+                      checked={permissions.editPlans || false}
                       onChange={handleCheckboxChange}
                       className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
@@ -234,7 +255,7 @@ const Settings = () => {
                   onClick={handleUpdate}
                   className="w-full sm:w-auto px-4 sm:px-6 py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Update
+                  Update Permissions
                 </button>
               </div>
             </div>

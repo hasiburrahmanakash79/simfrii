@@ -19,6 +19,7 @@ import apiClient from "../../../lib/api-client";
 export default function AllUsers() {
   // Assume useAdminUser returns refetch function for refreshing data after updates
   const { userList, loading, refetch } = useAdminUser();
+  console.log(userList);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;

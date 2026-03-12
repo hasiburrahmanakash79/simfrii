@@ -1,106 +1,103 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import apiClient from "../../lib/api-client";
-import ubigiLogo from "../../assets/logo/ubigi-logo.png"; // Assuming you have a Ubigi logo asset; add the import/path as needed
-import useFetchRegions from "./useFetchRegions";
+import ubigiLogo from "../../assets/logo/ubigi-logo.png";
 
-const useUbigiPackage = (countryCode, regionName) => {
+const formatData = (pkg) => {
+  const allowances = pkg.productDefinition?.allowances?.data;
+  if (!allowances || allowances.length === 0) return "N/A";
+
+  if (pkg.productDefinition?.unlimited) {
+    const fup = allowances.find((a) => a.resourceName === "DATA_BUNDLE_FUP");
+    if (fup) {
+      const gb = fup.resourceValue / (1024 * 1024);
+      return `Unlimited (${gb} GB)`;
+    }
+    return "Unlimited";
+  }
+
+  const bundle = allowances.find((a) => a.resourceName === "DATA_BUNDLE_COUNTRY");
+  if (bundle) {
+    const kb = bundle.resourceValue;
+    if (kb >= 1024 * 1024) {
+      return `${Math.round(kb / (1024 * 1024))} GB`;
+    }
+    return `${Math.round(kb / 1024)} MB`;
+  }
+  return "N/A";
+};
+
+const formatDuration = (validity) => {
+  if (!validity) return "";
+  const unit = validity.validityDurationUnit;
+  const val = validity.validityDuration;
+  const label = unit.charAt(0).toUpperCase() + unit.slice(1);
+  return `${val} ${label}`;
+};
+
+const cleanText = (text) => {
+  if (!text) return "";
+  return text.replace(/\(s\)/g, "s").replace(/\s+/g, " ").trim();
+};
+
+const getCurrencySymbol = (code) => {
+  const symbols = { USD: "$", EUR: "€", GBP: "£", JPY: "¥", CHF: "CHF", CAD: "C$", AUD: "A$", KRW: "₩", INR: "₹", BRL: "R$", MXN: "MX$", SGD: "S$", HKD: "HK$", ILS: "₪", PLN: "zł" };
+  return symbols[code] || code || "$";
+};
+
+const useUbigiData = () => {
   const [ubigiData, setUbigiData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { regions } = useFetchRegions();
 
-  const region = regions.find((c) => c.slug === regionName);
-  const findRegionName = region?.slug;
+  const fetchPackages = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.get("/esim_providers/ubigi/admin-packages");
+      const raw = response.data;
+      console.log(raw);
+      const packages = raw?.ubigi || (Array.isArray(raw) ? raw : []);
+      const normalizedPackages = packages
+        .filter((pkg) => pkg.availability?.available && pkg.canSubscribe?.allowed)
+        .map((pkg) => ({
+          id: pkg.id || pkg.productDefinition?.productId,
+          logo: ubigiLogo,
+          short_info: cleanText(pkg.productDefinition?.description?.productShortText) || "Ubigi",
+          info: cleanText(pkg.productDefinition?.description?.productShortText) || "",
+          image: null,
+          sim_type: "eSIM",
+          countries: pkg.productDefinition?.countryList || [],
+          provider: "ubigi",
+          company: cleanText(pkg.productDefinition?.description?.productLabel) || "Ubigi",
+          coverage: pkg.productDefinition?.countryList?.length || 0,
+          duration: formatDuration(pkg.productDefinition?.validityPeriod),
+          data: formatData(pkg),
+          originalPrice: pkg.prices?.subscriptionFee?.[0]?.[0]?.amount
+            ? (pkg.prices.subscriptionFee[0][0].amount / 100).toFixed(2)
+            : null,
+          currencySymbol: getCurrencySymbol(pkg.prices?.subscriptionFee?.[0]?.[0]?.currency),
+          voice: null,
+          text: null,
+          publish: pkg.publish,
+          isUnlimited: pkg.productDefinition?.unlimited || false,
+          bestseller: pkg.productDefinition?.bestseller || false,
+          networks: (pkg.productDefinition?.networks || []).flatMap(n =>
+            n.operators?.map(op => ({ operator: op.name, types: op.networkTypes })) || []
+          ),
+        }));
+      setUbigiData(normalizedPackages);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch Ubigi packages");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!countryCode && !findRegionName) return;
-
-    const fetchPackages = async () => {
-      try {
-        let queryParams = "page=1&limit=100";
-        if (countryCode) {
-          queryParams = `country-packages?country=${countryCode}&${queryParams}`;
-        }
-        if (findRegionName) {
-          queryParams = `region-packages?region=${findRegionName}&${queryParams}`;
-        }
-        // /esim_providers/ubigi/region-packages?region=middle-east-and-north-africa
-        const response = await apiClient.get(
-          `/esim_providers/ubigi/${queryParams}`
-        );
-        const data = response.data;
-        console.log(data);
-
-        // Flatten and normalize packages
-        const normalizedPackages = [];
-
-        // Assuming data is an array of Ubigi product objects; if it's an object, adjust accordingly (e.g., data.ubigi)
-        // Here, treating data as an array for multiple packages, but your example shows a single object—wrap in array if needed
-        (Array.isArray(data) ? data : [data]).forEach((pkg) => {
-          // Calculate data amount from allowances (e.g., convert KB to GB/MB)
-          let dataAmount = "Unlimited";
-          let fairUsagePolicy = null;
-          if (pkg.productDefinition?.allowances?.data) {
-            const fupAllowance = pkg.productDefinition.allowances.data.find(
-              (a) => a.resourceName === "DATA_BUNDLE_FUP"
-            );
-            if (fupAllowance) {
-              const kb = fupAllowance.resourceValue;
-              const gb = kb / (1024 * 1024); // Convert KB to GB
-              fairUsagePolicy = `${gb} GB`;
-              dataAmount = `Unlimited (${gb} GB high-speed)`;
-            }
-          }
-
-          // Get price (assuming first subscriptionFee in CENTS, convert to EUR)
-          let originalPrice = null;
-          if (
-            pkg.prices?.subscriptionFee?.[0]?.[0]?.amount &&
-            pkg.prices.subscriptionFee[0][0].currency === "EUR" &&
-            pkg.prices.subscriptionFee[0][0].unit === "CENTS"
-          ) {
-            originalPrice = (pkg.prices.subscriptionFee[0][0].amount / 100).toFixed(2);
-          }
-
-          normalizedPackages.push({
-            id: pkg.id || pkg.productDefinition?.productId,
-            logo: ubigiLogo, // Use the imported Ubigi logo
-            short_info: pkg.productDefinition?.description?.productShortText || "Ubigi",
-            info: pkg.productDefinition?.description?.productShortText || "", // Or expand with more details if available
-            image: null,
-            sim_type: "eSIM",
-            countries: pkg.productDefinition?.countryList || [],
-            provider: "ubigi",
-            company: "Ubigi", // Or derive from productId if needed, e.g., pkg.productDefinition.productId.split('_')[0]
-            coverage: pkg.productDefinition?.countryList?.length || 0,
-            duration: pkg.productDefinition?.validityPeriod
-              ? `${pkg.productDefinition.validityPeriod.validityDuration} ${pkg.productDefinition.validityPeriod.validityDurationUnit}`
-              : "",
-            data: dataAmount,
-            originalPrice,
-            voice: null, // Not provided
-            text: null, // Not provided
-            isUnlimited: pkg.productDefinition?.unlimited || false,
-            fairUsagePolicy,
-          });
-        });
-
-        // If you had Nomad logic, you could add it here similarly and push to the same array
-
-        setUbigiData(normalizedPackages);
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "Failed to fetch country packages"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPackages();
-  }, [countryCode, findRegionName]);
+  }, [fetchPackages]);
 
-  return { ubigiData, loading, error };
+  return { ubigiData, loading, error, refetch: fetchPackages };
 };
 
-export default useUbigiPackage;
+export default useUbigiData;

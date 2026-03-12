@@ -84,10 +84,10 @@ const TicketList = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-3 py-1 text-xs font-medium rounded-full capitalize ${
-                          ticket.status === "active"
-                            ? "bg-green-100 text-green-800"
+                          ticket.status === "solved"
+                            ? "bg-green-100 text-green-600"
                             : ticket.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
+                            ? "bg-yellow-100 text-yellow-600"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
