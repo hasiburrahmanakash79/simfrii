@@ -2,7 +2,7 @@ import { useState } from "react";
 import useAdminUser from "../../../components/adminHook/useAdminUser";
 import apiClient from "../../../lib/api-client";
 import { CircleQuestionMark } from "lucide-react";
-import Swal from "sweetalert2";   // ← npm install sweetalert2 (একবার রান করো)
+import Swal from "sweetalert2";  
 
 const Settings = () => {
   const { userList, refetch } = useAdminUser();
@@ -33,7 +33,7 @@ console.log(fetchedPermissions);
       });
       setIsModalOpen(true);
     } catch (error) {
-      // error handle করলে পরে toast দিতে পারবে
+      console.log(error);
     }
   };
 
@@ -81,7 +81,7 @@ console.log(fetchedPermissions);
       });
 
       closeModal();
-      refetch();   // ← list refresh হবে (status / data update)
+      refetch();  
     } catch (error) {
       Swal.fire({
         toast: true,
