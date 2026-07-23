@@ -22,9 +22,7 @@ const Footer = () => {
                 </Link>
               </div>
               <p className="text-gray-600 max-w-xs">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Possimus, odio iure quasi, ab, consequatur velita reiciendis
-                itaque quaerat
+                SimFrii provides affordable and convenient global eSIM solutions for travelers and digital nomads worldwide.
               </p>
               <div className="flex space-x-4">
                 <Link to="/">
@@ -125,6 +123,14 @@ const Footer = () => {
                 >
                   Help
                 </a>
+              </li>
+              <li>
+                <Link
+                  to="/privacy-policy"
+                  className="text-gray-600 hover:text-[#FF962C] transition-colors"
+                >
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>

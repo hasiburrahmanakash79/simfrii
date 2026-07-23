@@ -1,154 +1,283 @@
 import { X, Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import useContent from "../../../components/hook/useContent";
+import apiClient from "../../../lib/api-client";
 
 const ContentPage = () => {
-  const [bannerImage, setBannerImage] = useState(null);
-  const [videoImage, setVideoImage] = useState(null);
+  const { content, loading, error: fetchError, refetch } = useContent();
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const [offerPreview, setOfferPreview] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [offerFile, setOfferFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const bannerInput = useRef(null);
+  const offerInput = useRef(null);
+
+  useEffect(() => {
+    setBannerPreview(content?.banner_image || null);
+    setOfferPreview(content?.offer_file || null);
+    setBannerFile(null);
+    setOfferFile(null);
+  }, [content]);
+
+  const getPreviewSrc = (preview) => {
+    if (!preview) return "";
+    return preview.startsWith("http") ? preview : `https://api.simfrii.com${preview}`;
+  };
+
+  const openFilePicker = (type) => {
+    if (type === "banner") {
+      bannerInput.current?.click();
+    } else {
+      offerInput.current?.click();
+    }
+  };
 
   const handleFileChange = (event, type) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setError(null);
+    setSuccess(null);
     setIsUploading(true);
 
     const fileSizeMB = file.size / (1024 * 1024);
-
-    if (type === "banner" && !file.type.startsWith("image/")) {
-      setError("Banner must be an image file!");
-      setIsUploading(false);
-      return;
-    }
-
-    if (type === "video" && !file.type.match(/^(image|video)\//)) {
-      setError("Please upload an image or video file!");
+    if (!file.type.startsWith("image/")) {
+      setError("Only image files are supported.");
       setIsUploading(false);
       return;
     }
 
     if (fileSizeMB > 5) {
-      setError("Image size must be less than 5MB!");
-      setIsUploading(false);
-      return;
-    }
-
-    if (type === "video" && file.type.startsWith("video/") && fileSizeMB > 50) {
-      setError("Video size must be less than 50MB!");
+      setError("Image size must be less than 5MB.");
       setIsUploading(false);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      type === "banner" ? setBannerImage(e.target.result) : setVideoImage(e.target.result);
+      if (type === "banner") {
+        setBannerPreview(e.target.result);
+        setBannerFile(file);
+      } else {
+        setOfferPreview(e.target.result);
+        setOfferFile(file);
+      }
       setIsUploading(false);
     };
     reader.onerror = () => {
-      setError("Error reading file!");
+      setError("Unable to read the selected image.");
       setIsUploading(false);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleDelete = (type) => {
-    type === "banner" ? setBannerImage(null) : setVideoImage(null);
-  };
-
-  const handlePublish = () => {
-    if (!bannerImage && !videoImage) {
-      setError("Please upload at least one banner or video/image!");
+  const handleSave = async () => {
+    if (!bannerPreview && !offerPreview) {
+      setError("Please upload at least one image before saving.");
       return;
     }
+
     setError(null);
-    alert("Service published successfully!");
+    setSuccess(null);
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      if (bannerFile) {
+        formData.append("banner_image", bannerFile);
+      }
+      if (offerFile) {
+        formData.append("offer_file", offerFile);
+      }
+
+      await apiClient.patch("/content/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setSuccess("Content updated successfully.");
+      refetch();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update content.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
-    <div className="">
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-lg sm:text-xl md:text-2xl font-medium mb-2">Upload Content</h1>
-        <p className="text-xs sm:text-sm text-gray-600">Manage and upload your banners and media content.</p>
+    <div className="space-y-7">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">Content Management</h1>
+        <p className="mt-2 max-w-2xl text-sm text-gray-600">
+          Upload and edit the banner and offer images for your landing page. Only images are accepted, and each file must be under 5MB.
+        </p>
       </div>
-      <div className="p-4 sm:p-6 bg-white rounded-2xl shadow-md border border-gray-200">
+
+      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-[0_20px_80px_rgba(14,24,39,0.06)]">
+        {fetchError && (
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {fetchError}
+          </div>
+        )}
+
         {error && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 text-xs sm:text-sm">
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {error}
           </div>
         )}
-        {isUploading && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 text-blue-700 rounded-lg border border-blue-200 text-xs sm:text-sm">
-            Uploading file...
+
+        {success && (
+          <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+            {success}
           </div>
         )}
 
-        <div className="mb-6 sm:mb-8">
-          <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">
-            Banner Image <span className="text-gray-400 text-xs sm:text-sm">(Max 5MB)</span>
-          </label>
-          <div className="relative">
-            {bannerImage ? (
-              <div className="relative w-32 h-32 sm:w-48 sm:h-48 border border-gray-300 rounded-lg overflow-hidden group">
-                <img src={bannerImage} alt="Banner" className="w-full h-full object-cover" />
-                <button
-                  onClick={() => handleDelete("banner")}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1.5 sm:p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X size={12} sm:size={16} />
-                </button>
+        {isUploading && (
+          <div className="mb-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
+            Saving changes...
+          </div>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Banner Image</h2>
+                <p className="mt-1 text-sm text-gray-500">Recommended size: 1200×500. PNG or JPG.</p>
               </div>
-            ) : (
-              <label className="w-32 h-32 sm:w-48 sm:h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition">
-                <Upload className="w-8 h-8 sm:w-10 sm:h-10 mb-2 text-gray-400" />
-                <span className="text-xs sm:text-sm">Upload banner</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange(e, "banner")}
-                  className="hidden"
-                />
-              </label>
-            )}
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Image only</span>
+            </div>
+
+            <div className="relative rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-5 min-h-[240px] flex items-center justify-center">
+              {bannerPreview ? (
+                <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-sm">
+                  <img
+                    src={getPreviewSrc(bannerPreview)}
+                    alt="Banner preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 flex justify-between gap-3 bg-black/30 px-4 py-3 text-white">
+                    <button
+                      type="button"
+                      onClick={() => openFilePicker("banner")}
+                      className="rounded-full bg-white/15 px-3 py-2 text-sm transition hover:bg-white/25"
+                    >
+                      Replace
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBannerPreview(null);
+                        setBannerFile(null);
+                      }}
+                      className="rounded-full bg-white/15 px-3 py-2 text-sm transition hover:bg-white/25"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openFilePicker("banner")}
+                  className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500 transition hover:border-purple-400 hover:bg-purple-50"
+                >
+                  <Upload className="h-10 w-10 text-gray-400" />
+                  <span className="font-medium text-gray-900">Upload banner image</span>
+                  <span className="text-xs text-gray-500">PNG, JPG, JPEG — max 5MB</span>
+                </button>
+              )}
+            </div>
+
+            <input
+              ref={bannerInput}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleFileChange(e, "banner")}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Offer Image</h2>
+                <p className="mt-1 text-sm text-gray-500">Recommended size: 800×800. PNG or JPG.</p>
+              </div>
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Image only</span>
+            </div>
+
+            <div className="relative rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-5 min-h-[240px] flex items-center justify-center">
+              {offerPreview ? (
+                <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-sm">
+                  <img
+                    src={getPreviewSrc(offerPreview)}
+                    alt="Offer preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 flex justify-between gap-3 bg-black/30 px-4 py-3 text-white">
+                    <button
+                      type="button"
+                      onClick={() => openFilePicker("offer")}
+                      className="rounded-full bg-white/15 px-3 py-2 text-sm transition hover:bg-white/25"
+                    >
+                      Replace
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOfferPreview(null);
+                        setOfferFile(null);
+                      }}
+                      className="rounded-full bg-white/15 px-3 py-2 text-sm transition hover:bg-white/25"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openFilePicker("offer")}
+                  className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500 transition hover:border-purple-400 hover:bg-purple-50"
+                >
+                  <Upload className="h-10 w-10 text-gray-400" />
+                  <span className="font-medium text-gray-900">Upload offer image</span>
+                  <span className="text-xs text-gray-500">PNG, JPG, JPEG — max 5MB</span>
+                </button>
+              )}
+            </div>
+
+            <input
+              ref={offerInput}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleFileChange(e, "offer")}
+            />
           </div>
         </div>
 
-        <div className="mb-6 sm:mb-8">
-          <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">
-            Offer Image <span className="text-gray-400 text-xs sm:text-sm">(Image &lt; 5MB, Video &lt; 50MB)</span>
-          </label>
-          <div className="relative">
-            {videoImage ? (
-              <div className="relative w-32 h-32 sm:w-48 sm:h-48 border border-gray-300 rounded-lg overflow-hidden group">
-                <img src={videoImage} alt="Video or Image" className="w-full h-full object-cover" />
-                <button
-                  onClick={() => handleDelete("video")}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1.5 sm:p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X size={12} sm:size={16} />
-                </button>
-              </div>
-            ) : (
-              <label className="w-32 h-32 sm:w-48 sm:h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition">
-                <Upload className="w-8 h-8 sm:w-10 sm:h-10 mb-2 text-gray-400" />
-                <span className="text-xs sm:text-sm">Upload file</span>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={(e) => handleFileChange(e, "video")}
-                  className="hidden"
-                />
-              </label>
-            )}
-          </div>
-        </div>
-        <div className="flex justify-end">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <button
-            onClick={handlePublish}
+            type="button"
+            onClick={refetch}
             disabled={isUploading}
-            className="py-2 px-4 sm:px-6 bg-purple-200 text-black rounded-lg hover:shadow-xl text-sm sm:text-base transition-colors"
+            className="rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60"
           >
-            Publish Service
+            Refresh
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isUploading}
+            className="rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95 disabled:opacity-60"
+          >
+            {isUploading ? "Saving..." : "Save Content"}
           </button>
         </div>
       </div>

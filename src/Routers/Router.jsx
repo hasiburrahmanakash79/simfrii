@@ -35,61 +35,8 @@ import UserList from "../Pages/StaffPages/UserList/UserList";
 import AdminProtected from "./AdminProtected";
 import StaffProtected from "./StaffProtected";
 import PermissionRoute from "./PermissionRoute";
+import PrivacyPolicy from "../Pages/AccountSettings/PrivacyPolicy";
 const router = createBrowserRouter([
-  // {
-  //   path: "/",
-  //   element: <Main />,
-  //   children: [
-  //     {
-  //       path: "/",
-  //       element: <Homepage />,
-  //     },
-  //     {
-  //       path: "/worldwide",
-  //       element: <WorldWideESim />,
-  //     },
-  //     {
-  //       path: "/worldwide-esim/:countryName",
-  //       element: <CountryWiseAllSim />,
-  //     },
-  //     {
-  //       path:"/esim/:countryName/:provider",
-  //       element: <CountryEsim />,
-  //     },
-  //     {
-  //       path: "/region/:regionName",
-  //       element: <RegionOffers />,
-  //     },
-  //     {
-  //       path: "/my-esim",
-  //       element: <MyEsim />,
-  //     },
-  //     {
-  //       path: "/package-details",
-  //       element: <ESIMDetails />,
-  //     },
-  //     {
-  //       path: "/instruction",
-  //       element: <Instructions />,
-  //     },
-  //     {
-  //       path: "/top-up/:id",
-  //       element: <TopUp />,
-  //     },
-  //     {
-  //       path: "/settings",
-  //       element: <AccountSettings />,
-  //     },
-  //     {
-  //       path: "/order-preview/:id",
-  //       element: <OrderPreview />,
-  //     },
-  //     {
-  //       path: "/payment-successful",
-  //       element: <SuccessPayment />,
-  //     },
-  //   ],
-  // },
   {
     path: "/",
     element: <Dashboard />,
@@ -205,6 +152,10 @@ const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPassword />,
+  },
+  {
+    path: "/privacy-policy",
+    element: <PrivacyPolicy />,
   },
 ]);
 

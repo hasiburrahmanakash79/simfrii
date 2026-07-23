@@ -6,6 +6,7 @@ import {
   MessageCircleMoreIcon,
   Search,
 } from "lucide-react";
+const WS_URL = import.meta.env.VITE_WS_URL
 
 const CustomerSupport = () => {
   const { me } = useMe();
@@ -28,12 +29,14 @@ const CustomerSupport = () => {
   const loadTickets = async () => {
     try {
       const response = await apiClient.get("chats");
+      console.log(response.data);
       const chats = Array.isArray(response.data) ? response.data : [];
+      console.log("Fetched chats:", chats);
       const mappedTickets = chats
         .filter((chat) =>
           chat.members?.some(
             (m) =>
-              m.email === "staff@gmail.com" || m.email === "admin@gmail.com",
+              m.role === "staff" || m.role === "admin",
           ),
         )
         .map((chat) => ({
@@ -42,12 +45,12 @@ const CustomerSupport = () => {
           customer:
             chat.members?.find(
               (m) =>
-                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com",
-            )?.email || "Unknown",
+                m.role !== "staff" && m.role !== "admin",
+            )?.role || "Unknown",
           customerName:
             chat.members?.find(
               (m) =>
-                m.email !== "staff@gmail.com" && m.email !== "admin@gmail.com",
+                m.role !== "staff" && m.role !== "admin",
             )?.name || "Customer",
           created: chat.created_at || "Unknown",
           status: "Open",
@@ -70,7 +73,7 @@ const CustomerSupport = () => {
     if (isModalOpen && selectedTicket && token && me) {
       fetchMessages(selectedTicket.id);
 
-      const wsUrl = `ws://10.10.12.62:7000/ws/chat/${selectedTicket.id}?token=${token}`;
+      const wsUrl = `${WS_URL}/ws/chat/${selectedTicket.id}?token=${token}`;
       const socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
@@ -195,7 +198,7 @@ const CustomerSupport = () => {
       timeZone: "Asia/Dhaka",
     });
 
-    return `${time}, Date: ${formattedDate.replaceAll("/", "-")}`;
+    return `${time}, ${formattedDate.replaceAll("/", "-")}`;
   };
 
   // Filter tickets based on search query
@@ -204,6 +207,8 @@ const CustomerSupport = () => {
     ticket.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ticket.customerName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  console.log(tickets);
 
   return (
     <div className="">
@@ -248,7 +253,7 @@ const CustomerSupport = () => {
                       {ticket.title}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      {ticket.customer}
+                      Create: {formatDateTime(ticket.created)}
                     </p>
                   </div>
                 </div>
@@ -324,7 +329,7 @@ const CustomerSupport = () => {
                         </p>
  
                         <div
-                          className={`absolute top-1/2 -translate-y-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white p-1 rounded shadow z-10 ${
+                          className={`absolute top-1/2 -translate-y-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 ${
                             message.isCustomer
                               ? "left-full ml-2"  
                               : "right-full mr-2 text-right"  
